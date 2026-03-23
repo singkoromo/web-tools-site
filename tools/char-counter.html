@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="文字数カウントツール。テキストの文字数、単語数、行数、バイト数をリアルタイムで計算します。">
+    <meta name="keywords" content="文字数,カウント,単語数,行数,バイト数,テキスト">
+    <meta name="author" content="ToolBox">
+    <title>文字数カウント | ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .tool-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .textarea-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .textarea-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .tool-textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+            line-height: 1.6;
+        }
+
+        .tool-textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #007bff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-unit {
+            font-size: 0.9rem;
+            color: #999;
+            margin-left: 0.5rem;
+            font-weight: 400;
+        }
+
+        .twitter-limit {
+            background: linear-gradient(135deg, #1da1f2 0%, #1a8cd8 100%);
+            color: white;
+            border: none;
+        }
+
+        .twitter-limit .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .twitter-limit .stat-value {
+            color: white;
+        }
+
+        .twitter-limit .stat-unit {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .twitter-progress {
+            width: 100%;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .twitter-progress-bar {
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .twitter-warning {
+            color: #fff;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-highlight {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+        }
+
+        .stat-highlight .stat-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-highlight .stat-value {
+            color: white;
+        }
+
+        .stat-highlight .stat-unit {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: #333;
+            border: none;
+        }
+
+        .stat-warning .stat-label {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .stat-warning .stat-value {
+            color: #d84315;
+        }
+
+        .stat-warning .stat-unit {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .stats-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stats-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav class="nav">
+                <a href="../index.html" class="nav-link">ホーム</a>
+                <a href="../index.html#tools" class="nav-link">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Ad Banner (Before Tool) -->
+    <div class="ad-banner ad-before">
+        <p>広告スペース</p>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="tool-header">
+            <h1>文字数カウント</h1>
+            <p>テキストの文字数、単語数、行数、バイト数をリアルタイムで計算します。Twitter/Xの文字制限も表示します。</p>
+        </div>
+
+        <div class="tool-container">
+            <!-- Input Section -->
+            <div class="textarea-group">
+                <label for="textInput">テキスト入力</label>
+                <textarea
+                    id="textInput"
+                    class="tool-textarea"
+                    placeholder="ここにテキストを入力して、リアルタイムで統計情報を確認してください..."
+                ></textarea>
+            </div>
+
+            <!-- Button Controls -->
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="copyAllStats()">統計情報をコピー</button>
+                <button class="btn btn-secondary" onclick="clearText()">クリア</button>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="stats-title">統計情報</div>
+                <div class="stats-grid">
+                    <!-- 文字数 -->
+                    <div class="stat-card">
+                        <div class="stat-label">文字数</div>
+                        <div>
+                            <span class="stat-value" id="charCount">0</span>
+                            <span class="stat-unit">文字</span>
+                        </div>
+                    </div>
+
+                    <!-- スペース除く -->
+                    <div class="stat-card">
+                        <div class="stat-label">スペース除く</div>
+                        <div>
+                            <span class="stat-value" id="charCountNoSpace">0</span>
+                            <span class="stat-unit">文字</span>
+                        </div>
+                    </div>
+
+                    <!-- 単語数 -->
+                    <div class="stat-card stat-highlight">
+                        <div class="stat-label">単語数</div>
+                        <div>
+                            <span class="stat-value" id="wordCount">0</span>
+                            <span class="stat-unit">単語</span>
+                        </div>
+                    </div>
+
+                    <!-- 行数 -->
+                    <div class="stat-card">
+                        <div class="stat-label">行数</div>
+                        <div>
+                            <span class="stat-value" id="lineCount">0</span>
+                            <span class="stat-unit">行</span>
+                        </div>
+                    </div>
+
+                    <!-- バイト数 -->
+                    <div class="stat-card">
+                        <div class="stat-label">バイト数 (UTF-8)</div>
+                        <div>
+                            <span class="stat-value" id="byteCount">0</span>
+                            <span class="stat-unit">バイト</span>
+                        </div>
+                    </div>
+
+                    <!-- Twitter/X Limit -->
+                    <div class="stat-card twitter-limit">
+                        <div class="stat-label">Twitter/X</div>
+                        <div>
+                            <span class="stat-value" id="twitterRemaining">280</span>
+                            <span class="stat-unit">文字残り</span>
+                        </div>
+                        <div class="twitter-progress">
+                            <div class="twitter-progress-bar" id="twitterProgressBar" style="width: 0%;"></div>
+                        </div>
+                        <div class="twitter-warning" id="twitterWarning"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Ad Banner (After Tool) -->
+    <div class="ad-banner ad-after">
+        <p>広告スペース</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox</p>
+    </footer>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const TWITTER_LIMIT = 280;
+
+        // Update stats on input
+        textInput.addEventListener('input', updateStats);
+
+        // Initial stats update
+        updateStats();
+
+        function updateStats() {
+            const text = textInput.value;
+
+            // 文字数
+            const charCount = text.length;
+            document.getElementById('charCount').textContent = charCount;
+
+            // スペース除く
+            const charCountNoSpace = text.replace(/\s/g, '').length;
+            document.getElementById('charCountNoSpace').textContent = charCountNoSpace;
+
+            // 単語数 (Japanese + English)
+            const wordCount = countWords(text);
+            document.getElementById('wordCount').textContent = wordCount;
+
+            // 行数
+            const lineCount = text === '' ? 0 : text.split('\n').length;
+            document.getElementById('lineCount').textContent = lineCount;
+
+            // バイト数 (UTF-8)
+            const byteCount = new TextEncoder().encode(text).length;
+            document.getElementById('byteCount').textContent = byteCount;
+
+            // Twitter/X制限
+            updateTwitterStats(charCount);
+        }
+
+        function countWords(text) {
+            if (!text.trim()) return 0;
+
+            // Match English words and CJK characters separately
+            const englishWords = (text.match(/\b[a-zA-Z0-9]+\b/g) || []).length;
+            const cjkChars = (text.match(/[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/g) || []).length;
+
+            return englishWords + cjkChars;
+        }
+
+        function updateTwitterStats(charCount) {
+            const remaining = Math.max(0, TWITTER_LIMIT - charCount);
+            const percentage = Math.min(100, (charCount / TWITTER_LIMIT) * 100);
+
+            document.getElementById('twitterRemaining').textContent = remaining;
+            document.getElementById('twitterProgressBar').style.width = percentage + '%';
+
+            const warningDiv = document.getElementById('twitterWarning');
+            if (charCount > TWITTER_LIMIT) {
+                warningDiv.textContent = '⚠ Twitter/Xの制限を超えています';
+            } else if (charCount > TWITTER_LIMIT * 0.9) {
+                warningDiv.textContent = '⚠ 制限に近づいています';
+            } else {
+                warningDiv.textContent = '';
+            }
+        }
+
+        function copyAllStats() {
+            const text = textInput.value;
+            if (!text) {
+                showToast('テキストを入力してください', 'warning');
+                return;
+            }
+
+            const charCount = text.length;
+            const charCountNoSpace = text.replace(/\s/g, '').length;
+            const wordCount = countWords(text);
+            const lineCount = text === '' ? 0 : text.split('\n').length;
+            const byteCount = new TextEncoder().encode(text).length;
+            const twitterRemaining = Math.max(0, TWITTER_LIMIT - charCount);
+
+            const stats = `
+統計情報
+========
+文字数: ${charCount} 文字
+スペース除く: ${charCountNoSpace} 文字
+単語数: ${wordCount} 単語
+行数: ${lineCount} 行
+バイト数 (UTF-8): ${byteCount} バイト
+Twitter/X残り: ${twitterRemaining} 文字
+            `.trim();
+
+            navigator.clipboard.writeText(stats).then(() => {
+                showToast('統計情報をクリップボードにコピーしました', 'success');
+            }).catch(() => {
+                showToast('コピーに失敗しました', 'error');
+            });
+        }
+
+        function clearText() {
+            textInput.value = '';
+            updateStats();
+            showToast('テキストをクリアしました', 'success');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

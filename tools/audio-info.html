@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声ファイル情報 - ToolBox</title>
+    <meta name="description" content="音声ファイルの詳細情報を表示・確認できるツール。ファイルサイズ、再生時間、ビットレート、サンプリングレート等を解析。">
+    <meta name="keywords" content="ファイル情報, 音声ファイル, メタデータ, サンプリングレート, ビットレート">
+    <meta property="og:title" content="音声ファイル情報 - ToolBox">
+    <meta property="og:description" content="音声ファイルの詳細情報を確認できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/audio-info.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/audio-info.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page { padding: 2rem 1rem; }
+        .tool-container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .drop-zone {
+            border: 2px dashed #ccc; border-radius: 8px; padding: 2rem;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: #f9f9f9;
+        }
+        .drop-zone.dragover { border-color: #0066cc; background: #f0f7ff; }
+        .info-section {
+            margin-top: 2rem; padding: 1.5rem; background: #f5f5f5;
+            border-radius: 8px; display: none;
+        }
+        .info-section.show { display: block; }
+        .section-title {
+            font-size: 1.2rem; font-weight: 700;
+            margin-bottom: 1rem; color: #0066cc;
+            border-bottom: 2px solid #0066cc; padding-bottom: 0.5rem;
+        }
+        .info-group {
+            background: white; padding: 1.5rem; border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .info-group.first { margin-top: 0; }
+        .info-row {
+            display: grid; grid-template-columns: 1fr 1.5fr;
+            gap: 1rem; padding: 0.75rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label {
+            font-weight: 600; color: #333;
+        }
+        .info-value {
+            color: #666; word-break: break-all;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;
+        }
+        .waveform-container {
+            margin-top: 2rem; padding: 1rem; background: white;
+            border-radius: 8px;
+        }
+        #waveformPreview {
+            width: 100%; height: 150px;
+            background: #f5f5f5; border-radius: 4px;
+            display: block;
+        }
+        .player-container {
+            margin-top: 1.5rem; padding: 1rem; background: white;
+            border-radius: 8px;
+        }
+        audio {
+            width: 100%; margin-bottom: 1rem;
+        }
+        button {
+            padding: 0.75rem 1.5rem; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #ccc; }
+        .button-group {
+            display: flex; gap: 1rem; flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 1rem 1.5rem; background: #333; color: white;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .info-badge {
+            display: inline-block; padding: 0.25rem 0.75rem;
+            background: #e0f2f1; color: #00695c;
+            border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg> ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<div class="tool-page">
+    <div class="tool-container">
+        <h1>音声ファイル情報</h1>
+        <p class="subtitle">音声ファイルの詳細情報・メタデータを解析・表示</p>
+
+        <div class="drop-zone" id="dropZone">
+            <p>音声ファイルをドラッグ&ドロップするか、クリックして選択</p>
+            <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">対応形式: MP3, WAV, OGG, M4A, WebM など</p>
+            <input type="file" id="audioInput" accept="audio/*" style="display: none;">
+        </div>
+
+        <!-- ファイル情報セクション -->
+        <div class="info-section" id="fileInfoSection">
+            <div class="section-title">ファイル情報</div>
+            <div class="info-group first">
+                <div class="info-row">
+                    <span class="info-label">ファイル名</span>
+                    <span class="info-value" id="fileName">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">ファイルサイズ</span>
+                    <span class="info-value" id="fileSize">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">MIMEタイプ</span>
+                    <span class="info-value" id="mimeType">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">ファイル拡張子</span>
+                    <span class="info-value" id="fileExtension">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- オーディオ情報セクション -->
+        <div class="info-section" id="audioInfoSection">
+            <div class="section-title">オーディオ情報</div>
+            <div class="info-group first">
+                <div class="info-row">
+                    <span class="info-label">再生時間</span>
+                    <span class="info-value" id="duration">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">サンプリングレート</span>
+                    <span class="info-value" id="sampleRate">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">チャンネル数</span>
+                    <span class="info-value" id="channels">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">フレーム数</span>
+                    <span class="info-value" id="frameCount">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">推定ビットレート</span>
+                    <span class="info-value" id="bitrate">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 波形プレビュー -->
+        <div class="info-section" id="waveformSection">
+            <div class="section-title">波形プレビュー</div>
+            <div class="waveform-container">
+                <canvas id="waveformPreview"></canvas>
+            </div>
+        </div>
+
+        <!-- プレイヤーセクション -->
+        <div class="info-section" id="playerSection">
+            <div class="section-title">再生</div>
+            <div class="player-container">
+                <audio id="audioPlayer" controls></audio>
+                <div class="button-group">
+                    <button class="btn-primary" id="copyInfoBtn">情報をコピー</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+class AudioInfo {
+    constructor() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.audioBuffer = null;
+        this.file = null;
+
+        this.initElements();
+        this.attachEventListeners();
+    }
+
+    initElements() {
+        this.dropZone = document.getElementById('dropZone');
+        this.audioInput = document.getElementById('audioInput');
+        this.fileInfoSection = document.getElementById('fileInfoSection');
+        this.audioInfoSection = document.getElementById('audioInfoSection');
+        this.waveformSection = document.getElementById('waveformSection');
+        this.playerSection = document.getElementById('playerSection');
+        this.audioPlayer = document.getElementById('audioPlayer');
+        this.waveformCanvas = document.getElementById('waveformPreview');
+        this.waveformCtx = this.waveformCanvas.getContext('2d');
+        this.copyInfoBtn = document.getElementById('copyInfoBtn');
+    }
+
+    attachEventListeners() {
+        this.dropZone.addEventListener('click', () => this.audioInput.click());
+        this.dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.add('dragover');
+        });
+        this.dropZone.addEventListener('dragleave', () => {
+            this.dropZone.classList.remove('dragover');
+        });
+        this.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                this.handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        this.audioInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) this.handleFile(e.target.files[0]);
+        });
+
+        this.copyInfoBtn.addEventListener('click', () => this.copyInfo());
+    }
+
+    async handleFile(file) {
+        this.file = file;
+        const arrayBuffer = await file.arrayBuffer();
+
+        try {
+            this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.displayAllInfo();
+            this.showAllSections();
+        } catch (error) {
+            this.showToast('ファイルのデコードに失敗しました');
+        }
+    }
+
+    displayAllInfo() {
+        // ファイル情報
+        document.getElementById('fileName').textContent = this.file.name;
+        document.getElementById('fileSize').textContent = this.formatFileSize(this.file.size);
+        document.getElementById('mimeType').textContent = this.file.type || '不明';
+        document.getElementById('fileExtension').textContent = this.getFileExtension(this.file.name);
+
+        // オーディオ情報
+        document.getElementById('duration').textContent = this.formatTime(this.audioBuffer.duration);
+        document.getElementById('sampleRate').textContent = `${this.audioBuffer.sampleRate.toLocaleString()} Hz`;
+        document.getElementById('channels').textContent = this.getChannelsLabel(this.audioBuffer.numberOfChannels);
+        document.getElementById('frameCount').textContent = this.audioBuffer.length.toLocaleString();
+
+        // ビットレート計算
+        const bitrate = Math.round((this.file.size * 8) / this.audioBuffer.duration / 1000);
+        document.getElementById('bitrate').textContent = `${bitrate} kbps`;
+
+        // オーディオプレイヤー
+        const url = URL.createObjectURL(this.file);
+        this.audioPlayer.src = url;
+
+        // 波形描画
+        this.drawWaveform();
+    }
+
+    showAllSections() {
+        this.fileInfoSection.classList.add('show');
+        this.audioInfoSection.classList.add('show');
+        this.waveformSection.classList.add('show');
+        this.playerSection.classList.add('show');
+    }
+
+    drawWaveform() {
+        const data = this.audioBuffer.getChannelData(0);
+        const width = this.waveformCanvas.width;
+        const height = this.waveformCanvas.height;
+        const step = Math.ceil(data.length / width);
+        const amp = height / 2;
+
+        this.waveformCtx.fillStyle = '#f5f5f5';
+        this.waveformCtx.fillRect(0, 0, width, height);
+
+        this.waveformCtx.strokeStyle = '#0066cc';
+        this.waveformCtx.lineWidth = 1;
+        this.waveformCtx.beginPath();
+
+        for (let i = 0; i < width; i++) {
+            let min = 1, max = -1;
+            for (let j = 0; j < step; j++) {
+                const idx = i * step + j;
+                if (idx < data.length) {
+                    const val = data[idx];
+                    if (val < min) min = val;
+                    if (val > max) max = val;
+                }
+            }
+            const y = amp - max * amp;
+            if (i === 0) this.waveformCtx.moveTo(i, y);
+            else this.waveformCtx.lineTo(i, y);
+        }
+
+        this.waveformCtx.stroke();
+
+        // Draw center line
+        this.waveformCtx.strokeStyle = '#ddd';
+        this.waveformCtx.beginPath();
+        this.waveformCtx.moveTo(0, amp);
+        this.waveformCtx.lineTo(width, amp);
+        this.waveformCtx.stroke();
+    }
+
+    copyInfo() {
+        const info = `
+ファイル情報
+ファイル名: ${this.file.name}
+ファイルサイズ: ${this.formatFileSize(this.file.size)}
+MIMEタイプ: ${this.file.type || '不明'}
+拡張子: ${this.getFileExtension(this.file.name)}
+
+オーディオ情報
+再生時間: ${this.formatTime(this.audioBuffer.duration)}
+サンプリングレート: ${this.audioBuffer.sampleRate.toLocaleString()} Hz
+チャンネル: ${this.getChannelsLabel(this.audioBuffer.numberOfChannels)}
+フレーム数: ${this.audioBuffer.length.toLocaleString()}
+推定ビットレート: ${Math.round((this.file.size * 8) / this.audioBuffer.duration / 1000)} kbps
+        `.trim();
+
+        navigator.clipboard.writeText(info).then(() => {
+            this.showToast('情報をコピーしました');
+        }).catch(() => {
+            this.showToast('コピーに失敗しました');
+        });
+    }
+
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    getFileExtension(filename) {
+        const parts = filename.split('.');
+        return parts.length > 1 ? '.' + parts[parts.length - 1].toLowerCase() : '不明';
+    }
+
+    getChannelsLabel(channels) {
+        if (channels === 1) return 'モノラル (1ch)';
+        if (channels === 2) return 'ステレオ (2ch)';
+        return `${channels}ch`;
+    }
+
+    formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = (seconds % 60).toFixed(3);
+
+        if (hours > 0) {
+            return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(6, '0')} (${seconds.toFixed(3)}秒)`;
+        }
+        return `${minutes}:${String(secs).padStart(6, '0')} (${seconds.toFixed(3)}秒)`;
+    }
+
+    showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new AudioInfo();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>進数変換 - ToolBox</title>
+    <meta name="description" content="2進数、8進数、10進数、16進数を相互変換できるツール">
+    <meta name="keywords" content="進数変換, 2進数, 8進数, 10進数, 16進数, バイナリ, ビット">
+    <meta property="og:url" content="https://web-tool-site.com/tools/number-converter.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="進数変換 - ToolBox">
+    <meta property="og:description" content="2進数、8進数、10進数、16進数を相互変換できるツール">
+    <link rel="canonical" href="https://web-tool-site.com/tools/number-converter.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .input-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .input-group input,
+        .input-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .conversion-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .result-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 1rem;
+            border-left: 3px solid #667eea;
+        }
+        .result-card-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        .result-card-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .copy-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 0.4rem 0.8rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .bit-visualization {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .bit-visualization h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .bit-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .bit-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            min-width: 60px;
+        }
+        .bit-container {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
+        .bit {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: white;
+            border: 1px solid #ddd;
+            transition: all 0.2s;
+        }
+        .bit.zero {
+            background: #f8f9fa;
+            color: #999;
+        }
+        .bit.one {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 3rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="tool-title">進数変換</h1>
+
+        <div class="ad-banner">広告スペース: 進数変換ツール</div>
+
+        <div class="input-section">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #333;">入力</h2>
+            <div class="input-group">
+                <input type="text" id="input" placeholder="数値を入力" autocomplete="off">
+                <select id="baseSelector">
+                    <option value="10">10進数</option>
+                    <option value="2">2進数</option>
+                    <option value="8">8進数</option>
+                    <option value="16">16進数</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="conversion-results" id="results"></div>
+
+        <div class="bit-visualization">
+            <h3>ビット表現</h3>
+            <div id="bitVisualization"></div>
+        </div>
+
+        <div class="ad-banner">広告スペース: 進数変換ツール下部</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            showToast('コピーしました');
+        }
+
+        function convertNumber(input, fromBase) {
+            try {
+                const decimal = parseInt(input, fromBase);
+                if (isNaN(decimal)) return null;
+                return {
+                    decimal: decimal,
+                    binary: decimal.toString(2),
+                    octal: decimal.toString(8),
+                    hexadecimal: decimal.toString(16).toUpperCase()
+                };
+            } catch {
+                return null;
+            }
+        }
+
+        function updateResults() {
+            const input = document.getElementById('input').value.trim();
+            const baseSelector = document.getElementById('baseSelector');
+            const fromBase = parseInt(baseSelector.value);
+            const resultsDiv = document.getElementById('results');
+            const bitVizDiv = document.getElementById('bitVisualization');
+
+            resultsDiv.innerHTML = '';
+            bitVizDiv.innerHTML = '';
+
+            if (!input) return;
+
+            const result = convertNumber(input, fromBase);
+            if (!result) {
+                resultsDiv.innerHTML = '<div style="color: #e74c3c; font-weight: 500;">無効な入力です</div>';
+                return;
+            }
+
+            const conversions = [
+                { name: '2進数', value: result.binary },
+                { name: '8進数', value: result.octal },
+                { name: '10進数', value: result.decimal.toString() },
+                { name: '16進数', value: result.hexadecimal }
+            ];
+
+            conversions.forEach(conv => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <div class="result-card-label">${conv.name}</div>
+                    <div class="result-card-value">${conv.value}</div>
+                    <button class="copy-btn">コピー</button>
+                `;
+                card.querySelector('.copy-btn').addEventListener('click', () => {
+                    copyToClipboard(conv.value);
+                });
+                resultsDiv.appendChild(card);
+            });
+
+            // Bit visualization
+            if (result.decimal >= 0 && result.decimal <= 0xFFFFFFFF) {
+                const bitWidths = [
+                    { width: 8, label: '8ビット' },
+                    { width: 16, label: '16ビット' },
+                    { width: 32, label: '32ビット' }
+                ];
+
+                bitWidths.forEach(bw => {
+                    const num = result.decimal;
+                    if (num > (1 << bw) - 1) return;
+
+                    const bits = [];
+                    for (let i = bw - 1; i >= 0; i--) {
+                        bits.push((num >> i) & 1);
+                    }
+
+                    const bitRow = document.createElement('div');
+                    bitRow.className = 'bit-row';
+                    bitRow.innerHTML = `<div class="bit-label">${bw}ビット:</div>`;
+
+                    const bitContainer = document.createElement('div');
+                    bitContainer.className = 'bit-container';
+
+                    bits.forEach((bit, idx) => {
+                        const bitEl = document.createElement('div');
+                        bitEl.className = `bit ${bit === 1 ? 'one' : 'zero'}`;
+                        bitEl.textContent = bit;
+                        bitEl.title = `ビット ${bw - 1 - idx}`;
+                        bitEl.addEventListener('click', () => {
+                            const newDecimal = num ^ (1 << (bw - 1 - idx));
+                            document.getElementById('input').value = newDecimal.toString(parseInt(baseSelector.value));
+                            updateResults();
+                        });
+                        bitContainer.appendChild(bitEl);
+                    });
+
+                    bitRow.appendChild(bitContainer);
+                    bitVizDiv.appendChild(bitRow);
+                });
+            }
+        }
+
+        document.getElementById('input').addEventListener('input', updateResults);
+        document.getElementById('baseSelector').addEventListener('change', updateResults);
+    </script>
+</body>
+</html>

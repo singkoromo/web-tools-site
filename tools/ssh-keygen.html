@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Web Crypto APIを使用してSSH RSA鍵ペアを生成するツール。公開鍵と秘密鍵をPEM形式でダウンロードできます。">
+    <meta name="keywords" content="SSH, RSA, 鍵生成, セキュリティ, IT・インフラ">
+    <meta name="author" content="ToolBox">
+    <meta name="theme-color" content="#007bff">
+    <title>SSH鍵ペア生成 - ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .ad-banner {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .ad-placeholder {
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-page h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+            color: #856404;
+            font-size: 0.95rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .keys-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .key-section {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .key-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .key-output {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            color: #333;
+            user-select: all;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-copy {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-download {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        footer {
+            background: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .tool-page {
+                padding: 1.5rem;
+            }
+
+            .keys-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: unset;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav>
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-page">
+            <h1>SSH鍵ペア生成</h1>
+
+            <div class="warning">
+                <strong>注意:</strong> このツールはローカル環境でブラウザ内で鍵を生成します。本番環境ではOpenSSHなどの専用ツールの使用を強く推奨します。生成された鍵は絶対に他人と共有しないでください。
+            </div>
+
+            <div class="form-section">
+                <h2>鍵生成設定</h2>
+                <div class="form-group">
+                    <label for="keySize">RSA鍵長:</label>
+                    <select id="keySize">
+                        <option value="2048">2048 bits</option>
+                        <option value="4096" selected>4096 bits</option>
+                    </select>
+                </div>
+                <button type="button" class="btn-generate" onclick="generateKeys()" style="width: 100%; margin-top: 1rem;">SSH鍵ペアを生成</button>
+            </div>
+
+            <div id="loadingContainer" class="form-section" style="display: none;">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>SSH鍵を生成中... (数秒かかる場合があります)</p>
+                </div>
+            </div>
+
+            <div id="keysContainer" style="display: none;">
+                <div class="keys-container">
+                    <div class="key-section">
+                        <h3>公開鍵 (Public Key)</h3>
+                        <div class="key-output" id="publicKeyOutput"></div>
+                        <div class="button-group">
+                            <button class="btn-copy" onclick="copyPublicKey()">コピー</button>
+                            <button class="btn-download" onclick="downloadPublicKey()">ダウンロード</button>
+                        </div>
+                    </div>
+
+                    <div class="key-section">
+                        <h3>秘密鍵 (Private Key)</h3>
+                        <div class="key-output" id="privateKeyOutput"></div>
+                        <div class="button-group">
+                            <button class="btn-copy" onclick="copyPrivateKey()">コピー</button>
+                            <button class="btn-download" onclick="downloadPrivateKey()">ダウンロード</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 ToolBox
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
+    <script>
+        const toast = document.getElementById('toast');
+        let publicKey = '';
+        let privateKey = '';
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        async function generateKeys() {
+            const keySize = parseInt(document.getElementById('keySize').value);
+            document.getElementById('loadingContainer').style.display = 'block';
+            document.getElementById('keysContainer').style.display = 'none';
+
+            try {
+                // Generate RSA key pair using Web Crypto API
+                const keyPair = await window.crypto.subtle.generateKey(
+                    {
+                        name: 'RSASSA-PKCS1-v1_5',
+                        modulusLength: keySize,
+                        publicExponent: new Uint8Array([1, 0, 1]),
+                        hash: 'SHA-256'
+                    },
+                    true,
+                    ['sign', 'verify']
+                );
+
+                // Export keys
+                const pubKey = await window.crypto.subtle.exportKey('spki', keyPair.publicKey);
+                const privKey = await window.crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
+
+                // Convert to PEM format
+                publicKey = arrayBufferToPem(pubKey, 'PUBLIC KEY');
+                privateKey = arrayBufferToPem(privKey, 'PRIVATE KEY');
+
+                // Display keys
+                document.getElementById('publicKeyOutput').textContent = publicKey;
+                document.getElementById('privateKeyOutput').textContent = privateKey;
+
+                document.getElementById('loadingContainer').style.display = 'none';
+                document.getElementById('keysContainer').style.display = 'block';
+
+                showToast('SSH鍵ペアを生成しました');
+            } catch (error) {
+                showToast('鍵の生成に失敗しました: ' + error.message);
+                document.getElementById('loadingContainer').style.display = 'none';
+            }
+        }
+
+        function arrayBufferToPem(buffer, label) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.length; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            const base64 = btoa(binary);
+            const pem = base64.match(/.{1,64}/g).join('\n');
+            return `-----BEGIN ${label}-----\n${pem}\n-----END ${label}-----`;
+        }
+
+        function copyPublicKey() {
+            navigator.clipboard.writeText(publicKey).then(() => {
+                showToast('公開鍵をコピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function copyPrivateKey() {
+            navigator.clipboard.writeText(privateKey).then(() => {
+                showToast('秘密鍵をコピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function downloadPublicKey() {
+            const blob = new Blob([publicKey], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'id_rsa.pub';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('公開鍵をダウンロードしました');
+        }
+
+        function downloadPrivateKey() {
+            const blob = new Blob([privateKey], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'id_rsa';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('秘密鍵をダウンロードしました');
+        }
+    </script>
+</body>
+</html>

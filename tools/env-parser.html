@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content=".envファイルをパース・変換・生成するブラウザツール。JSON/YAML/Shell形式にも変換可能。">
+    <meta property="og:title" content=".envファイルパーサー - ToolBox">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/env-parser.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/env-parser.html">
+    <title>.envファイルパーサー - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+        textarea { width: 100%; min-height: 300px; padding: 14px; border: 1px solid #ddd; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 13px; resize: vertical; box-sizing: border-box; }
+        .btn-primary { padding: 10px 18px; background: #007bff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-secondary { padding: 10px 14px; background: #6c757d; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 13px; }
+        .btn-secondary:hover { background: #545b62; }
+        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .panel-label { font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block; }
+        .info-note { background: #e7f3ff; border-left: 4px solid #007bff; padding: 10px 14px; border-radius: 4px; font-size: 14px; color: #004085; margin-bottom: 16px; }
+        .vars-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+        .vars-table th { background: #f8f9fa; font-weight: 600; padding: 8px 10px; border: 1px solid #ddd; text-align: left; }
+        .vars-table td { padding: 7px 10px; border: 1px solid #eee; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+        .vars-table tr:hover td { background: #f0f4ff; }
+        .badge { display: inline-block; padding: 2px 6px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+        .badge-empty { background: #f8d7da; color: #842029; }
+        .badge-ok { background: #d1e7dd; color: #0f5132; }
+        .output-tabs { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+        .output-tab { padding: 6px 12px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 13px; font-family: inherit; }
+        .output-tab.active { background: #007bff; color: #fff; border-color: #007bff; }
+        .stats { font-size: 12px; color: #888; margin-top: 4px; }
+        .error-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px 14px; border-radius: 4px; font-size: 13px; color: #664d03; margin-top: 12px; display: none; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+        <div class="tool-container">
+            <h1>.envファイルパーサー</h1>
+            <div class="info-note">
+                .envファイルを解析してJSON/YAML/Shell形式に変換、または逆変換します。コメント・空行・引用符対応。
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <span class="panel-label">入力 (.env または JSON)</span>
+                    <div class="btn-row">
+                        <button class="btn-secondary" id="loadExampleBtn">📋 サンプル挿入</button>
+                        <button class="btn-secondary" id="fileBtn">📂 ファイル読込</button>
+                        <input type="file" id="fileInput" accept=".env,.txt,.json,.yaml,.yml" style="display:none">
+                    </div>
+                    <textarea id="inputText" placeholder="KEY=value&#10;DATABASE_URL=postgres://user:pass@localhost:5432/db&#10;DEBUG=true&#10;# コメント行&#10;EMPTY_VAR="></textarea>
+                    <div class="stats" id="inputStats"></div>
+                    <div class="error-box" id="errorBox"></div>
+                </div>
+                <div>
+                    <span class="panel-label">出力フォーマット</span>
+                    <div class="output-tabs">
+                        <button class="output-tab active" data-fmt="env">.env</button>
+                        <button class="output-tab" data-fmt="json">JSON</button>
+                        <button class="output-tab" data-fmt="yaml">YAML</button>
+                        <button class="output-tab" data-fmt="shell">Shell export</button>
+                        <button class="output-tab" data-fmt="docker">Docker --env</button>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn-primary" id="convertBtn">🔄 変換</button>
+                        <button class="btn-secondary" id="copyBtn">📋 コピー</button>
+                        <button class="btn-secondary" id="downloadBtn">💾 DL</button>
+                    </div>
+                    <textarea id="outputText" readonly placeholder="変換結果がここに表示されます..."></textarea>
+                    <div class="stats" id="outputStats"></div>
+                </div>
+            </div>
+
+            <div id="tableSection" style="margin-top:16px; display:none;">
+                <strong style="font-size:14px;">📋 解析された変数一覧</strong>
+                <table class="vars-table" id="varsTable">
+                    <thead><tr><th>#</th><th>変数名</th><th>値</th><th>状態</th></tr></thead>
+                    <tbody id="varsBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    const SAMPLE = `# アプリケーション設定
+APP_NAME=MyApp
+APP_ENV=development
+APP_DEBUG=true
+APP_PORT=3000
+
+# データベース
+DATABASE_URL=postgres://admin:secret@localhost:5432/mydb
+DB_POOL_SIZE=10
+
+# Redis
+REDIS_URL=redis://localhost:6379/0
+REDIS_PASSWORD=
+
+# JWT
+JWT_SECRET=your-super-secret-key-here
+JWT_EXPIRES_IN=3600
+
+# メール
+MAIL_SMTP_HOST=smtp.example.com
+MAIL_SMTP_PORT=587
+MAIL_FROM="MyApp <noreply@example.com>"
+
+# 外部API
+STRIPE_API_KEY=sk_test_xxxxxxxxxxxxxxxx
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx`;
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    let currentFmt = 'env';
+    document.querySelectorAll('.output-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentFmt = tab.dataset.fmt;
+        });
+    });
+
+    document.getElementById('loadExampleBtn').addEventListener('click', () => {
+        document.getElementById('inputText').value = SAMPLE;
+        updateInputStats();
+    });
+
+    document.getElementById('fileBtn').addEventListener('click', () => document.getElementById('fileInput').click());
+    document.getElementById('fileInput').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => { document.getElementById('inputText').value = ev.target.result; updateInputStats(); };
+        reader.readAsText(file, 'UTF-8');
+    });
+
+    document.getElementById('inputText').addEventListener('input', updateInputStats);
+
+    function updateInputStats() {
+        const t = document.getElementById('inputText').value;
+        const lines = t.split('\n').length;
+        const vars = parseEnv(t).length;
+        document.getElementById('inputStats').textContent = `${lines} 行 / ${vars} 変数`;
+    }
+
+    // Parse .env text to array of {key, value, comment}
+    function parseEnv(text) {
+        const vars = [];
+        for (const line of text.split('\n')) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('#')) continue;
+            const eqIdx = trimmed.indexOf('=');
+            if (eqIdx === -1) continue;
+            const key = trimmed.slice(0, eqIdx).trim();
+            let value = trimmed.slice(eqIdx + 1).trim();
+            // Remove inline comment
+            // Handle quoted values
+            if ((value.startsWith('"') && value.endsWith('"')) ||
+                (value.startsWith("'") && value.endsWith("'"))) {
+                value = value.slice(1, -1);
+            } else {
+                // Remove inline comment
+                const commentIdx = value.search(/\s+#/);
+                if (commentIdx !== -1) value = value.slice(0, commentIdx).trim();
+            }
+            if (key) vars.push({ key, value });
+        }
+        return vars;
+    }
+
+    // Parse JSON to vars
+    function parseJSON(text) {
+        const obj = JSON.parse(text);
+        return Object.entries(obj).map(([key, value]) => ({ key, value: String(value) }));
+    }
+
+    function toEnv(vars) {
+        return vars.map(({ key, value }) => {
+            if (value.includes(' ') || value.includes('"') || value === '') {
+                return `${key}="${value.replace(/"/g, '\\"')}"`;
+            }
+            return `${key}=${value}`;
+        }).join('\n');
+    }
+
+    function toJSON(vars) {
+        const obj = {};
+        vars.forEach(({ key, value }) => { obj[key] = value; });
+        return JSON.stringify(obj, null, 2);
+    }
+
+    function toYAML(vars) {
+        return vars.map(({ key, value }) => {
+            const needsQuotes = /[:#\[\]{}&*?|<>=!%@`]/.test(value) || value.includes('\n');
+            return `${key}: ${needsQuotes ? `"${value.replace(/"/g, '\\"')}"` : value || '""'}`;
+        }).join('\n');
+    }
+
+    function toShell(vars) {
+        return vars.map(({ key, value }) =>
+            `export ${key}="${value.replace(/"/g, '\\"').replace(/\$/g, '\\$')}"`
+        ).join('\n');
+    }
+
+    function toDocker(vars) {
+        return vars.map(({ key, value }) =>
+            `--env ${key}="${value.replace(/"/g, '\\"')}"`
+        ).join(' \\\n  ');
+    }
+
+    document.getElementById('convertBtn').addEventListener('click', () => {
+        const input = document.getElementById('inputText').value.trim();
+        if (!input) { showToast('テキストを入力してください'); return; }
+
+        const errBox = document.getElementById('errorBox');
+        errBox.style.display = 'none';
+
+        let vars;
+        try {
+            // Detect input format
+            if (input.startsWith('{')) {
+                vars = parseJSON(input);
+            } else {
+                vars = parseEnv(input);
+            }
+        } catch(e) {
+            errBox.textContent = '解析エラー: ' + e.message;
+            errBox.style.display = 'block';
+            return;
+        }
+
+        if (!vars.length) { showToast('変数が見つかりませんでした'); return; }
+
+        let output;
+        const fmt = currentFmt;
+        try {
+            if (fmt === 'json') output = toJSON(vars);
+            else if (fmt === 'yaml') output = toYAML(vars);
+            else if (fmt === 'shell') output = toShell(vars);
+            else if (fmt === 'docker') output = toDocker(vars);
+            else output = toEnv(vars);
+        } catch(e) {
+            errBox.textContent = '変換エラー: ' + e.message;
+            errBox.style.display = 'block';
+            return;
+        }
+
+        document.getElementById('outputText').value = output;
+        document.getElementById('outputStats').textContent = `${vars.length} 変数を変換`;
+        showToast(`${vars.length} 変数を変換しました`);
+
+        // Build table
+        const tbody = document.getElementById('varsBody');
+        tbody.innerHTML = '';
+        vars.forEach(({ key, value }, i) => {
+            const tr = document.createElement('tr');
+            const isEmpty = value === '';
+            tr.innerHTML = `<td>${i+1}</td><td>${key}</td><td>${isEmpty ? '(空)' : value.length > 60 ? value.slice(0,60)+'…' : value}</td>
+                <td><span class="badge ${isEmpty ? 'badge-empty' : 'badge-ok'}">${isEmpty ? '未設定' : '設定済'}</span></td>`;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('tableSection').style.display = 'block';
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+        const t = document.getElementById('outputText').value;
+        if (!t) { showToast('出力がありません'); return; }
+        navigator.clipboard.writeText(t).then(() => showToast('コピーしました'));
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        const t = document.getElementById('outputText').value;
+        if (!t) { showToast('出力がありません'); return; }
+        const extMap = { env: '.env', json: '.json', yaml: '.yaml', shell: '.sh', docker: '.txt' };
+        const ext = extMap[currentFmt] || '.txt';
+        const blob = new Blob([t], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = 'config' + ext; a.click(); URL.revokeObjectURL(a.href);
+    });
+    </script>
+</body>
+</html>

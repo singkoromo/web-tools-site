@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声録音 - ToolBox</title>
+    <meta name="description" content="ブラウザで直接音声を録音できるオンラインツール。WebM、WAVなど複数形式でダウンロード可能。">
+    <meta name="keywords" content="音声録音, 音声記録, マイク録音, オンライン録音, 音声ツール">
+    <meta property="og:title" content="音声録音 - ToolBox">
+    <meta property="og:description" content="ブラウザで簡単に音声を録音できるツール。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/audio-recorder.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/audio-recorder.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page { padding: 2rem 1rem; }
+        .tool-container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .initial-state { text-align: center; padding: 2rem; }
+        .btn-large {
+            padding: 1rem 2rem; font-size: 1.1rem;
+            border: none; border-radius: 8px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-primary:disabled {
+            background: #ccc; cursor: not-allowed;
+        }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .recorder-panel {
+            margin-top: 2rem; padding: 2rem;
+            background: #f5f5f5; border-radius: 8px;
+            display: none;
+        }
+        .recorder-panel.show { display: block; }
+        .timer {
+            font-size: 2.5rem; font-weight: 700;
+            text-align: center; margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            color: #0066cc;
+        }
+        .controls {
+            display: flex; gap: 1rem; justify-content: center;
+            margin: 1.5rem 0; flex-wrap: wrap;
+        }
+        .level-meter {
+            margin: 1.5rem 0; padding: 1rem;
+            background: white; border-radius: 8px;
+        }
+        .level-label {
+            font-size: 0.9rem; font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .level-bar {
+            width: 100%; height: 20px;
+            background: #e0e0e0; border-radius: 10px;
+            overflow: hidden;
+        }
+        .level-fill {
+            height: 100%; background: linear-gradient(90deg, #00ff00, #ffff00, #ff6600, #ff0000);
+            width: 0%; transition: width 0.1s;
+        }
+        .waveform {
+            margin: 1.5rem 0; padding: 1rem;
+            background: #1a1a1a; border-radius: 8px;
+        }
+        #waveformCanvas {
+            width: 100%; height: 150px;
+            display: block;
+            background: #0a0a0a; border-radius: 4px;
+        }
+        .setting-group {
+            margin-top: 1.5rem; padding: 1rem;
+            background: white; border-radius: 8px;
+        }
+        .setting-group label {
+            display: block; font-weight: 600; margin-bottom: 0.5rem;
+        }
+        select {
+            padding: 0.5rem; border: 1px solid #ddd;
+            border-radius: 4px; font-size: 1rem;
+            width: 100%; max-width: 300px;
+        }
+        .playback-section {
+            margin-top: 2rem; padding: 1.5rem;
+            background: white; border-radius: 8px;
+            display: none;
+        }
+        .playback-section.show { display: block; }
+        .playback-title { font-weight: 600; margin-bottom: 1rem; }
+        audio {
+            width: 100%; margin-bottom: 1rem;
+        }
+        .download-buttons {
+            display: flex; gap: 1rem; flex-wrap: wrap;
+        }
+        button {
+            padding: 0.75rem 1.5rem; border: none;
+            border-radius: 4px; cursor: pointer;
+            font-weight: 600; transition: all 0.3s;
+        }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #ccc; }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 1rem 1.5rem; background: #333; color: white;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .status { text-align: center; margin: 1rem 0; font-weight: 600; color: #0066cc; }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg> ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<div class="tool-page">
+    <div class="tool-container">
+        <h1>音声録音</h1>
+        <p class="subtitle">マイクから直接音声を録音。WebM、WAV形式で保存可能</p>
+
+        <div class="initial-state" id="initialState">
+            <button class="btn-large btn-primary" id="startRecordingBtn">マイクにアクセスして開始</button>
+            <p style="margin-top: 1rem; color: #999; font-size: 0.9rem;">初回使用時、マイクへのアクセスを許可してください</p>
+        </div>
+
+        <div class="recorder-panel" id="recorderPanel">
+            <div class="timer" id="timer">00:00:00</div>
+            <div class="status" id="status">スタンバイ</div>
+
+            <div class="controls">
+                <button class="btn-large btn-primary" id="recordBtn">録音開始</button>
+                <button class="btn-large btn-secondary" id="pauseBtn" style="display: none;">一時停止</button>
+                <button class="btn-large btn-danger" id="stopBtn" style="display: none;">停止</button>
+            </div>
+
+            <div class="level-meter">
+                <div class="level-label">入力レベル</div>
+                <div class="level-bar">
+                    <div class="level-fill" id="levelFill"></div>
+                </div>
+            </div>
+
+            <div class="waveform">
+                <canvas id="waveformCanvas"></canvas>
+            </div>
+
+            <div class="setting-group">
+                <label for="outputFormat">保存形式</label>
+                <select id="outputFormat">
+                    <option value="webm">WebM (推奨)</option>
+                    <option value="wav">WAV (無圧縮)</option>
+                </select>
+            </div>
+
+            <div class="playback-section" id="playbackSection">
+                <div class="playback-title">再生プレビュー</div>
+                <audio id="audioPlayback" controls></audio>
+                <div class="download-buttons">
+                    <button class="btn-secondary" id="downloadBtn">ダウンロード</button>
+                    <button class="btn-secondary" id="resetBtn">新規録音</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+class AudioRecorder {
+    constructor() {
+        this.mediaStream = null;
+        this.mediaRecorder = null;
+        this.audioContext = null;
+        this.analyser = null;
+        this.isRecording = false;
+        this.isPaused = false;
+        this.recordingStartTime = 0;
+        this.pausedTime = 0;
+        this.recordedChunks = [];
+        this.timerInterval = null;
+        this.animationFrameId = null;
+
+        this.initElements();
+    }
+
+    initElements() {
+        this.startBtn = document.getElementById('startRecordingBtn');
+        this.recordBtn = document.getElementById('recordBtn');
+        this.pauseBtn = document.getElementById('pauseBtn');
+        this.stopBtn = document.getElementById('stopBtn');
+        this.downloadBtn = document.getElementById('downloadBtn');
+        this.resetBtn = document.getElementById('resetBtn');
+        this.timer = document.getElementById('timer');
+        this.status = document.getElementById('status');
+        this.levelFill = document.getElementById('levelFill');
+        this.waveformCanvas = document.getElementById('waveformCanvas');
+        this.waveformCtx = this.waveformCanvas.getContext('2d');
+        this.initialState = document.getElementById('initialState');
+        this.recorderPanel = document.getElementById('recorderPanel');
+        this.playbackSection = document.getElementById('playbackSection');
+        this.audioPlayback = document.getElementById('audioPlayback');
+        this.outputFormat = document.getElementById('outputFormat');
+
+        this.startBtn.addEventListener('click', () => this.initRecorder());
+        this.recordBtn.addEventListener('click', () => this.startRecording());
+        this.pauseBtn.addEventListener('click', () => this.pauseRecording());
+        this.stopBtn.addEventListener('click', () => this.stopRecording());
+        this.downloadBtn.addEventListener('click', () => this.downloadRecording());
+        this.resetBtn.addEventListener('click', () => this.reset());
+    }
+
+    async initRecorder() {
+        try {
+            this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = this.audioContext.createMediaStreamAudioSource(this.mediaStream);
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 2048;
+            source.connect(this.analyser);
+
+            this.mediaRecorder = new MediaRecorder(this.mediaStream);
+            this.recordedChunks = [];
+
+            this.mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) this.recordedChunks.push(e.data);
+            };
+
+            this.mediaRecorder.onstop = () => {
+                this.onRecordingStop();
+            };
+
+            this.initialState.style.display = 'none';
+            this.recorderPanel.classList.add('show');
+            this.startBtn.style.display = 'none';
+            this.showToast('マイクにアクセスしました');
+        } catch (error) {
+            this.showToast('マイクへのアクセスに失敗しました');
+        }
+    }
+
+    startRecording() {
+        this.recordedChunks = [];
+        this.mediaRecorder.start();
+        this.isRecording = true;
+        this.isPaused = false;
+        this.recordingStartTime = Date.now() - this.pausedTime;
+        this.status.textContent = '録音中...';
+        this.recordBtn.style.display = 'none';
+        this.pauseBtn.style.display = 'inline-block';
+        this.stopBtn.style.display = 'inline-block';
+
+        this.timerInterval = setInterval(() => this.updateTimer(), 100);
+        this.drawWaveform();
+    }
+
+    pauseRecording() {
+        if (this.isRecording) {
+            this.mediaRecorder.pause();
+            this.pausedTime = Date.now() - this.recordingStartTime;
+            this.isPaused = true;
+            this.status.textContent = '一時停止中';
+            this.pauseBtn.textContent = '再開';
+        } else if (this.isPaused) {
+            this.mediaRecorder.resume();
+            this.recordingStartTime = Date.now() - this.pausedTime;
+            this.isRecording = true;
+            this.isPaused = false;
+            this.status.textContent = '録音中...';
+            this.pauseBtn.textContent = '一時停止';
+        }
+    }
+
+    stopRecording() {
+        this.mediaRecorder.stop();
+        this.isRecording = false;
+        clearInterval(this.timerInterval);
+        cancelAnimationFrame(this.animationFrameId);
+        this.status.textContent = '停止';
+        this.recordBtn.style.display = 'inline-block';
+        this.pauseBtn.style.display = 'none';
+        this.stopBtn.style.display = 'none';
+        this.pauseBtn.textContent = '一時停止';
+    }
+
+    onRecordingStop() {
+        const audioBlob = new Blob(this.recordedChunks, { type: this.mediaRecorder.mimeType });
+        const url = URL.createObjectURL(audioBlob);
+        this.audioPlayback.src = url;
+        this.playbackSection.classList.add('show');
+    }
+
+    downloadRecording() {
+        const format = this.outputFormat.value;
+        const audioBlob = new Blob(this.recordedChunks, { type: this.mediaRecorder.mimeType });
+
+        if (format === 'wav') {
+            this.convertToWAV(audioBlob);
+        } else {
+            const url = URL.createObjectURL(audioBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `recording_${Date.now()}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            this.showToast('ダウンロードしました');
+        }
+    }
+
+    async convertToWAV(webmBlob) {
+        try {
+            const arrayBuffer = await webmBlob.arrayBuffer();
+            const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+
+            const wavBlob = this.encodeWAV(audioBuffer);
+            const url = URL.createObjectURL(wavBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `recording_${Date.now()}.wav`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            this.showToast('WAV形式でダウンロードしました');
+        } catch (error) {
+            this.showToast('WAVへの変換に失敗しました');
+        }
+    }
+
+    encodeWAV(audioBuffer) {
+        const numberOfChannels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const format = 1;
+        const bitDepth = 16;
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numberOfChannels * bytesPerSample;
+
+        const channelData = [];
+        for (let i = 0; i < numberOfChannels; i++) {
+            channelData.push(audioBuffer.getChannelData(i));
+        }
+
+        const length = audioBuffer.length * numberOfChannels * bytesPerSample;
+        const buffer = new ArrayBuffer(44 + length);
+        const view = new DataView(buffer);
+
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + length, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(36, 'data');
+        view.setUint32(40, length, true);
+
+        let offset = 44;
+        for (let i = 0; i < audioBuffer.length; i++) {
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                let sample = Math.max(-1, Math.min(1, channelData[channel][i]));
+                sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                view.setInt16(offset, sample, true);
+                offset += 2;
+            }
+        }
+
+        return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    reset() {
+        this.recordedChunks = [];
+        this.audioPlayback.src = '';
+        this.playbackSection.classList.remove('show');
+        this.pausedTime = 0;
+        this.timer.textContent = '00:00:00';
+        this.status.textContent = 'スタンバイ';
+        this.recordBtn.style.display = 'inline-block';
+        this.showToast('リセットしました');
+    }
+
+    updateTimer() {
+        const elapsed = Date.now() - this.recordingStartTime;
+        const hours = Math.floor(elapsed / 3600000);
+        const minutes = Math.floor((elapsed % 3600000) / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        this.timer.textContent =
+            `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    drawWaveform() {
+        if (!this.analyser) return;
+
+        const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+        this.analyser.getByteFrequencyData(dataArray);
+
+        const width = this.waveformCanvas.width;
+        const height = this.waveformCanvas.height;
+
+        this.waveformCtx.fillStyle = '#0a0a0a';
+        this.waveformCtx.fillRect(0, 0, width, height);
+
+        this.waveformCtx.strokeStyle = '#0066cc';
+        this.waveformCtx.lineWidth = 2;
+        this.waveformCtx.beginPath();
+
+        const sliceWidth = width / dataArray.length;
+        let x = 0;
+
+        for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = (v * height) / 2;
+
+            if (i === 0) {
+                this.waveformCtx.moveTo(x, height - y);
+            } else {
+                this.waveformCtx.lineTo(x, height - y);
+            }
+
+            x += sliceWidth;
+        }
+
+        this.waveformCtx.lineTo(width, height / 2);
+        this.waveformCtx.stroke();
+
+        // Update level meter
+        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        this.levelFill.style.width = (average / 255 * 100) + '%';
+
+        if (this.isRecording || this.isPaused) {
+            this.animationFrameId = requestAnimationFrame(() => this.drawWaveform());
+        }
+    }
+
+    showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new AudioRecorder();
+});
+</script>
+</body>
+</html>

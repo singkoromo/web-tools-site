@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAML↔JSON変換 - ToolBox</title>
+    <meta name="description" content="YAMLとJSONを相互に変換できるツール">
+    <meta name="keywords" content="YAML, JSON, 変換, データ形式">
+    <meta property="og:url" content="https://web-tool-site.com/tools/yaml-json.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="YAML↔JSON変換 - ToolBox">
+    <meta property="og:description" content="YAMLとJSONを相互に変換できるツール">
+    <link rel="canonical" href="https://web-tool-site.com/tools/yaml-json.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .options-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .editor-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .editor {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .editor-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .editor textarea {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        .editor textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+        .error {
+            background: #ffe0e0;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 3rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @media (max-width: 768px) {
+            .editor-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="tool-title">YAML↔JSON変換</h1>
+
+        <div class="ad-banner">広告スペース: YAML-JSON変換ツール</div>
+
+        <div class="options-section">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #333;">オプション</h2>
+            <div class="checkbox-group">
+                <input type="checkbox" id="prettyPrint" checked>
+                <label for="prettyPrint" style="cursor: pointer;">JSONをフォーマット</label>
+            </div>
+        </div>
+
+        <div class="editor-section">
+            <div class="editor">
+                <div class="editor-title">YAML</div>
+                <textarea id="yamlInput" placeholder="YAMLデータを貼り付けてください..."></textarea>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="yamlToJsonBtn">YAML → JSON</button>
+                    <button class="btn btn-secondary" id="yamlCopyBtn">コピー</button>
+                </div>
+                <div class="error" id="yamlError"></div>
+            </div>
+
+            <div class="editor">
+                <div class="editor-title">JSON</div>
+                <textarea id="jsonInput" placeholder="JSONデータを貼り付けてください..."></textarea>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="jsonToYamlBtn">JSON → YAML</button>
+                    <button class="btn btn-secondary" id="jsonCopyBtn">コピー</button>
+                </div>
+                <div class="error" id="jsonError"></div>
+            </div>
+        </div>
+
+        <div class="ad-banner">広告スペース: YAML-JSON変換ツール下部</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        function hideError(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function showError(id, message) {
+            const error = document.getElementById(id);
+            error.textContent = message;
+            error.classList.add('show');
+        }
+
+        // Simple YAML parser
+        function parseYAML(yaml) {
+            const lines = yaml.split('\n');
+            const result = {};
+            const stack = [{ obj: result, indent: -1 }];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (!line.trim() || line.trim().startsWith('#')) continue;
+
+                const indent = line.search(/\S/);
+                const content = line.trim();
+
+                while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
+                    stack.pop();
+                }
+
+                if (content.startsWith('-')) {
+                    const val = content.substring(1).trim();
+                    if (!Array.isArray(stack[stack.length - 1].arr)) {
+                        stack[stack.length - 1].arr = [];
+                    }
+                    const parsed = parseValue(val);
+                    stack[stack.length - 1].arr.push(parsed);
+                } else if (content.includes(':')) {
+                    const [key, ...valParts] = content.split(':');
+                    const val = valParts.join(':').trim();
+                    const parent = stack[stack.length - 1];
+
+                    if (val === '') {
+                        const newObj = {};
+                        parent.obj[key.trim()] = newObj;
+                        stack.push({ obj: newObj, indent: indent });
+                    } else {
+                        const parsed = parseValue(val);
+                        parent.obj[key.trim()] = parsed;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        function parseValue(val) {
+            if (val === 'null' || val === '') return null;
+            if (val === 'true') return true;
+            if (val === 'false') return false;
+            if (!isNaN(val) && val !== '') return Number(val);
+            return val;
+        }
+
+        // Convert object to YAML
+        function objectToYAML(obj, indent = 0) {
+            let result = '';
+            const prefix = '  '.repeat(indent);
+
+            if (Array.isArray(obj)) {
+                obj.forEach(item => {
+                    result += prefix + '- ';
+                    if (typeof item === 'object' && item !== null) {
+                        result += '\n';
+                        result += objectToYAML(item, indent + 1);
+                    } else {
+                        result += stringifyValue(item) + '\n';
+                    }
+                });
+            } else if (typeof obj === 'object' && obj !== null) {
+                Object.entries(obj).forEach(([key, val]) => {
+                    result += prefix + key + ': ';
+                    if (typeof val === 'object' && val !== null && !Array.isArray(val) && Object.keys(val).length > 0) {
+                        result += '\n' + objectToYAML(val, indent + 1);
+                    } else if (Array.isArray(val)) {
+                        result += '\n' + objectToYAML(val, indent + 1);
+                    } else {
+                        result += stringifyValue(val) + '\n';
+                    }
+                });
+            }
+
+            return result;
+        }
+
+        function stringifyValue(val) {
+            if (val === null) return 'null';
+            if (typeof val === 'string') return val;
+            if (typeof val === 'boolean') return val.toString();
+            return String(val);
+        }
+
+        document.getElementById('yamlToJsonBtn').addEventListener('click', () => {
+            hideError('yamlError');
+            try {
+                const yaml = document.getElementById('yamlInput').value;
+                if (!yaml.trim()) throw new Error('YAMLが空です');
+
+                const obj = parseYAML(yaml);
+                const prettyPrint = document.getElementById('prettyPrint').checked;
+                const json = prettyPrint ? JSON.stringify(obj, null, 2) : JSON.stringify(obj);
+                document.getElementById('jsonInput').value = json;
+                hideError('jsonError');
+            } catch (err) {
+                showError('yamlError', `エラー: ${err.message}`);
+            }
+        });
+
+        document.getElementById('jsonToYamlBtn').addEventListener('click', () => {
+            hideError('jsonError');
+            try {
+                const json = document.getElementById('jsonInput').value;
+                if (!json.trim()) throw new Error('JSONが空です');
+
+                const obj = JSON.parse(json);
+                const yaml = objectToYAML(obj).trim();
+                document.getElementById('yamlInput').value = yaml;
+                hideError('yamlError');
+            } catch (err) {
+                showError('jsonError', `エラー: ${err.message}`);
+            }
+        });
+
+        document.getElementById('yamlCopyBtn').addEventListener('click', () => {
+            const yaml = document.getElementById('yamlInput').value;
+            if (yaml) {
+                navigator.clipboard.writeText(yaml);
+                showToast('YAMLをコピーしました');
+            }
+        });
+
+        document.getElementById('jsonCopyBtn').addEventListener('click', () => {
+            const json = document.getElementById('jsonInput').value;
+            if (json) {
+                navigator.clipboard.writeText(json);
+                showToast('JSONをコピーしました');
+            }
+        });
+    </script>
+</body>
+</html>

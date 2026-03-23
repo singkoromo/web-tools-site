@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI計算機 - ToolBox</title>
+    <meta name="description" content="身長と体重から簡単にBMIを計算します。BMI値のカテゴリー判定と理想体重も表示します。">
+    <meta name="keywords" content="BMI,BMI計算,健康,体重,身長,計算機,ツール">
+    <meta property="og:title" content="BMI計算機 - ToolBox">
+    <meta property="og:description" content="身長と体重からBMIを計算。カテゴリー判定と理想体重を表示します。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/bmi-calculator.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/bmi-calculator.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        input[type="number"] {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .unit {
+            color: #6b7280;
+            font-weight: 500;
+            min-width: 2.5rem;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .btn-calculate {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .btn-calculate:hover {
+            background: #2563eb;
+        }
+        .btn-clear {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-clear:hover {
+            background: #d1d5db;
+        }
+        .result-box {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+        .result-box.show {
+            display: block;
+        }
+        .result-main {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .result-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #1f2937;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .bmi-category {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .bmi-category.underweight {
+            background: #dbeafe;
+            color: #0c4a6e;
+        }
+        .bmi-category.normal {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .bmi-category.overweight {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .bmi-category.obese1 {
+            background: #fed7aa;
+            color: #92400e;
+        }
+        .bmi-category.obese2 {
+            background: #fecaca;
+            color: #7f1d1d;
+        }
+        .bmi-category.obese3 {
+            background: #fca5a5;
+            color: #7f1d1d;
+        }
+        .bmi-scale {
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to right, #0ea5e9, #10b981, #fbbf24, #f97316, #ef4444);
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .bmi-indicator {
+            position: absolute;
+            top: -8px;
+            width: 4px;
+            height: 46px;
+            background: #1f2937;
+            border-radius: 2px;
+        }
+        .bmi-scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        .info-box {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .info-value {
+            font-weight: 700;
+            color: #1f2937;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ad-banner {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1>BMI計算機</h1>
+        <p style="color: #6b7280; margin-bottom: 2rem;">身長と体重を入力して、BMIを計算します。</p>
+
+        <div class="ad-banner">広告スペース</div>
+
+        <div class="input-group">
+            <label class="input-label">身長</label>
+            <div class="input-wrapper">
+                <input type="number" id="height" placeholder="例: 170" step="0.1" min="0">
+                <span class="unit">cm</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">体重</label>
+            <div class="input-wrapper">
+                <input type="number" id="weight" placeholder="例: 65" step="0.1" min="0">
+                <span class="unit">kg</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-calculate" onclick="calculateBMI()">計算する</button>
+            <button class="btn-clear" onclick="clearForm()">クリア</button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <div class="result-main">
+                <div class="result-label">BMI値</div>
+                <div class="result-value" id="bmiValue">0</div>
+                <div class="bmi-category" id="bmiCategory"></div>
+            </div>
+
+            <div class="bmi-scale">
+                <div class="bmi-indicator" id="bmiIndicator"></div>
+                <div class="bmi-scale-labels">
+                    <span>18.5</span>
+                    <span>25</span>
+                    <span>30</span>
+                    <span>35</span>
+                    <span>40</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-item">
+                    <span class="info-label">身長</span>
+                    <span class="info-value" id="displayHeight">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">体重</span>
+                    <span class="info-value" id="displayWeight">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">理想体重（下限）</span>
+                    <span class="info-value" id="idealWeightMin">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">理想体重（上限）</span>
+                    <span class="info-value" id="idealWeightMax">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">広告スペース</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <div id="toast"></div>
+
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: #fff; padding: 1rem 1.5rem; border-radius: 6px; z-index: 1000; display: block;';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function getBMICategory(bmi) {
+            if (bmi < 18.5) return { name: 'やせ', class: 'underweight' };
+            if (bmi < 25) return { name: '普通', class: 'normal' };
+            if (bmi < 30) return { name: '肥満1度', class: 'overweight' };
+            if (bmi < 35) return { name: '肥満2度', class: 'obese1' };
+            if (bmi < 40) return { name: '肥満3度', class: 'obese2' };
+            return { name: '肥満4度以上', class: 'obese3' };
+        }
+
+        function calculateBMI() {
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            if (isNaN(height) || isNaN(weight) || height <= 0 || weight <= 0) {
+                showToast('身長と体重を入力してください');
+                return;
+            }
+
+            const heightM = height / 100;
+            const bmi = weight / (heightM * heightM);
+            const category = getBMICategory(bmi);
+
+            document.getElementById('bmiValue').textContent = bmi.toFixed(1);
+            const categoryEl = document.getElementById('bmiCategory');
+            categoryEl.textContent = category.name;
+            categoryEl.className = 'bmi-category ' + category.class;
+
+            document.getElementById('displayHeight').textContent = height.toFixed(1) + ' cm';
+            document.getElementById('displayWeight').textContent = weight.toFixed(1) + ' kg';
+
+            const idealMinBMI = 18.5;
+            const idealMaxBMI = 25;
+            const idealWeightMin = idealMinBMI * heightM * heightM;
+            const idealWeightMax = idealMaxBMI * heightM * heightM;
+            document.getElementById('idealWeightMin').textContent = idealWeightMin.toFixed(1) + ' kg';
+            document.getElementById('idealWeightMax').textContent = idealWeightMax.toFixed(1) + ' kg';
+
+            const indicator = document.getElementById('bmiIndicator');
+            let position = (bmi / 50) * 100;
+            if (position > 100) position = 100;
+            if (position < 0) position = 0;
+            indicator.style.left = position + '%';
+
+            document.getElementById('resultBox').classList.add('show');
+        }
+
+        function clearForm() {
+            document.getElementById('height').value = '';
+            document.getElementById('weight').value = '';
+            document.getElementById('resultBox').classList.remove('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('height').addEventListener('input', calculateBMI);
+            document.getElementById('weight').addEventListener('input', calculateBMI);
+        });
+    </script>
+</body>
+</html>

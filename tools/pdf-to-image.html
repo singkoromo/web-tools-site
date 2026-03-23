@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PDFの各ページをPNG/JPEG画像に変換。ブラウザ上で動作し、データは送信されません。">
+    <meta property="og:title" content="PDF→画像変換 - ToolBox">
+    <meta property="og:description" content="PDFページをPNG/JPEG画像に変換するブラウザツール。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/pdf-to-image.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/pdf-to-image.html">
+    <title>PDF→画像変換 - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .drop-zone {
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9ff;
+            transition: background 0.2s;
+            margin-bottom: 20px;
+        }
+        .drop-zone:hover, .drop-zone.drag-over { background: #e8f0ff; }
+        .drop-zone input[type="file"] { display: none; }
+        .drop-zone .icon { font-size: 48px; margin-bottom: 12px; }
+        .options-bar {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            margin-bottom: 20px; align-items: center;
+        }
+        .options-bar label { font-weight: 500; }
+        .options-bar select, .options-bar input[type="range"] {
+            padding: 6px 10px; border: 1px solid #ddd;
+            border-radius: 4px; font-family: inherit;
+        }
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px; margin-top: 20px;
+        }
+        .page-card {
+            border: 1px solid #ddd; border-radius: 8px;
+            overflow: hidden; background: #fff;
+        }
+        .page-card canvas { width: 100%; display: block; }
+        .page-card .page-footer {
+            padding: 8px; display: flex;
+            justify-content: space-between; align-items: center;
+            font-size: 13px; background: #f8f9fa;
+        }
+        .btn-primary {
+            padding: 10px 20px; background: #007bff; color: #fff;
+            border: none; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-family: inherit; font-size: 14px;
+        }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-sm {
+            padding: 4px 10px; background: #007bff; color: #fff;
+            border: none; border-radius: 4px; cursor: pointer;
+            font-size: 12px; font-family: inherit;
+        }
+        .btn-sm:hover { background: #0056b3; }
+        .progress-bar {
+            height: 6px; background: #e9ecef; border-radius: 3px;
+            margin-bottom: 16px; overflow: hidden; display: none;
+        }
+        .progress-fill {
+            height: 100%; background: #007bff;
+            transition: width 0.3s; border-radius: 3px;
+        }
+        .info-box {
+            background: #e7f3ff; border-left: 4px solid #007bff;
+            padding: 12px; border-radius: 4px; font-size: 14px;
+            color: #004085; margin-bottom: 20px;
+        }
+        .scale-val { font-weight: 600; color: #007bff; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+        <div class="tool-container">
+            <h1>PDF → 画像変換</h1>
+            <div class="info-box">
+                PDFの各ページをPNG/JPEG画像に変換します。変換はブラウザ上で行われ、ファイルはサーバーに送信されません。
+            </div>
+
+            <div class="drop-zone" id="dropZone">
+                <div class="icon">📄</div>
+                <p><strong>PDFファイルをドロップ</strong>またはクリックして選択</p>
+                <p style="color:#888; font-size:13px;">PDFファイルのみ対応</p>
+                <input type="file" id="fileInput" accept=".pdf,application/pdf">
+            </div>
+
+            <div class="options-bar">
+                <label>フォーマット：
+                    <select id="format">
+                        <option value="png">PNG（高品質）</option>
+                        <option value="jpeg">JPEG</option>
+                    </select>
+                </label>
+                <label>解像度スケール：
+                    <input type="range" id="scale" min="1" max="4" step="0.5" value="2">
+                    <span class="scale-val" id="scaleVal">2x</span>
+                </label>
+                <button class="btn-primary" id="downloadAllBtn" style="display:none">
+                    📦 全ページをZIPでダウンロード
+                </button>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="pages-grid" id="pagesGrid"></div>
+        </div>
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let renderedCanvases = [];
+
+        function showToast(msg, duration = 2500) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), duration);
+        }
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') processFile(file);
+            else showToast('PDFファイルを選択してください');
+        });
+        fileInput.addEventListener('change', e => {
+            if (e.target.files[0]) processFile(e.target.files[0]);
+        });
+
+        document.getElementById('scale').addEventListener('input', function() {
+            document.getElementById('scaleVal').textContent = this.value + 'x';
+        });
+
+        async function processFile(file) {
+            const grid = document.getElementById('pagesGrid');
+            grid.innerHTML = '';
+            renderedCanvases = [];
+            document.getElementById('downloadAllBtn').style.display = 'none';
+
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                const numPages = pdf.numPages;
+                const scale = parseFloat(document.getElementById('scale').value);
+                const format = document.getElementById('format').value;
+
+                for (let i = 1; i <= numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({ scale });
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const ctx = canvas.getContext('2d');
+                    await page.render({ canvasContext: ctx, viewport }).promise;
+
+                    renderedCanvases.push({ canvas, page: i, format });
+
+                    const card = document.createElement('div');
+                    card.className = 'page-card';
+                    const thumb = document.createElement('canvas');
+                    const maxW = 300;
+                    const ratio = maxW / canvas.width;
+                    thumb.width = maxW;
+                    thumb.height = canvas.height * ratio;
+                    thumb.getContext('2d').drawImage(canvas, 0, 0, thumb.width, thumb.height);
+                    card.appendChild(thumb);
+
+                    const footer = document.createElement('div');
+                    footer.className = 'page-footer';
+                    footer.innerHTML = `<span>ページ ${i}</span>`;
+                    const dlBtn = document.createElement('button');
+                    dlBtn.className = 'btn-sm';
+                    dlBtn.textContent = 'DL';
+                    dlBtn.addEventListener('click', () => downloadPage(canvas, i, format, file.name));
+                    footer.appendChild(dlBtn);
+                    card.appendChild(footer);
+                    grid.appendChild(card);
+
+                    progressFill.style.width = Math.round((i / numPages) * 100) + '%';
+                }
+
+                progressBar.style.display = 'none';
+                document.getElementById('downloadAllBtn').style.display = numPages > 1 ? 'inline-block' : 'none';
+                showToast(`${numPages}ページの変換が完了しました`);
+            } catch (err) {
+                progressBar.style.display = 'none';
+                showToast('エラー: ' + err.message);
+            }
+        }
+
+        function downloadPage(canvas, page, format, fileName) {
+            const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const ext = format === 'jpeg' ? 'jpg' : 'png';
+            const baseName = fileName.replace('.pdf', '');
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${baseName}_page${page}.${ext}`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }, mimeType, 0.92);
+        }
+
+        document.getElementById('downloadAllBtn').addEventListener('click', async () => {
+            if (!renderedCanvases.length) return;
+
+            // Simple sequential download
+            for (const { canvas, page, format } of renderedCanvases) {
+                const fileName = 'pdf';
+                downloadPage(canvas, page, format, fileName + '.pdf');
+                await new Promise(r => setTimeout(r, 200));
+            }
+            showToast('全ページをダウンロードしました');
+        });
+    </script>
+</body>
+</html>

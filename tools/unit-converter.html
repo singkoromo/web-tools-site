@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単位変換 - ToolBox</title>
+    <meta name="description" content="長さ、重さ、温度、面積、体積、速度、データ容量を簡単に変換できるツール">
+    <meta name="keywords" content="単位変換, 長さ, 重さ, 温度, 面積, 体積, 速度, データ容量">
+    <meta property="og:url" content="https://web-tool-site.com/tools/unit-converter.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="単位変換 - ToolBox">
+    <meta property="og:description" content="長さ、重さ、温度、面積、体積、速度、データ容量を簡単に変換できるツール">
+    <link rel="canonical" href="https://web-tool-site.com/tools/unit-converter.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .category-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .converter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #666;
+        }
+        .input-group select,
+        .input-group input {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .input-group select:focus,
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .result-display {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 3rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="tool-title">単位変換</h1>
+
+        <div class="ad-banner">広告スペース: 単位変換ツール</div>
+
+        <div id="categories"></div>
+
+        <div class="ad-banner">広告スペース: 単位変換ツール下部</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const conversions = {
+            '長さ': {
+                units: ['mm', 'cm', 'm', 'km', 'inch', 'foot', 'yard', 'mile'],
+                toBase: {
+                    'mm': 0.001,
+                    'cm': 0.01,
+                    'm': 1,
+                    'km': 1000,
+                    'inch': 0.0254,
+                    'foot': 0.3048,
+                    'yard': 0.9144,
+                    'mile': 1609.344
+                }
+            },
+            '重さ': {
+                units: ['mg', 'g', 'kg', 'ton', 'oz', 'lb'],
+                toBase: {
+                    'mg': 0.000001,
+                    'g': 0.001,
+                    'kg': 1,
+                    'ton': 1000,
+                    'oz': 0.0283495,
+                    'lb': 0.453592
+                }
+            },
+            '温度': {
+                units: ['°C', '°F', 'K'],
+                custom: true
+            },
+            '面積': {
+                units: ['mm²', 'cm²', 'm²', 'km²', 'acre', 'hectare'],
+                toBase: {
+                    'mm²': 0.000001,
+                    'cm²': 0.0001,
+                    'm²': 1,
+                    'km²': 1000000,
+                    'acre': 4046.86,
+                    'hectare': 10000
+                }
+            },
+            '体積': {
+                units: ['mL', 'L', 'gallon', 'cup', 'tablespoon'],
+                toBase: {
+                    'mL': 0.001,
+                    'L': 1,
+                    'gallon': 3.78541,
+                    'cup': 0.236588,
+                    'tablespoon': 0.0147868
+                }
+            },
+            '速度': {
+                units: ['m/s', 'km/h', 'mph', 'knot'],
+                toBase: {
+                    'm/s': 1,
+                    'km/h': 0.277778,
+                    'mph': 0.44704,
+                    'knot': 0.51444
+                }
+            },
+            'データ容量': {
+                units: ['B', 'KB', 'MB', 'GB', 'TB', 'PB'],
+                toBase: {
+                    'B': 1,
+                    'KB': 1024,
+                    'MB': 1048576,
+                    'GB': 1073741824,
+                    'TB': 1099511627776,
+                    'PB': 1125899906842624
+                }
+            }
+        };
+
+        function convertTemperature(value, fromUnit, toUnit) {
+            let celsius;
+            if (fromUnit === '°C') celsius = value;
+            else if (fromUnit === '°F') celsius = (value - 32) * 5/9;
+            else if (fromUnit === 'K') celsius = value - 273.15;
+
+            if (toUnit === '°C') return celsius;
+            else if (toUnit === '°F') return celsius * 9/5 + 32;
+            else if (toUnit === 'K') return celsius + 273.15;
+        }
+
+        function convert(value, fromUnit, toUnit, category) {
+            if (isNaN(value) || value === '') return '';
+
+            const config = conversions[category];
+
+            if (config.custom) {
+                return convertTemperature(parseFloat(value), fromUnit, toUnit).toFixed(6).replace(/\.?0+$/, '');
+            }
+
+            const baseValue = parseFloat(value) * config.toBase[fromUnit];
+            const result = baseValue / config.toBase[toUnit];
+            return result.toExponential().includes('e') && result < 0.0001
+                ? result.toExponential(6)
+                : result.toFixed(10).replace(/\.?0+$/, '');
+        }
+
+        function createConverter(category) {
+            const config = conversions[category];
+            const units = config.units;
+
+            const section = document.createElement('div');
+            section.className = 'category-section';
+            section.innerHTML = `
+                <h2 class="category-title">${category}</h2>
+                <div class="converter-row">
+                    <div class="input-group">
+                        <label>${units[0]}:</label>
+                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem;">
+                            <input type="number" class="input1" placeholder="値を入力" step="any">
+                            <select class="select1">
+                                ${units.map(u => `<option value="${u}">${u}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>${units[1]}:</label>
+                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem;">
+                            <input type="number" class="input2" placeholder="値を入力" step="any">
+                            <select class="select2">
+                                ${units.map(u => `<option value="${u}">${u}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const input1 = section.querySelector('.input1');
+            const input2 = section.querySelector('.input2');
+            const select1 = section.querySelector('.select1');
+            const select2 = section.querySelector('.select2');
+
+            function updateInput2() {
+                if (input1.value === '') {
+                    input2.value = '';
+                    return;
+                }
+                const result = convert(input1.value, select1.value, select2.value, category);
+                input2.value = result;
+            }
+
+            function updateInput1() {
+                if (input2.value === '') {
+                    input1.value = '';
+                    return;
+                }
+                const result = convert(input2.value, select2.value, select1.value, category);
+                input1.value = result;
+            }
+
+            input1.addEventListener('input', updateInput2);
+            input2.addEventListener('input', updateInput1);
+            select1.addEventListener('change', updateInput2);
+            select2.addEventListener('change', updateInput1);
+
+            return section;
+        }
+
+        function init() {
+            const container = document.getElementById('categories');
+            Object.keys(conversions).forEach(category => {
+                container.appendChild(createConverter(category));
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

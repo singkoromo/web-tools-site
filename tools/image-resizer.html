@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画像リサイズ - ToolBox</title>
+    <meta name="description" content="簡単に画像をリサイズできるオンラインツール。アスペクト比の保持や複数のプリセットに対応。">
+    <link rel="canonical" href="https://web-tool-site.com/tools/image-resizer.html">
+    <meta property="og:title" content="画像リサイズ - ToolBox">
+    <meta property="og:description" content="簡単に画像をリサイズできるオンラインツール。アスペクト比の保持や複数のプリセットに対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/image-resizer.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page {
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tool-container {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f9f9f9;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #0066cc;
+            background-color: #f0f4ff;
+        }
+
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+
+        .preview-section {
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .preview-item {
+            text-align: center;
+        }
+
+        .preview-item img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .preview-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .form-group {
+            margin: 1.5rem 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0052a3;
+        }
+
+        .preset-btn {
+            background-color: #f0f0f0;
+            color: #333;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .preset-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .quality-slider {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            flex: 1;
+        }
+
+        .quality-value {
+            font-family: 'JetBrains Mono', monospace;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .ad-banner {
+            margin: 2rem 0;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .ad-placeholder {
+            background-color: #e0e0e0;
+            border: 1px dashed #999;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            border-radius: 4px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .logo svg {
+            width: 28px;
+            height: 28px;
+            color: #0066cc;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #0066cc;
+        }
+
+        footer {
+            background-color: #f5f5f5;
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid #eee;
+            margin-top: 2rem;
+        }
+
+        footer a {
+            color: #0066cc;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-info {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .preview-section {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                align-items: stretch;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg>
+            ToolBox
+        </a>
+        <nav>
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </header>
+
+    <div class="tool-page">
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-container">
+            <h1>画像リサイズ</h1>
+
+            <div class="drop-zone" id="dropZone">
+                <p>画像をドラッグ＆ドロップするか、ここをクリックして選択してください</p>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+
+            <div id="previewContainer" style="display: none;">
+                <div class="preview-section">
+                    <div class="preview-item">
+                        <h3>元の画像</h3>
+                        <img id="originalImage" src="" alt="Original">
+                        <div class="preview-info">
+                            幅: <span id="originalWidth">-</span>px<br>
+                            高さ: <span id="originalHeight">-</span>px<br>
+                            ファイルサイズ: <span id="originalSize">-</span>
+                        </div>
+                    </div>
+                    <div class="preview-item">
+                        <h3>リサイズ後</h3>
+                        <canvas id="previewCanvas" style="max-width: 100%; max-height: 300px; border-radius: 4px; margin: 1rem 0;"></canvas>
+                        <div class="preview-info">
+                            幅: <span id="previewWidth">-</span>px<br>
+                            高さ: <span id="previewHeight">-</span>px<br>
+                            ファイルサイズ: <span id="previewSize">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>寸法設定</label>
+                    <div class="form-row">
+                        <div>
+                            <label for="width" style="margin-bottom: 0.25rem; display: inline;">幅 (px)</label>
+                            <input type="number" id="width" min="1">
+                        </div>
+                        <div>
+                            <label for="height" style="margin-bottom: 0.25rem; display: inline;">高さ (px)</label>
+                            <input type="number" id="height" min="1">
+                        </div>
+                        <div>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="lockAspectRatio" checked>
+                                アスペクト比を固定
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>プリセット</label>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" data-scale="0.5">50%</button>
+                        <button class="preset-btn" data-scale="0.75">75%</button>
+                        <button class="preset-btn" data-scale="1">元のサイズ</button>
+                        <button class="preset-btn" data-scale="1.5">150%</button>
+                        <button class="preset-btn" data-scale="2">200%</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="outputFormat">出力形式</label>
+                    <select id="outputFormat">
+                        <option value="auto">元の形式と同じ</option>
+                        <option value="image/png">PNG</option>
+                        <option value="image/jpeg">JPEG</option>
+                        <option value="image/webp">WebP</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="qualityGroup" style="display: none;">
+                    <label for="quality">品質</label>
+                    <div class="quality-slider">
+                        <input type="range" id="quality" min="0.1" max="1" step="0.1" value="0.8">
+                        <span class="quality-value"><span id="qualityValue">0.8</span></span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="resizeBtn" style="flex: 1;">リサイズ実行</button>
+                    <button id="downloadBtn" style="flex: 1;">ダウンロード</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </div>
+
+    <footer>
+        <div>
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+            <a href="../privacy.html">プライバシーポリシー</a>
+        </div>
+        <div class="footer-info" style="margin-top: 1rem;">© 2026 ToolBox</div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let originalImage = null;
+        let originalFile = null;
+        let resizedCanvas = null;
+        let aspectRatio = 1;
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                loadImage(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                loadImage(e.target.files[0]);
+            }
+        });
+
+        function loadImage(file) {
+            originalFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalImage = new Image();
+                originalImage.onload = () => {
+                    aspectRatio = originalImage.width / originalImage.height;
+                    document.getElementById('originalImage').src = e.target.result;
+                    document.getElementById('originalWidth').textContent = originalImage.width;
+                    document.getElementById('originalHeight').textContent = originalImage.height;
+                    document.getElementById('originalSize').textContent = formatFileSize(file.size);
+                    document.getElementById('width').value = originalImage.width;
+                    document.getElementById('height').value = originalImage.height;
+                    document.getElementById('previewContainer').style.display = 'block';
+                    updatePreview();
+                };
+                originalImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        document.getElementById('width').addEventListener('input', () => {
+            if (document.getElementById('lockAspectRatio').checked) {
+                const width = parseInt(document.getElementById('width').value);
+                document.getElementById('height').value = Math.round(width / aspectRatio);
+            }
+            updatePreview();
+        });
+
+        document.getElementById('height').addEventListener('input', () => {
+            if (document.getElementById('lockAspectRatio').checked) {
+                const height = parseInt(document.getElementById('height').value);
+                document.getElementById('width').value = Math.round(height * aspectRatio);
+            }
+            updatePreview();
+        });
+
+        document.getElementById('lockAspectRatio').addEventListener('change', () => {
+            updatePreview();
+        });
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const scale = parseFloat(btn.dataset.scale);
+                document.getElementById('width').value = Math.round(originalImage.width * scale);
+                document.getElementById('height').value = Math.round(originalImage.height * scale);
+                updatePreview();
+            });
+        });
+
+        document.getElementById('outputFormat').addEventListener('change', () => {
+            const format = document.getElementById('outputFormat').value;
+            const qualityGroup = document.getElementById('qualityGroup');
+            if (format === 'image/jpeg' || format === 'image/webp') {
+                qualityGroup.style.display = 'block';
+            } else {
+                qualityGroup.style.display = 'none';
+            }
+            updatePreview();
+        });
+
+        document.getElementById('quality').addEventListener('input', (e) => {
+            document.getElementById('qualityValue').textContent = e.target.value;
+            updatePreview();
+        });
+
+        function updatePreview() {
+            if (!originalImage) return;
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(originalImage, 0, 0, width, height);
+            document.getElementById('previewWidth').textContent = width;
+            document.getElementById('previewHeight').textContent = height;
+
+            canvas.toBlob((blob) => {
+                document.getElementById('previewSize').textContent = formatFileSize(blob.size);
+            }, document.getElementById('outputFormat').value === 'auto' ? originalFile.type : document.getElementById('outputFormat').value);
+        }
+
+        document.getElementById('resizeBtn').addEventListener('click', () => {
+            if (!originalImage) {
+                showToast('画像を選択してください');
+                return;
+            }
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const canvas = document.getElementById('previewCanvas');
+            resizedCanvas = canvas;
+            showToast('リサイズが完了しました');
+            document.getElementById('downloadBtn').classList.remove('disabled');
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (!resizedCanvas) {
+                showToast('先にリサイズを実行してください');
+                return;
+            }
+            const format = document.getElementById('outputFormat').value === 'auto' ? originalFile.type : document.getElementById('outputFormat').value;
+            const quality = document.getElementById('quality').value;
+            resizedCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `resized-${Date.now()}.${format.split('/')[1]}`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('ダウンロードが開始されました');
+            }, format, parseFloat(quality));
+        });
+    </script>
+</body>
+</html>

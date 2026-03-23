@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SHA-1、SHA-256、SHA-384、SHA-512のハッシュ値を生成するツール。テキストファイル両方に対応し、リアルタイムで計算します。">
+    <meta property="og:title" content="ハッシュ生成器 - ToolBox">
+    <meta property="og:description" content="SHA-1、SHA-256、SHA-384、SHA-512のハッシュ値を生成するツール。テキストとファイルに対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/hash-generator.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/hash-generator.html">
+    <title>ハッシュ生成器 - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .input-section {
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        textarea {
+            min-height: 150px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border-radius: 4px;
+            font-weight: 500;
+            text-align: center;
+            min-width: 150px;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .file-name {
+            margin-top: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+        .format-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .format-toggle button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: Inter, sans-serif;
+            font-weight: 500;
+        }
+        .format-toggle button.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .hashes-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .hash-item {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        .hash-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+        .hash-value {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .hash-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            background: #f8f9fa;
+        }
+        .copy-btn {
+            padding: 8px 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        .note {
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-container">
+            <h1>ハッシュ生成器</h1>
+
+            <div class="note">
+                注：MD5はWebCryptoAPIで非サポートのため、SHA-1、SHA-256、SHA-384、SHA-512のみ対応しています。
+            </div>
+
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="textInput">テキスト入力</label>
+                    <textarea id="textInput" placeholder="ハッシュ化するテキストを入力してください"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>またはファイルをアップロード</label>
+                    <div class="file-input-wrapper">
+                        <label class="file-input-label">ファイルを選択</label>
+                        <input type="file" id="fileInput">
+                    </div>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+            </div>
+
+            <div class="format-toggle">
+                <button class="format-btn active" data-format="hex">16進数</button>
+                <button class="format-btn" data-format="base64">Base64</button>
+            </div>
+
+            <div class="hashes-grid">
+                <div class="hash-item">
+                    <div class="hash-label">SHA-1</div>
+                    <div class="hash-value">
+                        <input type="text" class="hash-input" id="sha1-output" readonly>
+                        <button class="copy-btn" onclick="copyHash('sha1-output')">コピー</button>
+                    </div>
+                </div>
+
+                <div class="hash-item">
+                    <div class="hash-label">SHA-256</div>
+                    <div class="hash-value">
+                        <input type="text" class="hash-input" id="sha256-output" readonly>
+                        <button class="copy-btn" onclick="copyHash('sha256-output')">コピー</button>
+                    </div>
+                </div>
+
+                <div class="hash-item">
+                    <div class="hash-label">SHA-384</div>
+                    <div class="hash-value">
+                        <input type="text" class="hash-input" id="sha384-output" readonly>
+                        <button class="copy-btn" onclick="copyHash('sha384-output')">コピー</button>
+                    </div>
+                </div>
+
+                <div class="hash-item">
+                    <div class="hash-label">SHA-512</div>
+                    <div class="hash-value">
+                        <input type="text" class="hash-input" id="sha512-output" readonly>
+                        <button class="copy-btn" onclick="copyHash('sha512-output')">コピー</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let format = 'hex';
+
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        function copyHash(id) {
+            const el = document.getElementById(id);
+            if (el.value) {
+                navigator.clipboard.writeText(el.value).then(() => {
+                    showToast('コピーしました');
+                }).catch(() => {
+                    showToast('コピーに失敗しました');
+                });
+            }
+        }
+
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                format = btn.dataset.format;
+                generateHashes();
+            });
+        });
+
+        async function generateHashes(data = null) {
+            if (data === null) {
+                const text = document.getElementById('textInput').value;
+                if (!text) {
+                    document.getElementById('sha1-output').value = '';
+                    document.getElementById('sha256-output').value = '';
+                    document.getElementById('sha384-output').value = '';
+                    document.getElementById('sha512-output').value = '';
+                    return;
+                }
+                data = new TextEncoder().encode(text);
+            }
+
+            try {
+                const hashes = {
+                    'sha1': 'SHA-1',
+                    'sha256': 'SHA-256',
+                    'sha384': 'SHA-384',
+                    'sha512': 'SHA-512'
+                };
+
+                for (const [key, name] of Object.entries(hashes)) {
+                    const hashBuffer = await crypto.subtle.digest(name, data);
+                    let hashValue;
+
+                    if (format === 'hex') {
+                        const hashArray = Array.from(new Uint8Array(hashBuffer));
+                        hashValue = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    } else {
+                        const hashArray = Array.from(new Uint8Array(hashBuffer));
+                        const binaryString = String.fromCharCode(...hashArray);
+                        hashValue = btoa(binaryString);
+                    }
+
+                    document.getElementById(`${key}-output`).value = hashValue;
+                }
+            } catch (e) {
+                showToast('ハッシュ生成エラー: ' + e.message);
+            }
+        }
+
+        document.getElementById('textInput').addEventListener('input', () => {
+            generateHashes();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = 'ファイル: ' + file.name;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const data = new Uint8Array(event.target.result);
+                    generateHashes(data);
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                document.getElementById('fileName').textContent = '';
+                generateHashes();
+            }
+        });
+    </script>
+</body>
+</html>

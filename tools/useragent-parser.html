@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User-Agent解析 - ToolBox</title>
+    <meta name="description" content="User-Agent文字列を解析して、ブラウザ、OS、デバイスタイプを特定します。">
+    <meta name="keywords" content="User-Agent, ブラウザ, OS, デバイス, 解析">
+    <meta property="og:title" content="User-Agent解析 - ToolBox">
+    <meta property="og:description" content="User-Agent文字列を解析して、ブラウザ、OS、デバイスタイプを特定します。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/useragent-parser.html">
+    <meta property="og:site_name" content="ToolBox">
+    <link rel="canonical" href="https://web-tool-site.com/tools/useragent-parser.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-light: #eff6ff;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #e5e7eb;
+            --bg: #f9fafb;
+            --text: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .ad-top {
+            background: #f0f0f0;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .tool-section {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .tool-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        textarea {
+            min-height: 100px;
+            font-family: 'JetBrains Mono', monospace;
+            resize: vertical;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .info-card {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card label {
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .info-card .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--text);
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        .results {
+            margin-top: 2rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav {
+                gap: 1rem;
+            }
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .footer {
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--text);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .current-ua {
+            background: #e0f2fe;
+            border-left: 4px solid #0284c7;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .ua-section {
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="ad-top">
+            📢 広告スペース
+        </div>
+
+        <div class="tool-section">
+            <h2>User-Agent解析</h2>
+
+            <div class="ua-section">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">現在のブラウザ</h3>
+                <div class="current-ua">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <label style="margin-bottom: 0.25rem;">User-Agent文字列</label>
+                            <div id="currentUADisplay" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; word-break: break-all; color: var(--text);"></div>
+                        </div>
+                        <button class="copy-btn" onclick="copyCurrentUA()" style="margin-left: 1rem; white-space: nowrap;">コピー</button>
+                    </div>
+                </div>
+                <button onclick="parseCurrentUA()" style="width: 100%;">現在のBrowserを解析</button>
+            </div>
+
+            <div class="ua-section">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">カスタムUser-Agent解析</h3>
+                <div class="form-group">
+                    <label for="uaInput">User-Agent文字列を入力またはペースト</label>
+                    <textarea id="uaInput" placeholder="例: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"></textarea>
+                    <button onclick="parseUA()" style="margin-top: 0.5rem; width: 100%;">解析</button>
+                </div>
+            </div>
+
+            <div id="results"></div>
+        </div>
+
+        <div class="ad-top">
+            📢 広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        © 2026 ToolBox. All rights reserved.
+    </footer>
+
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function copyCurrentUA() {
+            const ua = navigator.userAgent;
+            navigator.clipboard.writeText(ua).then(() => {
+                showToast('User-Agentをコピーしました！');
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました！');
+            });
+        }
+
+        window.addEventListener('load', () => {
+            document.getElementById('currentUADisplay').textContent = navigator.userAgent;
+        });
+
+        function parseUA(input = null) {
+            const ua = input || document.getElementById('uaInput').value.trim();
+            if (!ua) {
+                document.getElementById('results').innerHTML = '<p style="color: #ef4444; font-weight: 500;">User-Agent文字列を入力してください。</p>';
+                return;
+            }
+
+            const result = analyzeUserAgent(ua);
+            displayResults(result, ua);
+        }
+
+        function parseCurrentUA() {
+            const ua = navigator.userAgent;
+            const result = analyzeUserAgent(ua);
+            displayResults(result, ua);
+        }
+
+        function analyzeUserAgent(ua) {
+            let browser = { name: '不明', version: '不明' };
+            let os = { name: '不明', version: '不明' };
+            let device = 'デスクトップ';
+            let engine = '不明';
+
+            // Browser and Engine detection
+            if (/Edge/.test(ua)) {
+                browser.name = 'Edge';
+                engine = 'Blink';
+                const match = ua.match(/Edge\/(\d+)/);
+                if (match) browser.version = match[1];
+            } else if (/Chrome/.test(ua)) {
+                browser.name = 'Chrome';
+                engine = 'Blink';
+                const match = ua.match(/Chrome\/(\d+)/);
+                if (match) browser.version = match[1];
+            } else if (/Safari/.test(ua) && !/Chrome/.test(ua)) {
+                browser.name = 'Safari';
+                engine = 'WebKit';
+                const match = ua.match(/Version\/(\d+)/);
+                if (match) browser.version = match[1];
+            } else if (/Firefox/.test(ua)) {
+                browser.name = 'Firefox';
+                engine = 'Gecko';
+                const match = ua.match(/Firefox\/(\d+)/);
+                if (match) browser.version = match[1];
+            } else if (/Trident/.test(ua)) {
+                browser.name = 'Internet Explorer';
+                engine = 'Trident';
+                const match = ua.match(/rv:(\d+)/);
+                if (match) browser.version = match[1];
+            } else if (/OPR|Opera/.test(ua)) {
+                browser.name = 'Opera';
+                engine = 'Blink';
+                const match = ua.match(/(?:Opera|OPR)\/(\d+)/);
+                if (match) browser.version = match[1];
+            }
+
+            // OS detection
+            if (/Windows/.test(ua)) {
+                os.name = 'Windows';
+                if (/Windows NT 10.0/.test(ua)) {
+                    os.version = '10';
+                    if (/Windows NT 10.0; Win64; x64/.test(ua) && /ZX\)/.test(ua)) {
+                        os.version = '11';
+                    }
+                } else if (/Windows NT 6.3/.test(ua)) {
+                    os.version = '8.1';
+                } else if (/Windows NT 6.2/.test(ua)) {
+                    os.version = '8';
+                }
+            } else if (/Macintosh/.test(ua)) {
+                os.name = 'macOS';
+                const match = ua.match(/Mac OS X ([\d_.]+)/);
+                if (match) os.version = match[1].replace(/_/g, '.');
+            } else if (/iPhone/.test(ua)) {
+                os.name = 'iOS';
+                device = 'スマートフォン';
+                const match = ua.match(/OS ([\d_]+)/);
+                if (match) os.version = match[1].replace(/_/g, '.');
+            } else if (/iPad/.test(ua)) {
+                os.name = 'iPadOS';
+                device = 'タブレット';
+                const match = ua.match(/OS ([\d_]+)/);
+                if (match) os.version = match[1].replace(/_/g, '.');
+            } else if (/Android/.test(ua)) {
+                os.name = 'Android';
+                device = /Mobile/.test(ua) ? 'スマートフォン' : 'タブレット';
+                const match = ua.match(/Android ([\d.]+)/);
+                if (match) os.version = match[1];
+            } else if (/Linux/.test(ua)) {
+                os.name = 'Linux';
+            }
+
+            // Device detection
+            if (/Mobile|Android|iPhone|iPad|iPod/.test(ua) && device === 'デスクトップ') {
+                device = /iPad/.test(ua) ? 'タブレット' : 'スマートフォン';
+            }
+
+            return { browser, os, device, engine };
+        }
+
+        function displayResults(result, ua) {
+            const resultsDiv = document.getElementById('results');
+
+            resultsDiv.innerHTML = `
+                <div class="results">
+                    <div class="grid-2">
+                        <div class="info-card">
+                            <label>ブラウザ</label>
+                            <div class="value">${result.browser.name} ${result.browser.version}</div>
+                        </div>
+                        <div class="info-card">
+                            <label>OS</label>
+                            <div class="value">${result.os.name} ${result.os.version}</div>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="info-card">
+                            <label>デバイスタイプ</label>
+                            <div class="value">${result.device}</div>
+                        </div>
+                        <div class="info-card">
+                            <label>レンダリングエンジン</label>
+                            <div class="value">${result.engine}</div>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <label>User-Agent文字列</label>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                            <div class="value" style="flex: 1;">${ua}</div>
+                            <button class="copy-btn" onclick="copyToClipboard('${ua.replace(/'/g, "\\'")}')">コピー</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

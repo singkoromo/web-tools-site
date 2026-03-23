@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="URLエンコードとデコードをリアルタイムで行うツール。コンポーネント形式と完全URL形式に対応し、クリップボードへの直接コピーが可能です。">
+    <meta property="og:title" content="URLエンコード/デコード - ToolBox">
+    <meta property="og:description" content="URLエンコードとデコードをリアルタイムで行うツール。コンポーネント形式と完全URL形式に対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/url-encoder.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/url-encoder.html">
+    <title>URLエンコード/デコード - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .mode-toggle button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: Inter, sans-serif;
+        }
+        .mode-toggle button.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .textarea-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .textarea-group {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        textarea {
+            min-height: 250px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Inter, sans-serif;
+            font-weight: 500;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #545b62;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .checkbox-group input {
+            cursor: pointer;
+        }
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-container">
+            <h1>URLエンコード/デコード</h1>
+
+            <div class="mode-toggle">
+                <button class="mode-btn active" data-mode="component">コンポーネント形式</button>
+                <button class="mode-btn" data-mode="full">完全URL形式</button>
+            </div>
+
+            <div class="error" id="errorMsg"></div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="realtimeToggle">
+                <label for="realtimeToggle">リアルタイム変換</label>
+            </div>
+
+            <div class="textarea-group">
+                <div class="form-group">
+                    <label for="inputText">入力テキスト</label>
+                    <textarea id="inputText" placeholder="エンコード/デコードするテキストを入力"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="outputText">出力テキスト</label>
+                    <textarea id="outputText" placeholder="結果がここに表示されます" readonly></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="encodeBtn">エンコード</button>
+                <button id="decodeBtn">デコード</button>
+                <button class="secondary" id="copyBtn">コピー</button>
+                <button class="secondary" id="clearBtn">クリア</button>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let mode = 'component';
+
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMsg');
+            if (message) {
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            } else {
+                errorEl.classList.remove('show');
+            }
+        }
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                mode = btn.dataset.mode;
+                document.getElementById('outputText').value = '';
+                showError('');
+            });
+        });
+
+        function encodeText() {
+            const input = document.getElementById('inputText').value;
+            const output = document.getElementById('outputText');
+
+            try {
+                if (mode === 'component') {
+                    output.value = encodeURIComponent(input);
+                } else {
+                    output.value = encodeURI(input);
+                }
+                showError('');
+            } catch (e) {
+                showError('エンコードエラー: ' + e.message);
+            }
+        }
+
+        function decodeText() {
+            const input = document.getElementById('inputText').value;
+            const output = document.getElementById('outputText');
+
+            try {
+                output.value = decodeURIComponent(input);
+                showError('');
+            } catch (e) {
+                showError('デコードエラー: 無効なエンコード文字列です');
+            }
+        }
+
+        document.getElementById('encodeBtn').addEventListener('click', encodeText);
+        document.getElementById('decodeBtn').addEventListener('click', decodeText);
+
+        document.getElementById('inputText').addEventListener('input', () => {
+            if (document.getElementById('realtimeToggle').checked) {
+                encodeText();
+            }
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const output = document.getElementById('outputText');
+            if (output.value) {
+                navigator.clipboard.writeText(output.value).then(() => {
+                    showToast('コピーしました');
+                }).catch(() => {
+                    showToast('コピーに失敗しました');
+                });
+            }
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            showError('');
+        });
+    </script>
+</body>
+</html>

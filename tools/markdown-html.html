@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown↔HTML変換 - ToolBox</title>
+    <meta name="description" content="MarkdownとHTMLを相互に変換できるツール">
+    <meta name="keywords" content="Markdown, HTML, 変換">
+    <meta property="og:url" content="https://web-tool-site.com/tools/markdown-html.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Markdown↔HTML変換 - ToolBox">
+    <meta property="og:description" content="MarkdownとHTMLを相互に変換できるツール">
+    <link rel="canonical" href="https://web-tool-site.com/tools/markdown-html.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .editor-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .editor {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .editor-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .editor textarea {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            resize: none;
+            line-height: 1.5;
+            min-height: 400px;
+        }
+        .editor textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .preview {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 550px;
+            background: #fafafa;
+            line-height: 1.6;
+        }
+        .preview h1 { font-size: 1.8rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+        .preview h2 { font-size: 1.5rem; font-weight: 700; margin: 0.9rem 0 0.4rem; }
+        .preview h3 { font-size: 1.3rem; font-weight: 600; margin: 0.8rem 0 0.3rem; }
+        .preview h4 { font-size: 1.1rem; font-weight: 600; margin: 0.7rem 0 0.2rem; }
+        .preview h5 { font-size: 1rem; font-weight: 600; margin: 0.6rem 0; }
+        .preview h6 { font-size: 0.95rem; font-weight: 600; margin: 0.6rem 0; color: #666; }
+        .preview p { margin: 0.5rem 0; }
+        .preview strong { font-weight: 700; }
+        .preview em { font-style: italic; }
+        .preview code {
+            background: #f0f0f0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .preview pre {
+            background: #333;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+        .preview pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .preview blockquote {
+            border-left: 3px solid #667eea;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+            color: #666;
+        }
+        .preview ul, .preview ol {
+            margin: 0.5rem 0 0.5rem 1.5rem;
+        }
+        .preview li { margin: 0.2rem 0; }
+        .preview a { color: #667eea; text-decoration: none; }
+        .preview a:hover { text-decoration: underline; }
+        .preview img { max-width: 100%; height: auto; margin: 0.5rem 0; }
+        .preview hr { border: none; border-top: 1px solid #ddd; margin: 1rem 0; }
+        .preview table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+        .preview th, .preview td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .preview th { background: #f0f0f0; font-weight: 600; }
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+        .error {
+            background: #ffe0e0;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 3rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @media (max-width: 1024px) {
+            .editor-section {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .editor-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="tool-title">Markdown↔HTML変換</h1>
+
+        <div class="ad-banner">広告スペース: Markdown-HTML変換ツール</div>
+
+        <div class="editor-section">
+            <div class="editor">
+                <div class="editor-title">Markdown</div>
+                <textarea id="mdInput" placeholder="Markdownテキストを入力してください..."></textarea>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="mdToHtmlBtn">MD → HTML</button>
+                    <button class="btn btn-secondary" id="mdCopyBtn">コピー</button>
+                </div>
+                <div class="error" id="mdError"></div>
+            </div>
+
+            <div class="editor">
+                <div class="editor-title">HTML</div>
+                <textarea id="htmlInput" placeholder="HTMLコードがここに表示されます..."></textarea>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="htmlToMdBtn">HTML → MD</button>
+                    <button class="btn btn-secondary" id="htmlCopyBtn">コピー</button>
+                </div>
+                <div class="error" id="htmlError"></div>
+            </div>
+
+            <div class="editor">
+                <div class="editor-title">プレビュー</div>
+                <div class="preview" id="preview"></div>
+            </div>
+        </div>
+
+        <div class="ad-banner">広告スペース: Markdown-HTML変換ツール下部</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        function hideError(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function showError(id, message) {
+            const error = document.getElementById(id);
+            error.textContent = message;
+            error.classList.add('show');
+        }
+
+        function markdownToHTML(md) {
+            let html = md;
+
+            // Code blocks
+            html = html.replace(/```([^`]*?)```/gs, '<pre><code>$1</code></pre>');
+
+            // Inline code
+            html = html.replace(/`([^`]+?)`/g, '<code>$1</code>');
+
+            // Bold
+            html = html.replace(/\*\*([^\*]+?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/__([^_]+?)__/g, '<strong>$1</strong>');
+
+            // Italic
+            html = html.replace(/\*([^\*]+?)\*/g, '<em>$1</em>');
+            html = html.replace(/_([^_]+?)_/g, '<em>$1</em>');
+
+            // Headings
+            html = html.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
+
+            // Horizontal rule
+            html = html.replace(/^---$/gm, '<hr>');
+
+            // Links and images
+            html = html.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<img src="$2" alt="$1">');
+            html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2">$1</a>');
+
+            // Blockquotes
+            html = html.replace(/^> (.*?)$/gm, '<blockquote>$1</blockquote>');
+
+            // Lists
+            html = html.replace(/^\* (.*?)$/gm, '<li>$1</li>');
+            html = html.replace(/^- (.*?)$/gm, '<li>$1</li>');
+            html = html.replace(/^\d+\. (.*?)$/gm, '<li>$1</li>');
+
+            // Wrap consecutive list items
+            html = html.replace(/(<li>.*?<\/li>)/s, (match) => {
+                const hasUl = match.includes('•') || match.match(/^- /m);
+                return '<ul>' + match + '</ul>';
+            });
+
+            // Paragraphs
+            html = html.replace(/^(?!<[h|b|u|o|p|l|t|d])(.+?)$/gm, '<p>$1</p>');
+
+            // Merge consecutive lists/blockquotes
+            html = html.replace(/<\/ul>\n<ul>/g, '');
+            html = html.replace(/<\/blockquote>\n<blockquote>/g, '');
+
+            return html;
+        }
+
+        function htmlToMarkdown(html) {
+            let md = html;
+
+            // Remove HTML comments
+            md = md.replace(/<!--.*?-->/gs, '');
+
+            // Headings
+            md = md.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n');
+            md = md.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n');
+            md = md.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n');
+            md = md.replace(/<h4[^>]*>(.*?)<\/h4>/gi, '#### $1\n');
+
+            // Images
+            md = md.replace(/<img[^>]*src="([^"]*)"[^>]*alt="([^"]*)"[^>]*>/gi, '![$2]($1)');
+            md = md.replace(/<img[^>]*src="([^"]*)"[^>]*>/gi, '![]($1)');
+
+            // Links
+            md = md.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+
+            // Bold
+            md = md.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
+            md = md.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
+
+            // Italic
+            md = md.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
+            md = md.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
+
+            // Code blocks
+            md = md.replace(/<pre[^>]*><code[^>]*>(.*?)<\/code><\/pre>/gis, '```\n$1\n```');
+
+            // Inline code
+            md = md.replace(/<code[^>]*>(.*?)<\/code>/gi, '`$1`');
+
+            // Lists
+            md = md.replace(/<ul[^>]*>/gi, '');
+            md = md.replace(/<ol[^>]*>/gi, '');
+            md = md.replace(/<\/ul>/gi, '');
+            md = md.replace(/<\/ol>/gi, '');
+            md = md.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n');
+
+            // Blockquotes
+            md = md.replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gis, '> $1\n');
+
+            // Paragraphs
+            md = md.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n');
+
+            // Horizontal rules
+            md = md.replace(/<hr[^>]*>/gi, '---\n');
+
+            // Remove extra tags
+            md = md.replace(/<[^>]*>/g, '');
+
+            // Clean up whitespace
+            md = md.replace(/\n{3,}/g, '\n\n').trim();
+
+            return md;
+        }
+
+        const mdInput = document.getElementById('mdInput');
+        const htmlInput = document.getElementById('htmlInput');
+        const preview = document.getElementById('preview');
+
+        function updatePreview() {
+            const md = mdInput.value;
+            if (md.trim()) {
+                const html = markdownToHTML(md);
+                preview.innerHTML = html;
+            } else {
+                preview.innerHTML = '';
+            }
+        }
+
+        document.getElementById('mdToHtmlBtn').addEventListener('click', () => {
+            hideError('mdError');
+            const md = mdInput.value;
+            if (!md.trim()) {
+                showError('mdError', 'Markdownが空です');
+                return;
+            }
+            const html = markdownToHTML(md);
+            htmlInput.value = html;
+            hideError('htmlError');
+            updatePreview();
+        });
+
+        document.getElementById('htmlToMdBtn').addEventListener('click', () => {
+            hideError('htmlError');
+            const html = htmlInput.value;
+            if (!html.trim()) {
+                showError('htmlError', 'HTMLが空です');
+                return;
+            }
+            const md = htmlToMarkdown(html);
+            mdInput.value = md;
+            hideError('mdError');
+            updatePreview();
+        });
+
+        document.getElementById('mdCopyBtn').addEventListener('click', () => {
+            if (mdInput.value) {
+                navigator.clipboard.writeText(mdInput.value);
+                showToast('Markdownをコピーしました');
+            }
+        });
+
+        document.getElementById('htmlCopyBtn').addEventListener('click', () => {
+            if (htmlInput.value) {
+                navigator.clipboard.writeText(htmlInput.value);
+                showToast('HTMLをコピーしました');
+            }
+        });
+
+        mdInput.addEventListener('input', updatePreview);
+    </script>
+</body>
+</html>

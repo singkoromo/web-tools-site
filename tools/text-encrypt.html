@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキスト暗号化 - ToolBox</title>
+    <meta name="description" content="テキストをAES-GCMで暗号化・復号化できるツールです。パスワード保護されたテキストを安全に共有できます。">
+    <meta property="og:title" content="テキスト暗号化 - ToolBox">
+    <meta property="og:description" content="テキストをAES-GCMで暗号化・復号化できるツールです。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/text-encrypt.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/text-encrypt.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-section {
+            margin: 20px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-size: 14px;
+        }
+        .warning-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .section {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: #007bff;
+            border-radius: 2px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.6;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-copy {
+            background: #28a745;
+        }
+        .btn-copy:hover {
+            background: #1e7e34;
+        }
+        .output-box {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            word-break: break-all;
+            min-height: 80px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .output-label {
+            font-weight: 500;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .status-message {
+            font-size: 13px;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tool-page">
+        <header class="header">
+            <div class="header-inner">
+                <a href="../index.html" class="logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                    ToolBox
+                </a>
+                <nav class="nav">
+                    <a href="../index.html">ホーム</a>
+                    <a href="../index.html#tools">ツール一覧</a>
+                </nav>
+            </div>
+        </header>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-container">
+            <h1>テキスト暗号化</h1>
+            <p>パスワードを使用してテキストをAES-GCMで暗号化・復号化します。</p>
+
+            <div class="warning">
+                <div class="warning-title">⚠ 重要な注意事項</div>
+                <div>パスワードを忘れると、暗号化されたテキストを復号化することはできません。パスワードは絶対に忘れないようにしてください。</div>
+            </div>
+
+            <div class="tool-section">
+                <div class="section">
+                    <div class="section-title">暗号化</div>
+
+                    <div class="form-group">
+                        <label>暗号化するテキスト</label>
+                        <textarea id="encryptInput" placeholder="暗号化したいテキストを入力してください..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>パスワード</label>
+                        <input type="password" id="encryptPassword" placeholder="暗号化用のパスワードを入力（8文字以上推奨）">
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn" onclick="encrypt()">暗号化</button>
+                    </div>
+
+                    <div id="encryptStatus"></div>
+
+                    <div class="output-label">暗号化されたテキスト（Base64）</div>
+                    <div class="output-box" id="encryptOutput"></div>
+
+                    <div class="button-group">
+                        <button class="btn btn-copy" onclick="copyEncrypted()">暗号化結果をコピー</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">復号化</div>
+
+                    <div class="form-group">
+                        <label>暗号化されたテキスト（Base64）</label>
+                        <textarea id="decryptInput" placeholder="暗号化されたテキストを貼り付けてください..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>パスワード</label>
+                        <input type="password" id="decryptPassword" placeholder="復号化用のパスワードを入力">
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn" onclick="decrypt()">復号化</button>
+                    </div>
+
+                    <div id="decryptStatus"></div>
+
+                    <div class="output-label">復号化されたテキスト</div>
+                    <div class="output-box" id="decryptOutput"></div>
+
+                    <div class="button-group">
+                        <button class="btn btn-copy" onclick="copyDecrypted()">復号化結果をコピー</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        async function deriveKey(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return await crypto.subtle.importKey('raw', hashBuffer, 'AES-GCM', false, ['encrypt', 'decrypt']);
+        }
+
+        async function encrypt() {
+            const plaintext = document.getElementById('encryptInput').value;
+            const password = document.getElementById('encryptPassword').value;
+            const status = document.getElementById('encryptStatus');
+
+            if (!plaintext) {
+                status.innerHTML = '<div class="status-message status-error">エラー: テキストを入力してください</div>';
+                return;
+            }
+
+            if (!password || password.length < 8) {
+                status.innerHTML = '<div class="status-message status-error">エラー: パスワードは8文字以上である必要があります</div>';
+                return;
+            }
+
+            try {
+                const key = await deriveKey(password);
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const encoder = new TextEncoder();
+                const data = encoder.encode(plaintext);
+
+                const ciphertext = await crypto.subtle.encrypt(
+                    { name: 'AES-GCM', iv },
+                    key,
+                    data
+                );
+
+                const combined = new Uint8Array(iv.length + ciphertext.byteLength);
+                combined.set(iv);
+                combined.set(new Uint8Array(ciphertext), iv.length);
+
+                const base64 = btoa(String.fromCharCode(...combined));
+                document.getElementById('encryptOutput').textContent = base64;
+                status.innerHTML = '<div class="status-message status-success">✓ 暗号化に成功しました</div>';
+                showToast('暗号化に成功しました');
+            } catch (error) {
+                status.innerHTML = '<div class="status-message status-error">エラー: ' + error.message + '</div>';
+            }
+        }
+
+        async function decrypt() {
+            const ciphertext = document.getElementById('decryptInput').value;
+            const password = document.getElementById('decryptPassword').value;
+            const status = document.getElementById('decryptStatus');
+
+            if (!ciphertext) {
+                status.innerHTML = '<div class="status-message status-error">エラー: 暗号化されたテキストを入力してください</div>';
+                return;
+            }
+
+            if (!password) {
+                status.innerHTML = '<div class="status-message status-error">エラー: パスワードを入力してください</div>';
+                return;
+            }
+
+            try {
+                const combined = new Uint8Array(atob(ciphertext).split('').map(c => c.charCodeAt(0)));
+                const iv = combined.slice(0, 12);
+                const data = combined.slice(12);
+
+                const key = await deriveKey(password);
+                const plaintext = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv },
+                    key,
+                    data
+                );
+
+                const decoder = new TextDecoder();
+                const result = decoder.decode(plaintext);
+                document.getElementById('decryptOutput').textContent = result;
+                status.innerHTML = '<div class="status-message status-success">✓ 復号化に成功しました</div>';
+                showToast('復号化に成功しました');
+            } catch (error) {
+                status.innerHTML = '<div class="status-message status-error">エラー: パスワードが間違っているか、データが破損しています</div>';
+            }
+        }
+
+        function copyEncrypted() {
+            const output = document.getElementById('encryptOutput').textContent;
+            if (!output) {
+                showToast('コピーするテキストがありません');
+                return;
+            }
+            navigator.clipboard.writeText(output).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function copyDecrypted() {
+            const output = document.getElementById('decryptOutput').textContent;
+            if (!output) {
+                showToast('コピーするテキストがありません');
+                return;
+            }
+            navigator.clipboard.writeText(output).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+    </script>
+</body>
+</html>

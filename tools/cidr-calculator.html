@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIDR計算機 - ToolBox</title>
+    <meta name="description" content="CIDR表記を使用してネットワークアドレス、ホストレンジ、サブネットマスクを計算します。">
+    <meta name="keywords" content="CIDR, サブネット, ネットワーク, 計算">
+    <meta property="og:title" content="CIDR計算機 - ToolBox">
+    <meta property="og:description" content="CIDR表記を使用してネットワークアドレス、ホストレンジ、サブネットマスクを計算します。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/cidr-calculator.html">
+    <meta property="og:site_name" content="ToolBox">
+    <link rel="canonical" href="https://web-tool-site.com/tools/cidr-calculator.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-light: #eff6ff;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #e5e7eb;
+            --bg: #f9fafb;
+            --text: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .ad-top {
+            background: #f0f0f0;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .tool-section {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .tool-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
+        }
+
+        .tool-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 150px;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-card {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card label {
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .info-card .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--text);
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .header-inner {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav {
+                gap: 1rem;
+            }
+        }
+
+        .results {
+            margin-top: 2rem;
+        }
+
+        .subnet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            overflow: hidden;
+        }
+
+        .subnet-table th,
+        .subnet-table td {
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .subnet-table th {
+            background: var(--primary-light);
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .subnet-table td {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text);
+        }
+
+        .subnet-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .binary-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .binary-label {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--text);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="ad-top">
+            📢 広告スペース
+        </div>
+
+        <div class="tool-section">
+            <h2>CIDR計算機</h2>
+
+            <div class="form-group">
+                <label>CIDR表記 (例: 192.168.1.0/24)</label>
+                <div class="input-group">
+                    <input type="text" id="ipInput" placeholder="IPアドレス">
+                    <input type="number" id="cidrInput" placeholder="CIDR" min="0" max="32">
+                </div>
+                <button onclick="calculate()" style="margin-top: 0.5rem; width: 100%;">計算</button>
+            </div>
+
+            <div id="results"></div>
+
+            <h3>よく使用するサブネットマスク</h3>
+            <div class="subnet-table-wrapper">
+                <table class="subnet-table">
+                    <thead>
+                        <tr>
+                            <th>CIDR</th>
+                            <th>サブネットマスク</th>
+                            <th>ワイルドカードマスク</th>
+                            <th>ホスト数</th>
+                            <th>利用可能ホスト数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subnetTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="ad-top">
+            📢 広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        © 2026 ToolBox. All rights reserved.
+    </footer>
+
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function ipToDecimal(ip) {
+            const parts = ip.split('.');
+            if (parts.length !== 4) return null;
+            return parts.reduce((acc, part) => {
+                const num = parseInt(part, 10);
+                if (isNaN(num) || num < 0 || num > 255) return null;
+                return (acc << 8) + num;
+            }, 0);
+        }
+
+        function decimalToIp(decimal) {
+            return [
+                (decimal >>> 24) & 255,
+                (decimal >>> 16) & 255,
+                (decimal >>> 8) & 255,
+                decimal & 255
+            ].join('.');
+        }
+
+        function ipToBinary(ip) {
+            const parts = ip.split('.');
+            return parts.map(p => {
+                const num = parseInt(p, 10);
+                return num.toString(2).padStart(8, '0');
+            }).join('.');
+        }
+
+        function generateSubnetTable() {
+            const tbody = document.getElementById('subnetTableBody');
+            const commonCidrs = [8, 9, 10, 16, 17, 18, 20, 24, 25, 26, 27, 28, 29, 30, 31, 32];
+
+            commonCidrs.forEach(cidr => {
+                const hostBits = 32 - cidr;
+                const hostCount = Math.pow(2, hostBits);
+                const usableHosts = hostCount - 2 >= 0 ? hostCount - 2 : hostCount;
+                const mask = (0xffffffff << (32 - cidr)) >>> 0;
+                const subnetMask = decimalToIp(mask);
+                const wildcardMask = decimalToIp(~mask >>> 0);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>/${cidr}</td>
+                    <td>${subnetMask}</td>
+                    <td>${wildcardMask}</td>
+                    <td>${hostCount}</td>
+                    <td>${usableHosts}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        window.addEventListener('load', generateSubnetTable);
+
+        function calculate() {
+            const ip = document.getElementById('ipInput').value.trim();
+            const cidr = parseInt(document.getElementById('cidrInput').value, 10);
+            const resultsDiv = document.getElementById('results');
+
+            if (!ip || isNaN(cidr) || cidr < 0 || cidr > 32) {
+                resultsDiv.innerHTML = '<div class="error-message">有効なIPアドレスとCIDR（0-32）を入力してください。</div>';
+                return;
+            }
+
+            const decimal = ipToDecimal(ip);
+            if (decimal === null) {
+                resultsDiv.innerHTML = '<div class="error-message">無効なIPアドレスです。</div>';
+                return;
+            }
+
+            const mask = (0xffffffff << (32 - cidr)) >>> 0;
+            const hostBits = 32 - cidr;
+            const networkDec = decimal & mask;
+            const broadcastDec = networkDec | (~mask >>> 0);
+            const hostCount = Math.pow(2, hostBits);
+            const usableHosts = hostCount >= 2 ? hostCount - 2 : hostCount;
+
+            const networkAddr = decimalToIp(networkDec);
+            const broadcastAddr = decimalToIp(broadcastDec);
+            const subnetMask = decimalToIp(mask);
+            const wildcardMask = decimalToIp((~mask >>> 0));
+            const firstHost = cidr === 31 ? networkAddr : decimalToIp(networkDec + 1);
+            const lastHost = cidr === 31 ? broadcastAddr : decimalToIp(broadcastDec - 1);
+
+            const networkBinary = ipToBinary(networkAddr);
+            const maskBinary = ipToBinary(subnetMask);
+
+            let html = '<div class="results">';
+
+            // Binary representation
+            html += '<h3>バイナリ表現</h3>';
+            html += '<div class="binary-display">';
+            html += '<div class="binary-label">ネットワークアドレス</div>';
+            html += networkBinary.split('.').map((octet, i) => `<div>${octet}${i < 3 ? '.' : ''}</div>`).join('');
+            html += '<div class="binary-label" style="margin-top: 1rem;">サブネットマスク (/' + cidr + ')</div>';
+            html += maskBinary.split('.').map((octet, i) => `<div>${octet}${i < 3 ? '.' : ''}</div>`).join('');
+            html += '</div>';
+
+            // Main results
+            html += '<h3>計算結果</h3>';
+            html += '<div class="grid-2">';
+            html += `<div class="info-card"><label>ネットワークアドレス</label><div class="value">${networkAddr}</div></div>`;
+            html += `<div class="info-card"><label>ブロードキャストアドレス</label><div class="value">${broadcastAddr}</div></div>`;
+            html += `<div class="info-card"><label>サブネットマスク</label><div class="value">${subnetMask}</div></div>`;
+            html += `<div class="info-card"><label>ワイルドカードマスク</label><div class="value">${wildcardMask}</div></div>`;
+            html += `<div class="info-card"><label>最初の利用可能ホスト</label><div class="value">${firstHost}</div></div>`;
+            html += `<div class="info-card"><label>最後の利用可能ホスト</label><div class="value">${lastHost}</div></div>`;
+            html += `<div class="info-card"><label>ホスト数</label><div class="value">${hostCount}</div></div>`;
+            html += `<div class="info-card"><label>利用可能ホスト数</label><div class="value">${usableHosts}</div></div>`;
+            html += '</div>';
+
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

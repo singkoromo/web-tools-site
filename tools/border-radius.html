@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Border Radius生成器 - ToolBox</title>
+    <meta name="description" content="CSSのborder-radiusを視覚的に生成するツール。プリセットとカスタマイズに対応。">
+    <meta property="og:title" content="Border Radius生成器 - ToolBox">
+    <meta property="og:description" content="CSSのborder-radiusを視覚的に生成するツール。プリセットとカスタマイズに対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/border-radius.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/border-radius.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .preview-container { display: flex; align-items: center; justify-content: center; background: white; border: 2px solid #ddd; border-radius: 8px; padding: 2rem; min-height: 400px; }
+        .preview-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.2s; }
+        .controls { display: flex; flex-direction: column; gap: 1.5rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.75rem; }
+        .control-group label { font-weight: 600; color: #333; font-size: 14px; }
+        .slider-group { display: grid; grid-template-columns: 1fr 60px; gap: 1rem; align-items: center; }
+        input[type="range"] { width: 100%; }
+        input[type="number"] { padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px; text-align: center; }
+        input[type="color"] { width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.75rem; margin: 1rem 0; }
+        .checkbox-group input { cursor: pointer; width: 18px; height: 18px; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .btn-copy { background: #2196F3; color: white; width: 100%; }
+        .btn-copy:hover { background: #0b7dda; }
+        .presets { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .preset-btn { padding: 0.75rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; font-weight: 500; color: #333; }
+        .preset-btn:hover { border-color: #667eea; }
+        .preset-btn.active { border-color: #667eea; background: #f3f4ff; }
+        .code-output { background: #f5f5f5; padding: 1rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; word-break: break-all; }
+        .divider { border-bottom: 2px solid #eee; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+        .advanced-section { display: none; }
+        .advanced-section.active { display: block; }
+        @media (max-width: 1024px) {
+            .tool-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <h1>Border Radius生成器</h1>
+            <p>Border-radiusを視覚的に調整して生成します。</p>
+
+            <div class="tool-wrapper">
+                <div class="preview-container">
+                    <div class="preview-box" id="previewBox" style="width: 200px; height: 200px;"></div>
+                </div>
+
+                <div class="controls">
+                    <h3>プリセット</h3>
+                    <div class="presets">
+                        <button class="preset-btn" onclick="loadPreset('square')">スクエア</button>
+                        <button class="preset-btn" onclick="loadPreset('rounded')">ラウンド</button>
+                        <button class="preset-btn" onclick="loadPreset('circle')">サークル</button>
+                        <button class="preset-btn" onclick="loadPreset('pill')">ピル</button>
+                        <button class="preset-btn" onclick="loadPreset('leaf')">リーフ</button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h3>基本設定</h3>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="linkCorners" checked onchange="toggleLink();">
+                        <label for="linkCorners">コーナーをリンク</label>
+                    </div>
+
+                    <div class="control-group">
+                        <label>コーナー半径</label>
+                        <div class="slider-group">
+                            <input type="range" id="topLeft" min="0" max="100" value="0" onchange="updateRadius();">
+                            <input type="number" id="topLeftValue" min="0" max="100" value="0" onchange="document.getElementById('topLeft').value = this.value; updateRadius();">
+                        </div>
+                    </div>
+
+                    <div id="individualCorners" style="display: none;">
+                        <div class="control-group">
+                            <label>右上</label>
+                            <div class="slider-group">
+                                <input type="range" id="topRight" min="0" max="100" value="0" onchange="updateRadius();">
+                                <input type="number" id="topRightValue" min="0" max="100" value="0" onchange="document.getElementById('topRight').value = this.value; updateRadius();">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label>右下</label>
+                            <div class="slider-group">
+                                <input type="range" id="bottomRight" min="0" max="100" value="0" onchange="updateRadius();">
+                                <input type="number" id="bottomRightValue" min="0" max="100" value="0" onchange="document.getElementById('bottomRight').value = this.value; updateRadius();">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label>左下</label>
+                            <div class="slider-group">
+                                <input type="range" id="bottomLeft" min="0" max="100" value="0" onchange="updateRadius();">
+                                <input type="number" id="bottomLeftValue" min="0" max="100" value="0" onchange="document.getElementById('bottomLeft').value = this.value; updateRadius();">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h3>スタイル設定</h3>
+                    <div class="control-group">
+                        <label for="boxWidth">幅 (px)</label>
+                        <div class="slider-group">
+                            <input type="range" id="boxWidth" min="100" max="400" value="200" onchange="updateBoxSize();">
+                            <input type="number" id="boxWidthValue" min="100" max="400" value="200" onchange="document.getElementById('boxWidth').value = this.value; updateBoxSize();">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="boxHeight">高さ (px)</label>
+                        <div class="slider-group">
+                            <input type="range" id="boxHeight" min="100" max="400" value="200" onchange="updateBoxSize();">
+                            <input type="number" id="boxHeightValue" min="100" max="400" value="200" onchange="document.getElementById('boxHeight').value = this.value; updateBoxSize();">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="boxColor">背景色</label>
+                        <input type="color" id="boxColor" value="#667eea" onchange="updateBoxColor();">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h3>生成されたCSS</h3>
+                    <div class="code-output" id="codeOutput">border-radius: 0px;</div>
+                    <button class="btn-copy" onclick="copyCode()">コピー</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <nav class="footer-nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシー</a>
+            </nav>
+            <p>&copy; 2026 ToolBox</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const presets = {
+            square: { tl: 0, tr: 0, br: 0, bl: 0 },
+            rounded: { tl: 10, tr: 10, br: 10, bl: 10 },
+            circle: { tl: 50, tr: 50, br: 50, bl: 50 },
+            pill: { tl: 50, tr: 50, br: 50, bl: 50 },
+            leaf: { tl: 50, tr: 0, br: 50, bl: 0 }
+        };
+
+        function toggleLink() {
+            const linked = document.getElementById('linkCorners').checked;
+            document.getElementById('individualCorners').style.display = linked ? 'none' : 'block';
+            if (linked) {
+                const topLeft = parseInt(document.getElementById('topLeft').value);
+                document.getElementById('topRight').value = topLeft;
+                document.getElementById('bottomRight').value = topLeft;
+                document.getElementById('bottomLeft').value = topLeft;
+            }
+            updateRadius();
+        }
+
+        function updateRadius() {
+            const linked = document.getElementById('linkCorners').checked;
+
+            if (linked) {
+                const value = parseInt(document.getElementById('topLeft').value);
+                document.getElementById('topLeftValue').value = value;
+                document.getElementById('topRight').value = value;
+                document.getElementById('bottomRight').value = value;
+                document.getElementById('bottomLeft').value = value;
+                document.getElementById('topRightValue').value = value;
+                document.getElementById('bottomRightValue').value = value;
+                document.getElementById('bottomLeftValue').value = value;
+            } else {
+                document.getElementById('topLeftValue').value = document.getElementById('topLeft').value;
+                document.getElementById('topRightValue').value = document.getElementById('topRight').value;
+                document.getElementById('bottomRightValue').value = document.getElementById('bottomRight').value;
+                document.getElementById('bottomLeftValue').value = document.getElementById('bottomLeft').value;
+            }
+
+            const tl = document.getElementById('topLeft').value;
+            const tr = document.getElementById('topRight').value;
+            const br = document.getElementById('bottomRight').value;
+            const bl = document.getElementById('bottomLeft').value;
+
+            const previewBox = document.getElementById('previewBox');
+            previewBox.style.borderRadius = `${tl}px ${tr}px ${br}px ${bl}px`;
+
+            let css = '';
+            if (linked && tl === tr && tr === br && br === bl) {
+                css = `border-radius: ${tl}px;`;
+            } else if (tl === br && tr === bl) {
+                css = `border-radius: ${tl}px ${tr}px;`;
+            } else if (tr === bl && tl === br) {
+                css = `border-radius: ${tl}px ${tr}px ${br}px;`;
+            } else {
+                css = `border-radius: ${tl}px ${tr}px ${br}px ${bl}px;`;
+            }
+
+            document.getElementById('codeOutput').textContent = css;
+        }
+
+        function updateBoxSize() {
+            const width = document.getElementById('boxWidth').value;
+            const height = document.getElementById('boxHeight').value;
+            document.getElementById('boxWidthValue').value = width;
+            document.getElementById('boxHeightValue').value = height;
+            document.getElementById('previewBox').style.width = width + 'px';
+            document.getElementById('previewBox').style.height = height + 'px';
+        }
+
+        function updateBoxColor() {
+            const color = document.getElementById('boxColor').value;
+            document.getElementById('previewBox').style.background = color;
+        }
+
+        function loadPreset(name) {
+            const preset = presets[name];
+            document.getElementById('linkCorners').checked = name === 'circle' || name === 'pill' || name === 'rounded';
+            document.getElementById('topLeft').value = preset.tl;
+            document.getElementById('topRight').value = preset.tr;
+            document.getElementById('bottomRight').value = preset.br;
+            document.getElementById('bottomLeft').value = preset.bl;
+            toggleLink();
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function copyCode() {
+            const code = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        updateRadius();
+    </script>
+</body>
+</html>

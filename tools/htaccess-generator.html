@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content=".htaccessファイルを簡単に生成できるツール。リダイレクト、HTTPS強制、キャッシュ設定などを設定できます。">
+    <meta name="keywords" content=".htaccess, Apache, リダイレクト, HTTPS, キャッシュ, IT・インフラ">
+    <meta name="author" content="ToolBox">
+    <meta name="theme-color" content="#007bff">
+    <title>.htaccess生成 - ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .ad-banner {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .ad-placeholder {
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-page h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #007bff;
+            margin-top: 0.25rem;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .checkbox-item label strong {
+            display: block;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .checkbox-item label span {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea {
+            font-family: 'JetBrains Mono', monospace;
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .redirects-container {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .redirect-item {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .redirect-item input {
+            flex: 1;
+        }
+
+        .redirect-item button {
+            padding: 0.75rem 1rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .redirect-item button:hover {
+            background: #c82333;
+        }
+
+        .output-section {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .output-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .htaccess-output {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            color: #333;
+            user-select: all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-copy {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-download {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        footer {
+            background: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .tool-page {
+                padding: 1.5rem;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav>
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-page">
+            <h1>.htaccess生成</h1>
+
+            <div class="form-section">
+                <h2>セキュリティ設定</h2>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="httpsForce" onchange="updateHtaccess()">
+                        <label for="httpsForce">
+                            <strong>HTTPS強制</strong>
+                            <span>HTTPをHTTPSにリダイレクト</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="wwwUnify" onchange="updateHtaccess()">
+                        <label for="wwwUnify">
+                            <strong>www統一</strong>
+                            <span>wwwありに統一</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>カスタムリダイレクト</h2>
+                <div class="redirects-container" id="redirectsContainer">
+                </div>
+                <button type="button" class="btn-generate" onclick="addRedirectField()" style="width: 100%; margin-top: 0.5rem;">+ リダイレクトを追加</button>
+            </div>
+
+            <div class="form-section">
+                <h2>キャッシュ設定</h2>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="gzipEnable" onchange="updateHtaccess()">
+                        <label for="gzipEnable">
+                            <strong>GZIP圧縮</strong>
+                            <span>テキストファイルを圧縮</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cacheEnable" onchange="updateHtaccess()">
+                        <label for="cacheEnable">
+                            <strong>ブラウザキャッシュ</strong>
+                            <span>静的ファイルをキャッシュ</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>エラーページ設定</h2>
+                <div class="form-group">
+                    <label for="error404">404エラーページ (相対パス):</label>
+                    <input type="text" id="error404" placeholder="/404.html" onchange="updateHtaccess()">
+                </div>
+                <div class="form-group">
+                    <label for="error500">500エラーページ (相対パス):</label>
+                    <input type="text" id="error500" placeholder="/500.html" onchange="updateHtaccess()">
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h3>生成された.htaccess:</h3>
+                <div class="htaccess-output" id="htaccessOutput"></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-copy" id="copyButton">クリップボードにコピー</button>
+                <button class="btn-download" id="downloadButton">ダウンロード</button>
+                <button class="btn-generate" id="generateButton">生成</button>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 ToolBox
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const redirectsContainer = document.getElementById('redirectsContainer');
+        const htaccessOutput = document.getElementById('htaccessOutput');
+        const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const generateButton = document.getElementById('generateButton');
+        const toast = document.getElementById('toast');
+
+        function addRedirectField() {
+            const div = document.createElement('div');
+            div.className = 'redirect-item';
+            div.innerHTML = `
+                <input type="text" placeholder="リダイレクト元 (/old-path)" class="redirect-from" oninput="updateHtaccess()">
+                <input type="text" placeholder="リダイレクト先 (/new-path)" class="redirect-to" oninput="updateHtaccess()">
+                <select class="redirect-code" onchange="updateHtaccess()">
+                    <option value="301">301</option>
+                    <option value="302">302</option>
+                </select>
+                <button type="button" onclick="this.parentElement.remove(); updateHtaccess();">削除</button>
+            `;
+            redirectsContainer.appendChild(div);
+        }
+
+        function updateHtaccess() {
+            let content = '';
+
+            // HTTPS Force
+            if (document.getElementById('httpsForce').checked) {
+                content += `# HTTPS強制\n`;
+                content += `RewriteEngine On\n`;
+                content += `RewriteCond %{HTTPS} off\n`;
+                content += `RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]\n\n`;
+            }
+
+            // WWW Unification
+            if (document.getElementById('wwwUnify').checked) {
+                content += `# www統一\n`;
+                content += `RewriteEngine On\n`;
+                content += `RewriteCond %{HTTP_HOST} !^www\\. [NC]\n`;
+                content += `RewriteRule ^(.*)$ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]\n\n`;
+            }
+
+            // Custom Redirects
+            const redirectItems = redirectsContainer.querySelectorAll('.redirect-item');
+            if (redirectItems.length > 0) {
+                content += `# カスタムリダイレクト\n`;
+                content += `RewriteEngine On\n`;
+                redirectItems.forEach(item => {
+                    const from = item.querySelector('.redirect-from').value;
+                    const to = item.querySelector('.redirect-to').value;
+                    const code = item.querySelector('.redirect-code').value;
+                    if (from && to) {
+                        content += `RewriteRule ^${from.replace(/^\//, '')}$ ${to} [L,R=${code}]\n`;
+                    }
+                });
+                content += `\n`;
+            }
+
+            // GZIP
+            if (document.getElementById('gzipEnable').checked) {
+                content += `# GZIP圧縮\n`;
+                content += `<IfModule mod_deflate.c>\n`;
+                content += `    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript\n`;
+                content += `</IfModule>\n\n`;
+            }
+
+            // Cache
+            if (document.getElementById('cacheEnable').checked) {
+                content += `# ブラウザキャッシュ\n`;
+                content += `<IfModule mod_expires.c>\n`;
+                content += `    ExpiresActive On\n`;
+                content += `    ExpiresByType image/jpeg "access plus 1 year"\n`;
+                content += `    ExpiresByType image/gif "access plus 1 year"\n`;
+                content += `    ExpiresByType image/png "access plus 1 year"\n`;
+                content += `    ExpiresByType text/css "access plus 1 month"\n`;
+                content += `    ExpiresByType application/javascript "access plus 1 month"\n`;
+                content += `    ExpiresDefault "access plus 2 weeks"\n`;
+                content += `</IfModule>\n\n`;
+            }
+
+            // Error Pages
+            const error404 = document.getElementById('error404').value;
+            const error500 = document.getElementById('error500').value;
+            if (error404 || error500) {
+                content += `# エラーページ\n`;
+                if (error404) content += `ErrorDocument 404 ${error404}\n`;
+                if (error500) content += `ErrorDocument 500 ${error500}\n`;
+            }
+
+            htaccessOutput.textContent = content || '# .htaccessの設定を選択してください';
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        generateButton.addEventListener('click', updateHtaccess);
+
+        copyButton.addEventListener('click', () => {
+            const content = htaccessOutput.textContent;
+            if (content) {
+                navigator.clipboard.writeText(content).then(() => {
+                    showToast('.htaccessをコピーしました');
+                }).catch(() => {
+                    showToast('コピーに失敗しました');
+                });
+            }
+        });
+
+        downloadButton.addEventListener('click', () => {
+            const content = htaccessOutput.textContent;
+            if (content) {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '.htaccess';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('.htaccessをダウンロードしました');
+            }
+        });
+
+        // Add initial redirect field
+        addRedirectField();
+        updateHtaccess();
+    </script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDFページ削除 - ToolBox</title>
+    <meta name="description" content="PDF内の不要なページを選択して削除できます。複数ページの選択と一括削除に対応しています。">
+    <meta name="keywords" content="PDF, ページ削除, ツール, 無料">
+    <meta property="og:title" content="PDFページ削除 - ToolBox">
+    <meta property="og:description" content="PDF内の不要なページを選択して削除できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/pdf-delete-pages.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/pdf-delete-pages.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        .tool-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 40px 20px;
+        }
+        .tool-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .ad-banner {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+        .drop-zone {
+            border: 2px dashed #007bff;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        .drop-zone:hover {
+            border-color: #0056b3;
+            background: #e8eeff;
+        }
+        .drop-zone.active {
+            border-color: #0056b3;
+            background: #e8eeff;
+        }
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .file-input-label:hover {
+            background: #0056b3;
+        }
+        .drop-zone-text {
+            margin-top: 15px;
+            color: #666;
+        }
+        .pages-container {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .pages-container.show {
+            display: block;
+        }
+        .selection-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .toolbar-button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+        .toolbar-button:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+        .selection-counter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            padding: 8px 16px;
+            background: #e8eeff;
+            border-radius: 6px;
+            color: #007bff;
+            font-weight: 600;
+        }
+        .page-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #f9f9f9;
+            transition: all 0.3s;
+        }
+        .page-item.selected {
+            background: #ffe8e8;
+            border-color: #dc3545;
+        }
+        .page-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #dc3545;
+        }
+        .page-number {
+            font-weight: bold;
+            color: #007bff;
+            min-width: 80px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .page-label {
+            flex: 1;
+            color: #666;
+        }
+        .delete-button {
+            padding: 12px 32px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.05em;
+            transition: background 0.3s;
+            display: block;
+            margin: 30px auto;
+        }
+        .delete-button:hover:not(:disabled) {
+            background: #c82333;
+        }
+        .delete-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .download-button {
+            padding: 14px 32px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: background 0.3s;
+            display: none;
+            margin: 20px auto;
+        }
+        .download-button:hover:not(:disabled) {
+            background: #218838;
+        }
+        .warning-message {
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            color: #856404;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .warning-message.show {
+            display: block;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: #333;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            display: none;
+        }
+        .toast.show {
+            display: block;
+        }
+        .toast.success {
+            background: #28a745;
+        }
+        .toast.error {
+            background: #dc3545;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 700;
+            font-size: 1.5em;
+        }
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            color: #007bff;
+        }
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav a:hover {
+            color: #007bff;
+        }
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 60px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <h1>PDFページ削除</h1>
+            <p class="subtitle">不要なページを選択して削除し、最適化されたPDFを作成します</p>
+
+            <div class="ad-banner">
+                広告スペース
+            </div>
+
+            <div class="drop-zone" id="dropZone">
+                <label class="file-input-label">
+                    PDFを選択
+                    <input type="file" id="fileInput" accept=".pdf" />
+                </label>
+                <div class="drop-zone-text">
+                    またはここにPDFをドラッグ＆ドロップ
+                </div>
+            </div>
+
+            <div class="pages-container" id="pagesContainer">
+                <h2>ページ一覧</h2>
+                <div class="selection-toolbar">
+                    <button class="toolbar-button" id="selectAllBtn">すべて選択</button>
+                    <button class="toolbar-button" id="deselectAllBtn">選択解除</button>
+                    <div class="selection-counter">
+                        <span id="counterText">0 ページ中 0 ページを削除します</span>
+                    </div>
+                </div>
+                <div class="warning-message" id="warningMessage">
+                    ⚠️ すべてのページが選択されています。最低1ページは保持する必要があります。
+                </div>
+                <div id="pagesList"></div>
+                <button class="delete-button" id="deleteButton">削除して保存</button>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>処理中...</p>
+                </div>
+                <button class="download-button" id="downloadButton">PDFをダウンロード</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner" style="margin: 40px 20px;">
+        広告スペース
+    </div>
+
+    <footer>
+        © 2026 ToolBox. All rights reserved.
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+
+        let currentPdf = null;
+        let selectedPages = new Set();
+        let processedPdf = null;
+        let totalPages = 0;
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const pagesContainer = document.getElementById('pagesContainer');
+        const pagesList = document.getElementById('pagesList');
+        const deleteButton = document.getElementById('deleteButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const loading = document.getElementById('loading');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const deselectAllBtn = document.getElementById('deselectAllBtn');
+        const counterText = document.getElementById('counterText');
+        const warningMessage = document.getElementById('warningMessage');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function updateCounter() {
+            const deleteCount = selectedPages.size;
+            counterText.textContent = `${totalPages}ページ中${deleteCount}ページを削除します`;
+
+            if (deleteCount === totalPages) {
+                warningMessage.classList.add('show');
+                deleteButton.disabled = true;
+            } else {
+                warningMessage.classList.remove('show');
+                deleteButton.disabled = false;
+            }
+        }
+
+        selectAllBtn.addEventListener('click', () => {
+            for (let i = 0; i < totalPages; i++) {
+                selectedPages.add(i);
+            }
+            displayPages();
+            updateCounter();
+            showToast('すべてのページを選択しました');
+        });
+
+        deselectAllBtn.addEventListener('click', () => {
+            selectedPages.clear();
+            displayPages();
+            updateCounter();
+            showToast('選択を解除しました');
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('active');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('active');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('active');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        async function handleFileSelect(file) {
+            if (!file.type.includes('pdf')) {
+                showToast('PDFファイルを選択してください', 'error');
+                return;
+            }
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                currentPdf = await PDFDocument.load(arrayBuffer);
+                selectedPages.clear();
+                processedPdf = null;
+                downloadButton.style.display = 'none';
+
+                totalPages = currentPdf.getPageCount();
+                displayPages();
+                pagesContainer.classList.add('show');
+                updateCounter();
+                showToast('PDFが読み込まれました');
+            } catch (error) {
+                showToast('PDFの読み込みに失敗しました: ' + error.message, 'error');
+            }
+        }
+
+        function displayPages() {
+            pagesList.innerHTML = '';
+
+            for (let i = 0; i < totalPages; i++) {
+                const pageItem = document.createElement('div');
+                pageItem.className = 'page-item';
+                if (selectedPages.has(i)) {
+                    pageItem.classList.add('selected');
+                }
+
+                pageItem.innerHTML = `
+                    <input type="checkbox" class="page-checkbox" data-page="${i}" ${selectedPages.has(i) ? 'checked' : ''}>
+                    <div class="page-number">ページ ${i + 1}</div>
+                    <div class="page-label">削除用に選択</div>
+                `;
+                pagesList.appendChild(pageItem);
+
+                const checkbox = pageItem.querySelector('.page-checkbox');
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectedPages.add(i);
+                        pageItem.classList.add('selected');
+                    } else {
+                        selectedPages.delete(i);
+                        pageItem.classList.remove('selected');
+                    }
+                    updateCounter();
+                });
+            }
+        }
+
+        deleteButton.addEventListener('click', async () => {
+            if (selectedPages.size === 0) {
+                showToast('削除するページを選択してください', 'error');
+                return;
+            }
+
+            if (selectedPages.size === totalPages) {
+                showToast('最低1ページは保持する必要があります', 'error');
+                return;
+            }
+
+            try {
+                loading.classList.add('show');
+                deleteButton.disabled = true;
+
+                const newPdf = await PDFDocument.create();
+                const pages = currentPdf.getPages();
+
+                for (let i = 0; i < pages.length; i++) {
+                    if (!selectedPages.has(i)) {
+                        const [copiedPage] = await newPdf.embedPage(pages[i]);
+                        newPdf.addPage([copiedPage.width, copiedPage.height]).drawPage(copiedPage);
+                    }
+                }
+
+                processedPdf = await newPdf.save();
+                downloadButton.style.display = 'block';
+                showToast(`${selectedPages.size}ページを削除しました`);
+            } catch (error) {
+                showToast('処理に失敗しました: ' + error.message, 'error');
+            } finally {
+                loading.classList.remove('show');
+                deleteButton.disabled = false;
+            }
+        });
+
+        downloadButton.addEventListener('click', () => {
+            if (!processedPdf) return;
+
+            const blob = new Blob([processedPdf], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'edited.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('ダウンロードが開始しました');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画トリミング - ToolBox</title>
+    <meta name="description" content="動画の開始・終了時間を指定してトリミング（カット）します。WebM形式で出力します。">
+    <meta name="keywords" content="動画、トリミング、カット、編集、ツール、無料">
+    <meta property="og:title" content="動画トリミング - ToolBox">
+    <meta property="og:description" content="動画をトリミングするオンラインツール">
+    <meta property="og:url" content="https://web-tool-site.com/tools/video-trimmer.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/video-trimmer.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .trim-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+        .trim-control { display: flex; flex-direction: column; gap: 0.5rem; }
+        .trim-control label { font-weight: 500; color: #333; font-size: 0.95rem; }
+        .trim-control input { padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.375rem; font-family: Inter, sans-serif; }
+        .timeline-bar { width: 100%; height: 50px; background: #e5e7eb; border-radius: 0.375rem; margin: 1rem 0; cursor: pointer; position: relative; overflow: hidden; }
+        .timeline-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); width: 0%; position: absolute; }
+        .timeline-slider { position: absolute; width: 4px; height: 100%; background: #ef4444; cursor: col-resize; top: 0; left: 0; }
+        .trim-range { position: absolute; height: 100%; background: rgba(59, 130, 246, 0.2); border-left: 2px solid #3b82f6; border-right: 2px solid #3b82f6; pointer-events: none; }
+        .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin: 1rem 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); width: 0%; transition: width 0.3s; }
+        .info-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; font-size: 0.9rem; color: #1e40af; }
+        .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; font-size: 0.9rem; color: #92400e; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <div class="ad-banner">スポンサー</div>
+
+            <h1>動画トリミング</h1>
+            <p class="subtitle">動画の不要な部分をカットして、選択した範囲のみを抽出します。</p>
+
+            <div class="drop-zone" id="dropZone">
+                <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <p>動画ファイルをドラッグ&ドロップするか、クリックして選択</p>
+                <small>対応形式: MP4, WebM, MOV (最大 500MB)</small>
+                <input type="file" id="videoFile" accept="video/*" style="display: none;">
+            </div>
+
+            <div id="videoInfo" style="display: none;">
+                <div class="info-box">
+                    <strong>ファイル名:</strong> <span id="fileName"></span> | <strong>長さ:</strong> <span id="videoDuration"></span>
+                </div>
+
+                <video id="videoElement" style="max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;" controls></video>
+
+                <div class="trim-controls">
+                    <div class="trim-control">
+                        <label>開始時間（秒）</label>
+                        <input type="number" id="startTime" min="0" step="0.1" value="0">
+                    </div>
+                    <div class="trim-control">
+                        <label>終了時間（秒）</label>
+                        <input type="number" id="endTime" step="0.1" value="5">
+                    </div>
+                </div>
+
+                <div class="timeline-bar" id="timelineBar">
+                    <div class="trim-range" id="trimRange"></div>
+                    <div class="timeline-fill" id="timelineFill"></div>
+                    <div class="timeline-slider" id="timelineSlider"></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                    <button class="btn btn-primary" onclick="previewTrim()">選択範囲をプレビュー</button>
+                    <button class="btn btn-success" onclick="startTrimming()">トリミングを開始</button>
+                </div>
+
+                <div class="warning-box" style="display: none;" id="warningBox">
+                    <strong>注意:</strong> <span id="warningText"></span>
+                </div>
+
+                <div class="info-box" style="display: none;" id="fileInfoBox">
+                    <strong>推定ファイルサイズ:</strong> <span id="estimatedSize"></span>
+                </div>
+
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div id="progressText" style="text-align: center; color: #666; margin: 1rem 0; display: none;"></div>
+
+                <div id="resultSection" style="display: none; margin-top: 2rem;">
+                    <h3>トリミング完了</h3>
+                    <video id="resultVideo" style="max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;" controls></video>
+                    <button class="btn btn-primary" onclick="downloadTrimmedVideo()">WebMをダウンロード</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner" style="margin-top: 2rem;">スポンサー</div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let video = document.getElementById('videoElement');
+        let dropZone = document.getElementById('dropZone');
+        let isDraggingSlider = false;
+        let trimmedBlob = null;
+
+        dropZone.addEventListener('click', () => document.getElementById('videoFile').click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.background = '#f3f4f6'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.background = ''; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) loadVideo(files[0]);
+        });
+
+        document.getElementById('videoFile').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) loadVideo(e.target.files[0]);
+        });
+
+        function loadVideo(file) {
+            const url = URL.createObjectURL(file);
+            video.src = url;
+            video.onloadedmetadata = () => {
+                document.getElementById('videoInfo').style.display = 'block';
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('videoDuration').textContent = formatTime(video.duration);
+                document.getElementById('endTime').value = Math.min(5, video.duration).toFixed(1);
+                dropZone.style.display = 'none';
+                setupTimeline();
+                updateTrimRange();
+                showToast('動画が読み込まれました');
+            };
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            return `${h > 0 ? h + ':' : ''}${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function setupTimeline() {
+            const timelineBar = document.getElementById('timelineBar');
+            const slider = document.getElementById('timelineSlider');
+
+            timelineBar.addEventListener('click', (e) => {
+                const rect = timelineBar.getBoundingClientRect();
+                const percentage = (e.clientX - rect.left) / rect.width;
+                video.currentTime = percentage * video.duration;
+            });
+
+            slider.addEventListener('mousedown', () => { isDraggingSlider = true; });
+            document.addEventListener('mouseup', () => { isDraggingSlider = false; });
+            document.addEventListener('mousemove', (e) => {
+                if (!isDraggingSlider) return;
+                const rect = timelineBar.getBoundingClientRect();
+                const percentage = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                video.currentTime = percentage * video.duration;
+            });
+
+            video.addEventListener('timeupdate', () => {
+                const percentage = (video.currentTime / video.duration) * 100;
+                document.getElementById('timelineFill').style.width = percentage + '%';
+                slider.style.left = percentage + '%';
+            });
+
+            document.getElementById('startTime').addEventListener('input', updateTrimRange);
+            document.getElementById('endTime').addEventListener('input', updateTrimRange);
+        }
+
+        function updateTrimRange() {
+            const startTime = parseFloat(document.getElementById('startTime').value) || 0;
+            const endTime = parseFloat(document.getElementById('endTime').value) || video.duration;
+
+            if (startTime >= endTime) {
+                document.getElementById('warningBox').style.display = 'block';
+                document.getElementById('warningText').textContent = '開始時間は終了時間より前に設定してください';
+                return;
+            } else {
+                document.getElementById('warningBox').style.display = 'none';
+            }
+
+            const startPercent = (startTime / video.duration) * 100;
+            const endPercent = (endTime / video.duration) * 100;
+            const trimRange = document.getElementById('trimRange');
+            trimRange.style.left = startPercent + '%';
+            trimRange.style.width = (endPercent - startPercent) + '%';
+
+            const duration = endTime - startTime;
+            document.getElementById('fileInfoBox').style.display = 'block';
+            const estimatedSize = (duration * 1000 / 8).toFixed(1); // Rough estimate
+            document.getElementById('estimatedSize').textContent = (estimatedSize / 1024 / 1024).toFixed(2) + ' MB';
+        }
+
+        function previewTrim() {
+            const startTime = parseFloat(document.getElementById('startTime').value);
+            const endTime = parseFloat(document.getElementById('endTime').value);
+            video.currentTime = startTime;
+            video.play();
+            setTimeout(() => video.pause(), (endTime - startTime) * 1000);
+            showToast('プレビュー中');
+        }
+
+        function startTrimming() {
+            const startTime = parseFloat(document.getElementById('startTime').value);
+            const endTime = parseFloat(document.getElementById('endTime').value);
+
+            if (startTime >= endTime) {
+                showToast('開始時間は終了時間より前に設定してください', 'error');
+                return;
+            }
+
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('progressText').style.display = 'block';
+
+            trimVideo(startTime, endTime);
+        }
+
+        function trimVideo(startTime, endTime) {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const stream = canvas.captureStream(30);
+            const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            const chunks = [];
+
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+
+            mediaRecorder.onstop = () => {
+                trimmedBlob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(trimmedBlob);
+                document.getElementById('resultVideo').src = url;
+                document.getElementById('resultSection').style.display = 'block';
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('progressText').style.display = 'none';
+                showToast('トリミング完了');
+            };
+
+            mediaRecorder.start();
+
+            const ctx = canvas.getContext('2d');
+            let currentTime = startTime;
+            const frameInterval = 1000 / 30;
+            const duration = endTime - startTime;
+
+            function drawFrame() {
+                video.currentTime = currentTime;
+                video.onseeked = () => {
+                    ctx.drawImage(video, 0, 0);
+                    const progress = ((currentTime - startTime) / duration) * 100;
+                    document.getElementById('progressFill').style.width = progress + '%';
+                    document.getElementById('progressText').textContent = `進捗: ${progress.toFixed(0)}%`;
+
+                    currentTime += frameInterval / 1000;
+                    if (currentTime < endTime) {
+                        requestAnimationFrame(drawFrame);
+                    } else {
+                        mediaRecorder.stop();
+                    }
+                };
+            }
+
+            drawFrame();
+        }
+
+        function downloadTrimmedVideo() {
+            if (!trimmedBlob) return;
+            const url = URL.createObjectURL(trimmedBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'trimmed-video.webm';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('ダウンロードを開始しました');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + (type === 'error' ? 'error' : 'success');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+</body>
+</html>

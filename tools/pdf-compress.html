@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF圧縮 - ToolBox</title>
+    <meta name="description" content="PDFファイルを圧縮してファイルサイズを削減できるツールです。ブラウザで処理するので安全です。">
+    <meta name="keywords" content="PDF圧縮, PDF, ツール, オンライン, ファイルサイズ削減">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PDF圧縮 - ToolBox">
+    <meta property="og:description" content="PDFファイルを圧縮してファイルサイズを削減できるツールです。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/pdf-compress.html">
+    <meta property="og:site_name" content="ToolBox">
+    <link rel="canonical" href="https://web-tool-site.com/tools/pdf-compress.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Inter, sans-serif; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); min-height: 100vh; color: #333; }
+        .header { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-size: 1.5rem; font-weight: 700; color: #00f2fe; text-decoration: none; }
+        .logo svg { width: 28px; height: 28px; }
+        .nav { display: flex; gap: 2rem; }
+        .nav a { color: #333; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .nav a:hover { color: #00f2fe; }
+        .tool-page { max-width: 1200px; margin: 0 auto; padding: 2rem; min-height: calc(100vh - 200px); }
+        .ad-banner { background: #f5f5f5; border: 2px dashed #ddd; border-radius: 8px; padding: 2rem; text-align: center; margin: 2rem 0; }
+        .ad-placeholder { color: #999; font-size: 0.95rem; }
+        .tool-container { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 8px 32px rgba(0,0,0,0.1); margin: 2rem 0; }
+        .tool-title { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: #333; }
+        .drop-zone { border: 3px dashed #00f2fe; border-radius: 12px; padding: 3rem; text-align: center; cursor: pointer; transition: all 0.3s; background: #f0fffe; }
+        .drop-zone.dragover { background: #e0fffd; border-color: #4facfe; }
+        .drop-zone-text { font-size: 1.1rem; color: #00f2fe; margin-bottom: 0.5rem; font-weight: 600; }
+        .drop-zone-small { color: #999; font-size: 0.95rem; }
+        .file-input { display: none; }
+        .progress-bar { width: 100%; height: 4px; background: #eee; border-radius: 2px; margin-top: 1rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: #00f2fe; width: 0%; transition: width 0.3s; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast.success { background: #4caf50; }
+        .toast.error { background: #ff6b6b; }
+        .footer { background: #333; color: white; padding: 2rem; text-align: center; margin-top: 3rem; }
+        .footer-inner { max-width: 1200px; margin: 0 auto; }
+        .footer-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 1rem; }
+        .footer-links a { color: #aaa; text-decoration: none; transition: color 0.3s; }
+        .footer-links a:hover { color: white; }
+        .footer-links p { color: #999; }
+        .compress-container { margin-top: 2rem; }
+        .file-info { background: #e0fffd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #00f2fe; margin-bottom: 1.5rem; }
+        .file-info-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; }
+        .file-info-label { color: #666; }
+        .file-info-value { font-weight: 700; color: #333; }
+        .options { background: #f9f9f9; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
+        .option-item { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .option-item:last-child { margin-bottom: 0; }
+        .checkbox { width: 18px; height: 18px; cursor: pointer; }
+        .option-label { font-weight: 500; color: #333; cursor: pointer; }
+        .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.3s; }
+        .btn-primary { background: #00f2fe; color: #333; }
+        .btn-primary:hover { background: #0dd9e5; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .results { background: #f0f0f0; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; }
+        .result-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .result-card { background: white; padding: 1rem; border-radius: 6px; border-left: 4px solid #00f2fe; }
+        .result-label { color: #999; font-size: 0.9rem; margin-bottom: 0.25rem; }
+        .result-value { font-size: 1.2rem; font-weight: 700; color: #333; }
+        .result-unit { font-size: 0.85rem; color: #999; }
+        .result-message { color: #4caf50; font-weight: 700; margin-bottom: 1.5rem; font-size: 1.1rem; }
+        .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; border-radius: 6px; margin-top: 1.5rem; color: #856404; font-size: 0.9rem; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-container">
+            <h1 class="tool-title">PDF圧縮</h1>
+
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-text">PDFファイルをドラッグ&ドロップ</div>
+                <div class="drop-zone-small">または<span style="color: #00f2fe; cursor: pointer; font-weight: 600;">クリックして選択</span></div>
+            </div>
+            <input type="file" id="fileInput" class="file-input" accept=".pdf">
+
+            <div id="compressContainer" class="compress-container hidden">
+                <div class="file-info">
+                    <div class="file-info-row">
+                        <span class="file-info-label">ファイル名:</span>
+                        <span class="file-info-value" id="fileName"></span>
+                    </div>
+                    <div class="file-info-row">
+                        <span class="file-info-label">元のサイズ:</span>
+                        <span class="file-info-value" id="originalSize"></span>
+                    </div>
+                </div>
+
+                <div class="options">
+                    <div class="option-item">
+                        <input type="checkbox" id="removeMetadata" class="checkbox" checked>
+                        <label for="removeMetadata" class="option-label">メタデータを削除</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="flattenForms" class="checkbox">
+                        <label for="flattenForms" class="option-label">フォームフィールドを統合</label>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" id="compressBtn">圧縮する</button>
+                    <button class="btn btn-secondary" id="clearBtn">クリア</button>
+                </div>
+
+                <div class="progress-bar" id="progressBar" style="display:none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div id="results" class="results hidden">
+                    <div class="result-message" id="resultMessage"></div>
+                    <div class="result-row">
+                        <div class="result-card">
+                            <div class="result-label">圧縮前</div>
+                            <div class="result-value" id="beforeSize"></div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">圧縮後</div>
+                            <div class="result-value" id="afterSize"></div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-label">圧縮率</div>
+                            <div class="result-value" id="compressionRate"></div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="downloadBtn" style="width: 100%;">圧縮されたPDFをダウンロード</button>
+                </div>
+
+                <div class="warning-box">
+                    <strong>注意:</strong> ブラウザベースの圧縮には限界があります。大きなファイルや複雑な画像を含むPDFは、圧縮効果が限定的な場合があります。
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+
+        let currentPdfData = null;
+        let currentFileName = '';
+        let currentFileSize = 0;
+        let compressedData = null;
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const compressContainer = document.getElementById('compressContainer');
+        const fileName = document.getElementById('fileName');
+        const originalSize = document.getElementById('originalSize');
+        const removeMetadataCheckbox = document.getElementById('removeMetadata');
+        const flattenFormsCheckbox = document.getElementById('flattenForms');
+        const compressBtn = document.getElementById('compressBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const results = document.getElementById('results');
+        const resultMessage = document.getElementById('resultMessage');
+        const beforeSize = document.getElementById('beforeSize');
+        const afterSize = document.getElementById('afterSize');
+        const compressionRate = document.getElementById('compressionRate');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        async function handleFile(file) {
+            if (file.type !== 'application/pdf') {
+                showToast('PDFファイルを選択してください', 'error');
+                return;
+            }
+
+            try {
+                currentPdfData = await file.arrayBuffer();
+                currentFileName = file.name;
+                currentFileSize = file.size;
+
+                fileName.textContent = currentFileName;
+                originalSize.textContent = formatBytes(currentFileSize);
+                compressContainer.classList.remove('hidden');
+                results.classList.add('hidden');
+            } catch (error) {
+                showToast('ファイルの読み込みに失敗しました', 'error');
+            }
+        }
+
+        compressBtn.addEventListener('click', compressPDF);
+
+        async function compressPDF() {
+            if (!currentPdfData) {
+                showToast('ファイルを選択してください', 'error');
+                return;
+            }
+
+            compressBtn.disabled = true;
+            progressBar.style.display = 'block';
+
+            try {
+                progressFill.style.width = '25%';
+
+                const pdf = await PDFDocument.load(currentPdfData);
+
+                progressFill.style.width = '50%';
+
+                if (removeMetadataCheckbox.checked) {
+                    pdf.setTitle('');
+                    pdf.setAuthor('');
+                    pdf.setSubject('');
+                    pdf.setKeywords([]);
+                    pdf.setProducer('');
+                    pdf.setCreator('');
+                }
+
+                progressFill.style.width = '75%';
+
+                const pdfBytes = await pdf.save();
+                compressedData = pdfBytes;
+
+                const compressedSize = pdfBytes.length;
+                const savedBytes = currentFileSize - compressedSize;
+                const compressionPercent = ((savedBytes / currentFileSize) * 100).toFixed(1);
+
+                beforeSize.textContent = formatBytes(currentFileSize);
+                afterSize.textContent = formatBytes(compressedSize);
+                compressionRate.textContent = compressionPercent + '%';
+                resultMessage.textContent = '圧縮が完了しました！';
+
+                results.classList.remove('hidden');
+                progressFill.style.width = '100%';
+
+                showToast('PDFを圧縮しました', 'success');
+
+            } catch (error) {
+                showToast('圧縮処理でエラーが発生しました: ' + error.message, 'error');
+            } finally {
+                compressBtn.disabled = false;
+                setTimeout(() => {
+                    progressBar.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 1000);
+            }
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (!compressedData) {
+                showToast('ファイルが見つかりません', 'error');
+                return;
+            }
+
+            const blob = new Blob([compressedData], {type: 'application/pdf'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'compressed_' + currentFileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+
+        clearBtn.addEventListener('click', () => {
+            currentPdfData = null;
+            currentFileName = '';
+            currentFileSize = 0;
+            compressedData = null;
+            fileInput.value = '';
+            compressContainer.classList.add('hidden');
+            results.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>

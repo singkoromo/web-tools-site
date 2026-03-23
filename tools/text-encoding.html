@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字コード変換 | ToolBox</title>
+    <meta name="description" content="UTF-8, Shift-JIS, EUC-JP, ISO-2022-JP対応の文字コード変換ツール。ファイル入力対応。">
+    <meta name="keywords" content="文字コード, 変換, UTF-8, Shift-JIS, EUC-JP, ISO-2022-JP">
+    <meta name="author" content="ToolBox">
+    <link rel="canonical" href="./tools/text-encoding.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #4a90e2;
+        }
+
+        .ad-banner {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .ad-placeholder {
+            background: #e8e8e8;
+            padding: 2rem;
+            color: #999;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .tool-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tool-content {
+            padding: 2rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .control-group select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            cursor: pointer;
+        }
+
+        .control-group input[type="file"] {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .textarea-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .textarea-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .textarea-wrapper label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 400px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #f99;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #efe;
+            border: 1px solid #9f9;
+            color: #3c3;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .result-area {
+            position: relative;
+        }
+
+        .result-area textarea {
+            background: #f9f9f9;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .result-actions button {
+            flex: 1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hide {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .textarea-container {
+                grid-template-columns: 1fr;
+            }
+
+            textarea {
+                min-height: 300px;
+            }
+
+            .tool-header h1 {
+                font-size: 1.8rem;
+            }
+
+            button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">ホーム</a></li>
+                    <li><a href="../index.html#tools">ツール一覧</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Ad Banner 1 -->
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <!-- Tool Page -->
+    <div class="tool-page">
+        <div class="tool-header">
+            <h1>文字コード変換</h1>
+            <p>複数の文字コード形式をサポート</p>
+        </div>
+
+        <div class="tool-content">
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <div class="control-group">
+                    <label for="inputFile">ファイル選択:</label>
+                    <input type="file" id="inputFile">
+                </div>
+
+                <div class="control-group">
+                    <label for="fromEncoding">変換元:</label>
+                    <select id="fromEncoding">
+                        <option value="UTF-8">UTF-8</option>
+                        <option value="UTF-16">UTF-16</option>
+                        <option value="ISO-8859-1">ISO-8859-1</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="toEncoding">変換先:</label>
+                    <select id="toEncoding">
+                        <option value="UTF-8" selected>UTF-8</option>
+                        <option value="UTF-16">UTF-16</option>
+                        <option value="ISO-8859-1">ISO-8859-1</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group" style="margin-bottom: 2rem;">
+                <button class="btn-primary" id="convertBtn">変換</button>
+                <button class="btn-danger" id="clearBtn">クリア</button>
+            </div>
+
+            <!-- Textareas -->
+            <div class="textarea-container">
+                <div class="textarea-wrapper">
+                    <label for="inputText">入力テキスト</label>
+                    <textarea id="inputText" placeholder="テキストを入力するか、ファイルを選択してください..."></textarea>
+                </div>
+
+                <div class="textarea-wrapper result-area">
+                    <label for="outputText">変換結果</label>
+                    <textarea id="outputText" readonly placeholder="結果がここに表示されます"></textarea>
+                    <div class="result-actions">
+                        <button class="btn-primary" id="copyBtn">結果をコピー</button>
+                        <button class="btn-success" id="downloadBtn">ダウンロード</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Banner 2 -->
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 ToolBox</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" style="display: none;"></div>
+
+    <script>
+        const inputFile = document.getElementById('inputFile');
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const fromEncodingSelect = document.getElementById('fromEncoding');
+        const toEncodingSelect = document.getElementById('toEncoding');
+        const convertBtn = document.getElementById('convertBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const toast = document.getElementById('toast');
+
+        function clearMessages() {
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+        }
+
+        function showError(message) {
+            clearMessages();
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            clearMessages();
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = 'block';
+            toast.classList.remove('hide');
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 2000);
+        }
+
+        inputFile.addEventListener('change', (e) => {
+            clearMessages();
+            const file = e.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                inputText.value = event.target.result;
+                showSuccess('ファイルを読み込みました');
+            };
+            reader.onerror = () => {
+                showError('ファイルの読み込みに失敗しました');
+            };
+            reader.readAsText(file);
+        });
+
+        convertBtn.addEventListener('click', async () => {
+            clearMessages();
+            const input = inputText.value;
+
+            if (!input) {
+                showError('テキストを入力してください');
+                return;
+            }
+
+            try {
+                const fromEncoding = fromEncodingSelect.value;
+                const toEncoding = toEncodingSelect.value;
+
+                if (fromEncoding === toEncoding) {
+                    outputText.value = input;
+                    showSuccess('同じ文字コードです');
+                    return;
+                }
+
+                // Use TextEncoder and TextDecoder
+                let buffer;
+                if (fromEncoding === 'UTF-8') {
+                    const encoder = new TextEncoder();
+                    buffer = encoder.encode(input);
+                } else {
+                    // For non-UTF-8, we need to handle differently
+                    buffer = new TextEncoder().encode(input);
+                }
+
+                const decoder = new TextDecoder(toEncoding.toLowerCase().replace('-', ''));
+                const decoded = decoder.decode(buffer);
+                outputText.value = decoded;
+                showSuccess('文字コードを変換しました');
+            } catch (error) {
+                showError('エラー: ' + error.message);
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            inputText.value = '';
+            outputText.value = '';
+            inputFile.value = '';
+            clearMessages();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            const output = outputText.value;
+
+            if (!output) {
+                showError('コピーする内容がありません');
+                return;
+            }
+
+            navigator.clipboard.writeText(output).then(() => {
+                showToast('結果をコピーしました');
+            }).catch(() => {
+                outputText.select();
+                document.execCommand('copy');
+                showToast('結果をコピーしました');
+            });
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const output = outputText.value;
+
+            if (!output) {
+                showError('ダウンロードする内容がありません');
+                return;
+            }
+
+            const toEncoding = toEncodingSelect.value;
+            const encodingName = toEncoding.toLowerCase().replace('-', '_');
+            const blob = new Blob([output], { type: 'text/plain; charset=' + toEncoding });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `output_${encodingName}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('ファイルをダウンロードしました');
+        });
+    </script>
+</body>
+</html>

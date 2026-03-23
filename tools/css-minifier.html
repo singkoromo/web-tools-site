@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS整形・圧縮 - ToolBox</title>
+    <meta name="description" content="CSSコードを整形・圧縮するオンラインツール。スペース最適化と可読性の向上に対応。">
+    <meta property="og:title" content="CSS整形・圧縮 - ToolBox">
+    <meta property="og:description" content="CSSコードを整形・圧縮するオンラインツール。スペース最適化と可読性の向上に対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/css-minifier.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/css-minifier.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .code-section { display: flex; flex-direction: column; gap: 1rem; }
+        .code-label { font-weight: 600; color: #333; }
+        textarea { font-family: 'JetBrains Mono', monospace; font-size: 14px; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; resize: vertical; min-height: 400px; background: #f9f9f9; }
+        .button-group { display: flex; gap: 1rem; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .btn-format { background: #4CAF50; color: white; }
+        .btn-format:hover { background: #45a049; }
+        .btn-minify { background: #2196F3; color: white; }
+        .btn-minify:hover { background: #0b7dda; }
+        .btn-copy { background: #FF9800; color: white; }
+        .btn-copy:hover { background: #e68900; }
+        .stats { padding: 1rem; background: #f0f0f0; border-radius: 6px; margin-top: 1rem; font-size: 14px; }
+        .stat-item { margin: 0.5rem 0; }
+        .ratio { color: #2196F3; font-weight: 600; }
+        @media (max-width: 1024px) {
+            .tool-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <h1>CSS整形・圧縮</h1>
+            <p>CSSコードを整形または圧縮します。</p>
+
+            <div class="tool-wrapper">
+                <div class="code-section">
+                    <label class="code-label">入力CSS</label>
+                    <textarea id="inputCSS" placeholder="CSSコードを入力してください..."></textarea>
+                </div>
+                <div class="code-section">
+                    <label class="code-label">出力</label>
+                    <textarea id="outputCSS" placeholder="出力結果がここに表示されます..." readonly></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-format" onclick="formatCSS()">整形</button>
+                <button class="btn-minify" onclick="minifyCSS()">圧縮</button>
+                <button class="btn-copy" onclick="copyOutput()">コピー</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">入力サイズ: <span id="inputSize">0</span> bytes</div>
+                <div class="stat-item">出力サイズ: <span id="outputSize">0</span> bytes</div>
+                <div class="stat-item">圧縮率: <span class="ratio" id="ratio">0%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <nav class="footer-nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシー</a>
+            </nav>
+            <p>&copy; 2026 ToolBox</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const inputCSS = document.getElementById('inputCSS');
+        const outputCSS = document.getElementById('outputCSS');
+
+        inputCSS.addEventListener('input', updateStats);
+
+        function updateStats() {
+            const inputSize = new Blob([inputCSS.value]).size;
+            const outputSize = new Blob([outputCSS.value]).size;
+            document.getElementById('inputSize').textContent = inputSize;
+            document.getElementById('outputSize').textContent = outputSize;
+            if (outputSize > 0) {
+                const ratio = Math.round(((inputSize - outputSize) / inputSize) * 100);
+                document.getElementById('ratio').textContent = ratio + '%';
+            } else {
+                document.getElementById('ratio').textContent = '0%';
+            }
+        }
+
+        function formatCSS() {
+            let css = inputCSS.value.trim();
+            if (!css) {
+                showToast('CSSコードを入力してください');
+                return;
+            }
+
+            // Remove comments
+            css = css.replace(/\/\*[\s\S]*?\*\//g, '');
+
+            // Add newlines after }
+            css = css.replace(/\}/g, '}\n');
+
+            // Add proper indentation
+            let formatted = '';
+            let indentLevel = 0;
+            const lines = css.split('\n');
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+
+                if (line.includes('}')) {
+                    indentLevel = Math.max(0, indentLevel - 1);
+                }
+
+                formatted += '  '.repeat(indentLevel) + line + '\n';
+
+                if (line.includes('{')) {
+                    indentLevel++;
+                }
+            });
+
+            outputCSS.value = formatted.trim();
+            updateStats();
+            showToast('CSS整形完了');
+        }
+
+        function minifyCSS() {
+            let css = inputCSS.value.trim();
+            if (!css) {
+                showToast('CSSコードを入力してください');
+                return;
+            }
+
+            // Remove comments
+            css = css.replace(/\/\*[\s\S]*?\*\//g, '');
+
+            // Remove newlines and extra whitespace
+            css = css.replace(/\n/g, ' ');
+            css = css.replace(/\s+/g, ' ');
+
+            // Remove spaces around special characters
+            css = css.replace(/\s*([{}:;,>+~])\s*/g, '$1');
+
+            // Remove trailing semicolons before }
+            css = css.replace(/;}/g, '}');
+
+            outputCSS.value = css.trim();
+            updateStats();
+            showToast('CSS圧縮完了');
+        }
+
+        function copyOutput() {
+            if (!outputCSS.value) {
+                showToast('コピーする内容がありません');
+                return;
+            }
+            navigator.clipboard.writeText(outputCSS.value).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexboxプレイグラウンド - ToolBox</title>
+    <meta name="description" content="Flexboxレイアウトを視覚的に学べるインタラクティブツール。">
+    <meta property="og:title" content="Flexboxプレイグラウンド - ToolBox">
+    <meta property="og:description" content="Flexboxレイアウトを視覚的に学べるインタラクティブツール。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/flexbox-playground.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/flexbox-playground.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .preview-container { background: white; border: 2px solid #ddd; border-radius: 8px; padding: 2rem; }
+        .flex-container { background: #f0f0f0; border: 2px dashed #999; border-radius: 4px; padding: 1rem; display: flex; min-height: 300px; }
+        .flex-item { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 4px; padding: 1rem; margin: 0.5rem; min-width: 80px; min-height: 80px; flex: 0 0 100px; }
+        .controls { display: flex; flex-direction: column; gap: 1.5rem; }
+        .control-group { display: flex; flex-direction: column; gap: 0.75rem; }
+        .control-group label { font-weight: 600; color: #333; font-size: 14px; }
+        .control-group select { padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
+        .items-control { display: flex; gap: 1rem; margin-top: 1rem; }
+        button { padding: 0.6rem 1.2rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 13px; }
+        .btn-add { background: #4CAF50; color: white; }
+        .btn-add:hover { background: #45a049; }
+        .btn-remove { background: #ff6b6b; color: white; }
+        .btn-remove:hover { background: #ff5252; }
+        .btn-copy { background: #2196F3; color: white; width: 100%; }
+        .btn-copy:hover { background: #0b7dda; }
+        .code-output { background: #f5f5f5; padding: 1rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; word-break: break-all; max-height: 300px; overflow-y: auto; }
+        .item-list { display: flex; flex-direction: column; gap: 1rem; padding: 1rem; background: #f9f9f9; border-radius: 6px; max-height: 300px; overflow-y: auto; }
+        .item-controls { padding: 0.75rem; background: white; border: 1px solid #ddd; border-radius: 4px; }
+        .item-controls h5 { margin: 0 0 0.75rem 0; color: #333; font-size: 13px; }
+        .item-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 12px; }
+        .item-grid input { padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; }
+        .item-grid label { font-weight: 500; color: #666; }
+        .divider { border-bottom: 2px solid #eee; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+        @media (max-width: 1024px) {
+            .tool-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <h1>Flexboxプレイグラウンド</h1>
+            <p>Flexboxのプロパティを視覚的に学べます。</p>
+
+            <div class="tool-wrapper">
+                <div class="preview-container">
+                    <div class="flex-container" id="flexContainer"></div>
+                </div>
+
+                <div class="controls">
+                    <div>
+                        <h3>コンテナのプロパティ</h3>
+                        <div class="control-group">
+                            <label for="flexDirection">flex-direction</label>
+                            <select id="flexDirection" onchange="updateContainer();">
+                                <option value="row">row</option>
+                                <option value="row-reverse">row-reverse</option>
+                                <option value="column">column</option>
+                                <option value="column-reverse">column-reverse</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="flexWrap">flex-wrap</label>
+                            <select id="flexWrap" onchange="updateContainer();">
+                                <option value="nowrap">nowrap</option>
+                                <option value="wrap">wrap</option>
+                                <option value="wrap-reverse">wrap-reverse</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="justifyContent">justify-content</label>
+                            <select id="justifyContent" onchange="updateContainer();">
+                                <option value="flex-start">flex-start</option>
+                                <option value="flex-end">flex-end</option>
+                                <option value="center">center</option>
+                                <option value="space-between">space-between</option>
+                                <option value="space-around">space-around</option>
+                                <option value="space-evenly">space-evenly</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="alignItems">align-items</label>
+                            <select id="alignItems" onchange="updateContainer();">
+                                <option value="stretch">stretch</option>
+                                <option value="flex-start">flex-start</option>
+                                <option value="flex-end">flex-end</option>
+                                <option value="center">center</option>
+                                <option value="baseline">baseline</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="alignContent">align-content</label>
+                            <select id="alignContent" onchange="updateContainer();">
+                                <option value="stretch">stretch</option>
+                                <option value="flex-start">flex-start</option>
+                                <option value="flex-end">flex-end</option>
+                                <option value="center">center</option>
+                                <option value="space-between">space-between</option>
+                                <option value="space-around">space-around</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="gap">gap (px)</label>
+                            <input type="range" id="gap" min="0" max="30" value="8" onchange="updateContainer();">
+                            <input type="number" id="gapValue" min="0" max="30" value="8" onchange="document.getElementById('gap').value = this.value; updateContainer();">
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div>
+                        <h3>アイテム管理</h3>
+                        <div class="items-control">
+                            <button class="btn-add" onclick="addItem()">追加</button>
+                            <button class="btn-remove" onclick="removeItem()">削除</button>
+                        </div>
+
+                        <div class="item-list" id="itemsList"></div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div>
+                        <h3>生成されたCSS</h3>
+                        <div class="code-output" id="codeOutput"></div>
+                        <button class="btn-copy" onclick="copyCode()">コピー</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <nav class="footer-nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシー</a>
+            </nav>
+            <p>&copy; 2026 ToolBox</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let items = [
+            { id: 1, flexGrow: 0, flexShrink: 1, flexBasis: 'auto', order: 0, alignSelf: 'auto' },
+            { id: 2, flexGrow: 0, flexShrink: 1, flexBasis: 'auto', order: 0, alignSelf: 'auto' },
+            { id: 3, flexGrow: 0, flexShrink: 1, flexBasis: 'auto', order: 0, alignSelf: 'auto' }
+        ];
+        let nextId = 4;
+
+        function updateContainer() {
+            const container = document.getElementById('flexContainer');
+            container.style.flexDirection = document.getElementById('flexDirection').value;
+            container.style.flexWrap = document.getElementById('flexWrap').value;
+            container.style.justifyContent = document.getElementById('justifyContent').value;
+            container.style.alignItems = document.getElementById('alignItems').value;
+            container.style.alignContent = document.getElementById('alignContent').value;
+            const gap = document.getElementById('gap').value;
+            container.style.gap = gap + 'px';
+            document.getElementById('gapValue').value = gap;
+            updateCode();
+        }
+
+        function renderItems() {
+            const container = document.getElementById('flexContainer');
+            container.innerHTML = items.map((item, i) =>
+                `<div class="flex-item" style="flex-grow: ${item.flexGrow}; flex-shrink: ${item.flexShrink}; flex-basis: ${item.flexBasis}; order: ${item.order}; align-self: ${item.alignSelf};">Item ${item.id}</div>`
+            ).join('');
+
+            const list = document.getElementById('itemsList');
+            list.innerHTML = items.map((item, i) => `
+                <div class="item-controls">
+                    <h5>Item ${item.id}</h5>
+                    <div class="item-grid">
+                        <label>flex-grow</label>
+                        <input type="number" min="0" max="10" value="${item.flexGrow}" onchange="updateItem(${i}, 'flexGrow', this.value);">
+                        <label>flex-shrink</label>
+                        <input type="number" min="0" max="10" value="${item.flexShrink}" onchange="updateItem(${i}, 'flexShrink', this.value);">
+                        <label>flex-basis</label>
+                        <input type="text" value="${item.flexBasis}" onchange="updateItem(${i}, 'flexBasis', this.value);">
+                        <label>order</label>
+                        <input type="number" min="-5" max="5" value="${item.order}" onchange="updateItem(${i}, 'order', this.value);">
+                        <label>align-self</label>
+                        <select onchange="updateItem(${i}, 'alignSelf', this.value);">
+                            <option value="auto" ${item.alignSelf === 'auto' ? 'selected' : ''}>auto</option>
+                            <option value="flex-start" ${item.alignSelf === 'flex-start' ? 'selected' : ''}>flex-start</option>
+                            <option value="flex-end" ${item.alignSelf === 'flex-end' ? 'selected' : ''}>flex-end</option>
+                            <option value="center" ${item.alignSelf === 'center' ? 'selected' : ''}>center</option>
+                            <option value="stretch" ${item.alignSelf === 'stretch' ? 'selected' : ''}>stretch</option>
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateItem(index, property, value) {
+            items[index][property] = isNaN(value) ? value : parseInt(value);
+            renderItems();
+            updateCode();
+        }
+
+        function addItem() {
+            items.push({ id: nextId++, flexGrow: 0, flexShrink: 1, flexBasis: 'auto', order: 0, alignSelf: 'auto' });
+            renderItems();
+            updateCode();
+        }
+
+        function removeItem() {
+            if (items.length > 1) {
+                items.pop();
+                renderItems();
+                updateCode();
+            }
+        }
+
+        function updateCode() {
+            const direction = document.getElementById('flexDirection').value;
+            const wrap = document.getElementById('flexWrap').value;
+            const justify = document.getElementById('justifyContent').value;
+            const align = document.getElementById('alignItems').value;
+            const alignContent = document.getElementById('alignContent').value;
+            const gap = document.getElementById('gap').value;
+
+            let code = `.flex-container {\n  display: flex;\n  flex-direction: ${direction};\n  flex-wrap: ${wrap};\n  justify-content: ${justify};\n  align-items: ${align};\n  align-content: ${alignContent};\n  gap: ${gap}px;\n}\n\n`;
+
+            items.forEach((item, i) => {
+                code += `.flex-item-${i + 1} {\n  flex-grow: ${item.flexGrow};\n  flex-shrink: ${item.flexShrink};\n  flex-basis: ${item.flexBasis};\n  order: ${item.order};\n  align-self: ${item.alignSelf};\n}\n\n`;
+            });
+
+            document.getElementById('codeOutput').textContent = code.trim();
+        }
+
+        function copyCode() {
+            const code = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        renderItems();
+        updateContainer();
+    </script>
+</body>
+</html>

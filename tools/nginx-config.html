@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nginx設定ファイルをGUIで生成します。サーバーブロック、リバースプロキシ、SSL設定対応。">
+    <meta property="og:title" content="Nginx設定生成ツール - ToolBox">
+    <meta property="og:description" content="Nginx設定を簡単生成。リバースプロキシ、SSL、キャッシュ設定対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/nginx-config.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/nginx-config.html">
+    <title>Nginx設定生成ツール - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+        select {
+            cursor: pointer;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-item input {
+            cursor: pointer;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            display: none;
+        }
+        .output-section.active {
+            display: block;
+        }
+        .output-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .code-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        .optional-section {
+            border-left: 3px solid #2563eb;
+            padding-left: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🛠️ ToolBox</h1>
+                <nav class="nav">
+                    <a href="/">ホーム</a>
+                    <a href="/#tools">ツール一覧</a>
+                    <a href="/about">について</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <div class="tool-page">
+        <div class="container">
+            <div class="tool-container">
+                <h1>Nginx設定生成ツール</h1>
+                <p class="description">サーバーブロック、リバースプロキシ、SSL設定などをGUIで設定し、Nginx設定ファイルを生成します。</p>
+
+                <div class="form-section">
+                    <h3>基本設定</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="domain">ドメイン名</label>
+                            <input type="text" id="domain" placeholder="example.com" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="serverPort">ポート</label>
+                            <input type="number" id="serverPort" placeholder="80" value="80">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>サーバータイプ</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="radio" id="typeStatic" name="serverType" value="static" checked onchange="updateFormType()">
+                            <label for="typeStatic">静的ファイル配信</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="radio" id="typeProxy" name="serverType" value="proxy" onchange="updateFormType()">
+                            <label for="typeProxy">リバースプロキシ</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section" id="staticSection">
+                    <h3>静的ファイル配信設定</h3>
+                    <div class="form-group">
+                        <label for="rootPath">ルートパス</label>
+                        <input type="text" id="rootPath" placeholder="/var/www/html" value="/var/www/html">
+                    </div>
+                    <div class="form-group">
+                        <label for="indexFile">インデックスファイル</label>
+                        <input type="text" id="indexFile" placeholder="index.html index.htm" value="index.html index.htm">
+                    </div>
+                </div>
+
+                <div class="form-section" id="proxySection" style="display: none;">
+                    <h3>リバースプロキシ設定</h3>
+                    <div class="form-group">
+                        <label for="proxyUrl">プロキシURL</label>
+                        <input type="text" id="proxyUrl" placeholder="http://localhost:3000" value="">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>SSL/TLS設定</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="useSSL" onchange="updateSSLFields()">
+                            <label for="useSSL">SSL/TLSを有効化</label>
+                        </div>
+                    </div>
+                    <div id="sslFields" style="display: none; margin-top: 15px;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="certPath">証明書パス</label>
+                                <input type="text" id="certPath" placeholder="/etc/letsencrypt/live/example.com/fullchain.pem" value="">
+                            </div>
+                            <div class="form-group">
+                                <label for="keyPath">秘密鍵パス</label>
+                                <input type="text" id="keyPath" placeholder="/etc/letsencrypt/live/example.com/privkey.pem" value="">
+                            </div>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="redirectHttps" checked>
+                            <label for="redirectHttps">HTTPからHTTPSにリダイレクト</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section optional-section">
+                    <h3>追加オプション</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="enableGzip" checked>
+                            <label for="enableGzip">Gzip圧縮を有効化</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="enableCache">
+                            <label for="enableCache">キャッシュを有効化</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="enableSecurity" checked>
+                            <label for="enableSecurity">セキュリティヘッダーを追加</label>
+                        </div>
+                    </div>
+                    <div id="cacheSettings" style="display: none; margin-top: 15px;">
+                        <div class="form-group">
+                            <label for="cacheTime">キャッシュ時間</label>
+                            <select id="cacheTime">
+                                <option value="1h">1時間</option>
+                                <option value="1d" selected>1日</option>
+                                <option value="30d">30日</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="generateConfig()">設定を生成</button>
+                </div>
+
+                <div class="output-section" id="outputSection">
+                    <div class="output-label">生成されたnginx.conf</div>
+                    <div class="code-box" id="output"></div>
+                    <div class="button-group">
+                        <button onclick="copyOutput()">コピー</button>
+                        <button onclick="downloadOutput()">ダウンロード</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        document.getElementById('enableCache').addEventListener('change', (e) => {
+            document.getElementById('cacheSettings').style.display = e.target.checked ? 'block' : 'none';
+        });
+
+        function updateFormType() {
+            const type = document.querySelector('input[name="serverType"]:checked').value;
+            document.getElementById('staticSection').style.display = type === 'static' ? 'block' : 'none';
+            document.getElementById('proxySection').style.display = type === 'proxy' ? 'block' : 'none';
+        }
+
+        function updateSSLFields() {
+            const enabled = document.getElementById('useSSL').checked;
+            document.getElementById('sslFields').style.display = enabled ? 'block' : 'none';
+        }
+
+        function generateConfig() {
+            const domain = document.getElementById('domain').value || 'example.com';
+            const port = document.getElementById('serverPort').value || 80;
+            const serverType = document.querySelector('input[name="serverType"]:checked').value;
+
+            let config = 'server {\n';
+            config += `    listen ${port};\n`;
+            config += `    server_name ${domain};\n\n`;
+
+            if (document.getElementById('useSSL').checked) {
+                const certPath = document.getElementById('certPath').value;
+                const keyPath = document.getElementById('keyPath').value;
+                if (certPath && keyPath) {
+                    config += `    ssl_certificate ${certPath};\n`;
+                    config += `    ssl_certificate_key ${keyPath};\n`;
+                    config += `    ssl_protocols TLSv1.2 TLSv1.3;\n`;
+                    config += `    ssl_ciphers HIGH:!aNULL:!MD5;\n\n`;
+                }
+                if (document.getElementById('redirectHttps').checked) {
+                    config += `    if ($scheme != "https") {\n`;
+                    config += `        return 301 https://$server_name$request_uri;\n`;
+                    config += `    }\n\n`;
+                }
+            }
+
+            if (document.getElementById('enableGzip').checked) {
+                config += `    gzip on;\n`;
+                config += `    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;\n\n`;
+            }
+
+            if (document.getElementById('enableSecurity').checked) {
+                config += `    add_header X-Frame-Options "SAMEORIGIN" always;\n`;
+                config += `    add_header X-Content-Type-Options "nosniff" always;\n`;
+                config += `    add_header X-XSS-Protection "1; mode=block" always;\n\n`;
+            }
+
+            if (serverType === 'static') {
+                const rootPath = document.getElementById('rootPath').value;
+                const indexFile = document.getElementById('indexFile').value;
+                config += `    root ${rootPath};\n`;
+                config += `    index ${indexFile};\n\n`;
+
+                if (document.getElementById('enableCache').checked) {
+                    const cacheTime = document.getElementById('cacheTime').value;
+                    config += `    location ~* \\.(jpg|jpeg|png|gif|ico|css|js)$ {\n`;
+                    config += `        expires ${cacheTime};\n`;
+                    config += `    }\n\n`;
+                }
+
+                config += `    location / {\n`;
+                config += `        try_files $uri $uri/ =404;\n`;
+                config += `    }\n`;
+            } else if (serverType === 'proxy') {
+                const proxyUrl = document.getElementById('proxyUrl').value || 'http://localhost:3000';
+                config += `    location / {\n`;
+                config += `        proxy_pass ${proxyUrl};\n`;
+                config += `        proxy_set_header Host $host;\n`;
+                config += `        proxy_set_header X-Real-IP $remote_addr;\n`;
+                config += `        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n`;
+                config += `        proxy_set_header X-Forwarded-Proto $scheme;\n`;
+                config += `    }\n`;
+            }
+
+            config += `}\n`;
+
+            document.getElementById('output').textContent = config;
+            document.getElementById('outputSection').classList.add('active');
+            showToast('設定を生成しました', 'success');
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                showToast('コピーしました', 'success');
+            });
+        }
+
+        function downloadOutput() {
+            const output = document.getElementById('output').textContent;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(output));
+            element.setAttribute('download', 'nginx.conf');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            showToast('ダウンロード開始', 'success');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

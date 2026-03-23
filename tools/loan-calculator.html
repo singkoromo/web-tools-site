@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ローン計算機 - ToolBox</title>
+    <meta name="description" content="借入金額、金利、返済期間から月々の返済額と総返済額を計算します。元利均等返済と元金均等返済に対応。">
+    <meta name="keywords" content="ローン計算,返済計算,住宅ローン,金利計算,元利均等返済">
+    <meta property="og:title" content="ローン計算機 - ToolBox">
+    <meta property="og:description" content="月々の返済額と総返済額を簡単に計算。元利均等返済と元金均等返済に対応。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/loan-calculator.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/loan-calculator.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        input[type="number"] {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .unit {
+            color: #6b7280;
+            font-weight: 500;
+            min-width: 3rem;
+        }
+        .method-tabs {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .method-tab {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .method-tab.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+        .method-tab:hover {
+            border-color: #3b82f6;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .btn-calculate {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .btn-calculate:hover {
+            background: #2563eb;
+        }
+        .btn-clear {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-clear:hover {
+            background: #d1d5db;
+        }
+        .result-box {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+        .result-box.show {
+            display: block;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .summary-item {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .summary-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .summary-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1f2937;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        .schedule-table thead {
+            background: #e5e7eb;
+        }
+        .schedule-table th {
+            padding: 0.75rem;
+            text-align: right;
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.875rem;
+        }
+        .schedule-table td {
+            padding: 0.5rem 0.75rem;
+            text-align: right;
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', monospace;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .schedule-table tbody tr:hover {
+            background: #fff;
+        }
+        .schedule-table th:first-child,
+        .schedule-table td:first-child {
+            text-align: left;
+        }
+        .schedule-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+        .ad-banner {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1>ローン計算機</h1>
+        <p style="color: #6b7280; margin-bottom: 2rem;">月々の返済額と総返済額を計算します。</p>
+
+        <div class="ad-banner">広告スペース</div>
+
+        <div class="input-group">
+            <label class="input-label">借入金額</label>
+            <div class="input-wrapper">
+                <input type="number" id="principal" placeholder="例: 3000000" step="10000" min="0">
+                <span class="unit">円</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">年利</label>
+            <div class="input-wrapper">
+                <input type="number" id="rate" placeholder="例: 3.5" step="0.01" min="0" max="100">
+                <span class="unit">%</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">返済期間</label>
+            <div class="input-wrapper">
+                <input type="number" id="years" placeholder="例: 20" step="1" min="1">
+                <span class="unit">年</span>
+            </div>
+        </div>
+
+        <div class="method-tabs">
+            <button class="method-tab active" onclick="switchMethod(0)">元利均等返済</button>
+            <button class="method-tab" onclick="switchMethod(1)">元金均等返済</button>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-calculate" onclick="calculate()">計算する</button>
+            <button class="btn-clear" onclick="clearForm()">クリア</button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">月々の返済額（初回）</div>
+                    <div class="summary-value" id="monthlyPayment">0円</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">総返済額</div>
+                    <div class="summary-value" id="totalPayment">0円</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">総利息</div>
+                    <div class="summary-value" id="totalInterest">0円</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">返済期間</div>
+                    <div class="summary-value" id="displayYears">0年</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #1f2937;">返済スケジュール</h3>
+            <div class="schedule-container">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>月</th>
+                            <th>返済額</th>
+                            <th>元金</th>
+                            <th>利息</th>
+                            <th>残高</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="ad-banner">広告スペース</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <div id="toast"></div>
+
+    <script>
+        let currentMethod = 0;
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: #fff; padding: 1rem 1.5rem; border-radius: 6px; z-index: 1000; display: block;';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function switchMethod(method) {
+            currentMethod = method;
+            const tabs = document.querySelectorAll('.method-tab');
+            tabs.forEach((tab, index) => {
+                if (index === method) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            calculate();
+        }
+
+        function formatCurrency(value) {
+            return Math.round(value).toLocaleString('ja-JP') + '円';
+        }
+
+        function calculate() {
+            const principal = parseFloat(document.getElementById('principal').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const years = parseFloat(document.getElementById('years').value);
+
+            if (isNaN(principal) || isNaN(rate) || isNaN(years) || principal <= 0 || years <= 0) {
+                showToast('すべての値を入力してください');
+                return;
+            }
+
+            const monthlyRate = rate / 12 / 100;
+            const months = years * 12;
+            let schedule = [];
+
+            if (currentMethod === 0) {
+                // 元利均等返済
+                const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+                let balance = principal;
+                let totalInterest = 0;
+
+                for (let i = 1; i <= months; i++) {
+                    const interest = balance * monthlyRate;
+                    const principal_payment = monthlyPayment - interest;
+                    balance -= principal_payment;
+                    totalInterest += interest;
+
+                    if (i % 12 === 1 || i === months) {
+                        schedule.push({
+                            month: i,
+                            payment: monthlyPayment,
+                            principal: principal_payment,
+                            interest: interest,
+                            balance: Math.max(0, balance)
+                        });
+                    }
+                }
+
+                document.getElementById('monthlyPayment').textContent = formatCurrency(monthlyPayment);
+                document.getElementById('totalPayment').textContent = formatCurrency(monthlyPayment * months);
+                document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+
+            } else {
+                // 元金均等返済
+                const principalPerMonth = principal / months;
+                let balance = principal;
+                let totalInterest = 0;
+
+                for (let i = 1; i <= months; i++) {
+                    const interest = balance * monthlyRate;
+                    const payment = principalPerMonth + interest;
+                    balance -= principalPerMonth;
+                    totalInterest += interest;
+
+                    if (i % 12 === 1 || i === months) {
+                        schedule.push({
+                            month: i,
+                            payment: payment,
+                            principal: principalPerMonth,
+                            interest: interest,
+                            balance: Math.max(0, balance)
+                        });
+                    }
+                }
+
+                document.getElementById('monthlyPayment').textContent = formatCurrency(principalPerMonth + principal * monthlyRate);
+                document.getElementById('totalPayment').textContent = formatCurrency(principal + totalInterest);
+                document.getElementById('totalInterest').textContent = formatCurrency(totalInterest);
+            }
+
+            document.getElementById('displayYears').textContent = years + '年';
+
+            const tbody = document.getElementById('scheduleBody');
+            tbody.innerHTML = '';
+            schedule.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.month}ヶ月</td>
+                    <td>${formatCurrency(row.payment)}</td>
+                    <td>${formatCurrency(row.principal)}</td>
+                    <td>${formatCurrency(row.interest)}</td>
+                    <td>${formatCurrency(row.balance)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('resultBox').classList.add('show');
+        }
+
+        function clearForm() {
+            document.getElementById('principal').value = '';
+            document.getElementById('rate').value = '';
+            document.getElementById('years').value = '';
+            document.getElementById('resultBox').classList.remove('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('principal').addEventListener('input', calculate);
+            document.getElementById('rate').addEventListener('input', calculate);
+            document.getElementById('years').addEventListener('input', calculate);
+        });
+    </script>
+</body>
+</html>

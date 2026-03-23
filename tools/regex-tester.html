@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="正規表現をリアルタイムでテストできるツール。パターンマッチング、キャプチャグループ、置換機能に対応しています。">
+    <meta property="og:title" content="正規表現テスター - ToolBox">
+    <meta property="og:description" content="正規表現をリアルタイムでテストできるツール。マッチング、キャプチャ、置換機能に対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/regex-tester.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/regex-tester.html">
+    <title>正規表現テスター - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .regex-input-section {
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+        input[type="text"] {
+            height: auto;
+        }
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .flags-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .flag-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .flag-checkbox input {
+            cursor: pointer;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        .sidebar {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        .sidebar h3 {
+            margin-top: 0;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .pattern-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .pattern-btn {
+            padding: 8px 10px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s;
+        }
+        .pattern-btn:hover {
+            background: #e0e0e0;
+        }
+        .pattern-description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        .results-section {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .match-count {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        .matches-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .match-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 10px;
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .match-index {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        .match-text {
+            background: #fff3cd;
+            padding: 4px 6px;
+            border-radius: 2px;
+            word-break: break-all;
+            margin-bottom: 6px;
+        }
+        .match-groups {
+            font-size: 12px;
+            color: #666;
+        }
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .replace-section {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Inter, sans-serif;
+            font-weight: 500;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.secondary {
+            background: #6c757d;
+        }
+        button.secondary:hover {
+            background: #545b62;
+        }
+        .replace-result {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-container">
+            <h1>正規表現テスター</h1>
+
+            <div class="regex-input-section">
+                <div class="form-group">
+                    <label for="patternInput">正規表現パターン</label>
+                    <input type="text" id="patternInput" placeholder="例: \d+">
+                </div>
+
+                <div class="form-group">
+                    <label>フラグ</label>
+                    <div class="flags-group">
+                        <label class="flag-checkbox">
+                            <input type="checkbox" value="g" id="flagG">
+                            <span>g (全一致)</span>
+                        </label>
+                        <label class="flag-checkbox">
+                            <input type="checkbox" value="i" id="flagI">
+                            <span>i (大文字小文字を区別しない)</span>
+                        </label>
+                        <label class="flag-checkbox">
+                            <input type="checkbox" value="m" id="flagM">
+                            <span>m (複数行)</span>
+                        </label>
+                        <label class="flag-checkbox">
+                            <input type="checkbox" value="s" id="flagS">
+                            <span>s (ドット記号が改行にも一致)</span>
+                        </label>
+                        <label class="flag-checkbox">
+                            <input type="checkbox" value="u" id="flagU">
+                            <span>u (Unicode)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="testString">テスト文字列</label>
+                    <textarea id="testString" placeholder="マッチングをテストする文字列を入力してください"></textarea>
+                </div>
+            </div>
+
+            <div class="error" id="errorMsg"></div>
+
+            <div class="main-content">
+                <div>
+                    <div class="results-section">
+                        <div class="match-count">マッチ数: <span id="matchCount">0</span></div>
+                        <div class="matches-list" id="matchesList"></div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <h3>よく使うパターン</h3>
+                    <div class="pattern-list">
+                        <button class="pattern-btn" onclick="setPattern('\\w+@\\w+\\.\\w+')">
+                            メール
+                            <div class="pattern-description">メールアドレス</div>
+                        </button>
+                        <button class="pattern-btn" onclick="setPattern('https?://[^\\s]+')">
+                            URL
+                            <div class="pattern-description">ウェブURL</div>
+                        </button>
+                        <button class="pattern-btn" onclick="setPattern('^\\d{3}-\\d{4}-\\d{4}$')">
+                            電話番号
+                            <div class="pattern-description">03-1234-5678</div>
+                        </button>
+                        <button class="pattern-btn" onclick="setPattern('^\\d{3}-\\d{4}$')">
+                            郵便番号
+                            <div class="pattern-description">123-4567</div>
+                        </button>
+                        <button class="pattern-btn" onclick="setPattern('^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$')">
+                            IPv4
+                            <div class="pattern-description">192.168.1.1</div>
+                        </button>
+                        <button class="pattern-btn" onclick="setPattern('^\\d{4}-\\d{2}-\\d{2}$')">
+                            日付
+                            <div class="pattern-description">YYYY-MM-DD</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="replace-section">
+                <div class="form-group">
+                    <label for="replaceInput">置換文字列</label>
+                    <input type="text" id="replaceInput" placeholder="置換後の文字列">
+                </div>
+                <div class="button-group">
+                    <button onclick="performReplace()">置換実行</button>
+                </div>
+                <div id="replaceResult"></div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMsg');
+            if (message) {
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            } else {
+                errorEl.classList.remove('show');
+            }
+        }
+
+        function setPattern(pattern) {
+            document.getElementById('patternInput').value = pattern;
+            testRegex();
+        }
+
+        function getFlags() {
+            let flags = '';
+            if (document.getElementById('flagG').checked) flags += 'g';
+            if (document.getElementById('flagI').checked) flags += 'i';
+            if (document.getElementById('flagM').checked) flags += 'm';
+            if (document.getElementById('flagS').checked) flags += 's';
+            if (document.getElementById('flagU').checked) flags += 'u';
+            return flags;
+        }
+
+        function testRegex() {
+            const pattern = document.getElementById('patternInput').value;
+            const testString = document.getElementById('testString').value;
+            const matchesList = document.getElementById('matchesList');
+            const matchCount = document.getElementById('matchCount');
+
+            matchesList.innerHTML = '';
+            matchCount.textContent = '0';
+
+            if (!pattern || !testString) {
+                return;
+            }
+
+            try {
+                const flags = getFlags();
+                const regex = new RegExp(pattern, flags);
+                const matches = [];
+
+                if (flags.includes('g')) {
+                    let match;
+                    while ((match = regex.exec(testString)) !== null) {
+                        matches.push(match);
+                    }
+                } else {
+                    const match = regex.exec(testString);
+                    if (match) {
+                        matches.push(match);
+                    }
+                }
+
+                matchCount.textContent = matches.length;
+                showError('');
+
+                matches.forEach((match, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'match-item';
+
+                    const indexDiv = document.createElement('div');
+                    indexDiv.className = 'match-index';
+                    indexDiv.textContent = `マッチ ${index + 1} (インデックス: ${match.index})`;
+
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'match-text';
+                    textDiv.textContent = match[0];
+
+                    item.appendChild(indexDiv);
+                    item.appendChild(textDiv);
+
+                    if (match.length > 1) {
+                        const groupsDiv = document.createElement('div');
+                        groupsDiv.className = 'match-groups';
+                        let groupsHtml = 'グループ: ';
+                        for (let i = 1; i < match.length; i++) {
+                            groupsHtml += `[${i}] = ${match[i] || '(undefined)'} `;
+                        }
+                        groupsDiv.innerHTML = groupsHtml;
+                        item.appendChild(groupsDiv);
+                    }
+
+                    matchesList.appendChild(item);
+                });
+            } catch (e) {
+                showError('正規表現エラー: ' + e.message);
+                matchCount.textContent = '0';
+            }
+        }
+
+        function performReplace() {
+            const pattern = document.getElementById('patternInput').value;
+            const replaceStr = document.getElementById('replaceInput').value;
+            const testString = document.getElementById('testString').value;
+            const resultDiv = document.getElementById('replaceResult');
+
+            if (!pattern || !testString) {
+                resultDiv.innerHTML = '';
+                return;
+            }
+
+            try {
+                const flags = getFlags();
+                const regex = new RegExp(pattern, flags);
+                const result = testString.replace(regex, replaceStr);
+
+                const resultHtml = `
+                    <div class="form-group">
+                        <label>置換結果</label>
+                        <div class="replace-result">${result}</div>
+                    </div>
+                `;
+                resultDiv.innerHTML = resultHtml;
+                showError('');
+            } catch (e) {
+                resultDiv.innerHTML = '';
+                showError('置換エラー: ' + e.message);
+            }
+        }
+
+        document.getElementById('patternInput').addEventListener('input', testRegex);
+        document.getElementById('testString').addEventListener('input', testRegex);
+        document.querySelectorAll('input[id^="flag"]').forEach(checkbox => {
+            checkbox.addEventListener('change', testRegex);
+        });
+
+        testRegex();
+    </script>
+</body>
+</html>

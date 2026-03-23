@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Base64エンコード・デコードツール。テキストファイルを簡単にBase64形式に変換できます。">
+    <meta name="keywords" content="Base64,エンコード,デコード,変換,テキスト">
+    <meta name="author" content="ToolBox">
+    <title>Base64 エンコード・デコード | ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .tool-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .textarea-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .textarea-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tool-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .tool-textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .textarea-info {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .btn-file {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .btn-file:hover {
+            background-color: #5a32a3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+        }
+
+        .error-message {
+            padding: 1rem;
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            padding: 1rem;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .sections-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav class="nav">
+                <a href="../index.html" class="nav-link">ホーム</a>
+                <a href="../index.html#tools" class="nav-link">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Ad Banner (Before Tool) -->
+    <div class="ad-banner ad-before">
+        <p>広告スペース</p>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="tool-header">
+            <h1>Base64 エンコード・デコード</h1>
+            <p>テキストやファイルをBase64形式に変換、またはBase64形式のテキストをデコードします。</p>
+        </div>
+
+        <div class="tool-container">
+            <div class="sections-grid">
+                <!-- Encode Section -->
+                <div>
+                    <div class="textarea-group">
+                        <label for="encodeInput">エンコード対象テキスト</label>
+                        <div class="textarea-wrapper">
+                            <textarea id="encodeInput" class="tool-textarea" placeholder="ここにテキストを入力するか、ファイルをアップロードしてください..."></textarea>
+                            <span class="textarea-info" id="encodeInfo">0 文字</span>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="encodeToBase64()">エンコード</button>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="encodeFileInput" onchange="handleFileUpload(event, 'encode')">
+                            <button class="btn btn-file" onclick="document.getElementById('encodeFileInput').click()">ファイルを選択</button>
+                        </div>
+                        <button class="btn btn-secondary" onclick="copyToClipboard('encodeInput')">コピー</button>
+                        <button class="btn btn-secondary" onclick="clearArea('encodeInput')">クリア</button>
+                    </div>
+                </div>
+
+                <!-- Decode Section -->
+                <div>
+                    <div class="textarea-group">
+                        <label for="decodeInput">Base64 テキスト</label>
+                        <div class="textarea-wrapper">
+                            <textarea id="decodeInput" class="tool-textarea" placeholder="ここにBase64テキストを貼り付けてください..."></textarea>
+                            <span class="textarea-info" id="decodeInfo">0 文字</span>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="decodeFromBase64()">デコード</button>
+                        <button class="btn btn-secondary" onclick="copyToClipboard('decodeInput')">コピー</button>
+                        <button class="btn btn-secondary" onclick="clearArea('decodeInput')">クリア</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div>
+                <div class="textarea-group">
+                    <label for="output">結果</label>
+                    <div class="textarea-wrapper">
+                        <textarea id="output" class="tool-textarea" placeholder="結果がここに表示されます..." readonly></textarea>
+                        <span class="textarea-info" id="outputInfo">0 文字</span>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="copyToClipboard('output')">結果をコピー</button>
+                    <button class="btn btn-secondary" onclick="clearArea('output')">クリア</button>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+        </div>
+    </main>
+
+    <!-- Ad Banner (After Tool) -->
+    <div class="ad-banner ad-after">
+        <p>広告スペース</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox</p>
+    </footer>
+
+    <script>
+        function updateCharCount(elementId, infoId) {
+            const element = document.getElementById(elementId);
+            const count = element.value.length;
+            document.getElementById(infoId).textContent = count + ' 文字';
+        }
+
+        document.getElementById('encodeInput').addEventListener('input', () => {
+            updateCharCount('encodeInput', 'encodeInfo');
+            clearMessages();
+        });
+
+        document.getElementById('decodeInput').addEventListener('input', () => {
+            updateCharCount('decodeInput', 'decodeInfo');
+            clearMessages();
+        });
+
+        document.getElementById('output').addEventListener('input', () => {
+            updateCharCount('output', 'outputInfo');
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            showToast(message, 'error');
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.add('show');
+            showToast(message, 'success');
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function encodeToBase64() {
+            clearMessages();
+            const input = document.getElementById('encodeInput').value;
+
+            if (!input.trim()) {
+                showError('エンコード対象のテキストを入力してください。');
+                return;
+            }
+
+            try {
+                const encoded = btoa(new TextEncoder().encode(input).reduce((acc, byte) => acc + String.fromCharCode(byte), ''));
+                document.getElementById('output').value = encoded;
+                updateCharCount('output', 'outputInfo');
+                showSuccess('エンコード完了しました。');
+            } catch (error) {
+                showError('エンコード中にエラーが発生しました: ' + error.message);
+            }
+        }
+
+        function decodeFromBase64() {
+            clearMessages();
+            const input = document.getElementById('decodeInput').value;
+
+            if (!input.trim()) {
+                showError('デコード対象のBase64テキストを入力してください。');
+                return;
+            }
+
+            try {
+                const binaryString = atob(input);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const decoded = new TextDecoder().decode(bytes);
+                document.getElementById('output').value = decoded;
+                updateCharCount('output', 'outputInfo');
+                showSuccess('デコード完了しました。');
+            } catch (error) {
+                showError('無効なBase64形式です。デコードできませんでした。');
+            }
+        }
+
+        function handleFileUpload(event, type) {
+            clearMessages();
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const base64 = btoa(new Uint8Array(content).reduce((acc, byte) => acc + String.fromCharCode(byte), ''));
+                    const dataUri = 'data:' + file.type + ';base64,' + base64;
+                    document.getElementById('output').value = dataUri;
+                    updateCharCount('output', 'outputInfo');
+                    showSuccess('ファイルをBase64に変換しました。');
+                } catch (error) {
+                    showError('ファイル処理中にエラーが発生しました。');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element.value) {
+                showToast('コピーする内容がありません', 'warning');
+                return;
+            }
+
+            navigator.clipboard.writeText(element.value).then(() => {
+                showToast('クリップボードにコピーしました', 'success');
+            }).catch(() => {
+                showError('コピーに失敗しました。');
+            });
+        }
+
+        function clearArea(elementId) {
+            document.getElementById(elementId).value = '';
+            updateCharCount(elementId, elementId === 'encodeInput' ? 'encodeInfo' : elementId === 'decodeInput' ? 'decodeInfo' : 'outputInfo');
+            clearMessages();
+        }
+    </script>
+</body>
+</html>

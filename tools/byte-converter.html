@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>バイト単位変換 - ToolBox</title>
+    <meta name="description" content="バイト単位の相互変換と転送時間計算ツール">
+    <meta name="keywords" content="バイト, KB, MB, GB, 単位変換, 転送速度">
+    <meta property="og:url" content="https://web-tool-site.com/tools/byte-converter.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="バイト単位変換 - ToolBox">
+    <meta property="og:description" content="バイト単位の相互変換と転送時間計算ツール">
+    <link rel="canonical" href="https://web-tool-site.com/tools/byte-converter.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .input-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .input-group input,
+        .input-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .toggle-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .toggle-btn {
+            padding: 0.6rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .conversion-results {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 1rem;
+            border-left: 3px solid #667eea;
+        }
+        .result-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            word-break: break-all;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .result-value.small {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .copy-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 0.4rem 0.8rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .copy-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .transfer-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .speed-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+        .speed-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 1rem;
+            border-left: 3px solid #667eea;
+        }
+        .speed-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .speed-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: #666;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 3rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="tool-title">バイト単位変換</h1>
+
+        <div class="ad-banner">広告スペース: バイト単位変換ツール</div>
+
+        <div class="input-section">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #333;">入力</h2>
+            <div class="input-group">
+                <input type="number" id="inputValue" placeholder="数値を入力" step="any">
+                <select id="inputUnit">
+                    <option value="bit">Bit</option>
+                    <option value="byte" selected>Byte (B)</option>
+                    <option value="kb">KB</option>
+                    <option value="mb">MB</option>
+                    <option value="gb">GB</option>
+                    <option value="tb">TB</option>
+                    <option value="pb">PB</option>
+                    <option value="eb">EB</option>
+                </select>
+            </div>
+
+            <label style="font-weight: 600; font-size: 0.95rem; color: #333; display: block; margin-bottom: 0.5rem;">計算基準</label>
+            <div class="toggle-group">
+                <button class="toggle-btn active" data-standard="binary" onclick="converter.setStandard('binary')">バイナリ (1024)</button>
+                <button class="toggle-btn" data-standard="si" onclick="converter.setStandard('si')">SI (1000)</button>
+            </div>
+        </div>
+
+        <div class="conversion-results">
+            <h2 class="result-title">変換結果</h2>
+            <div class="result-grid" id="results"></div>
+        </div>
+
+        <div class="transfer-section">
+            <h2 class="result-title">転送時間予測</h2>
+            <div class="speed-grid" id="transferTimes"></div>
+        </div>
+
+        <div class="ad-banner">広告スペース: バイト単位変換ツール下部</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            showToast('コピーしました');
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0';
+            if (bytes < 1) return bytes.toExponential(2);
+
+            const places = Math.floor(Math.log10(Math.abs(bytes)) / 3);
+            const scale = Math.pow(10, places * 3);
+            const scaled = bytes / scale;
+
+            return scaled.toFixed(2).replace(/\.?0+$/, '');
+        }
+
+        function formatTime(seconds) {
+            if (seconds < 1) return (seconds * 1000).toFixed(2) + ' ms';
+            if (seconds < 60) return seconds.toFixed(2) + ' sec';
+            if (seconds < 3600) {
+                const min = Math.floor(seconds / 60);
+                const sec = (seconds % 60).toFixed(0);
+                return `${min}m ${sec}s`;
+            }
+
+            const hours = Math.floor(seconds / 3600);
+            const min = Math.floor((seconds % 3600) / 60);
+            return `${hours}h ${min}m`;
+        }
+
+        const converter = {
+            standard: 'binary',
+            binaryBases: { bit: 1, byte: 8, kb: 8192, mb: 8388608, gb: 8589934592, tb: 8796093022208, pb: 9007199254740992, eb: 9223372036854775808 },
+            siBases: { bit: 1, byte: 8, kb: 8000, mb: 8000000, gb: 8000000000, tb: 8000000000000, pb: 8000000000000000, eb: 8000000000000000000 },
+
+            setStandard(std) {
+                this.standard = std;
+                document.querySelectorAll('.toggle-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.standard === std) btn.classList.add('active');
+                });
+                this.update();
+            },
+
+            getBases() {
+                return this.standard === 'binary' ? this.binaryBases : this.siBases;
+            },
+
+            update() {
+                const value = parseFloat(document.getElementById('inputValue').value) || 0;
+                const unit = document.getElementById('inputUnit').value;
+                const bases = this.getBases();
+
+                const bits = value * bases[unit];
+
+                const results = document.getElementById('results');
+                results.innerHTML = '';
+
+                const units = ['bit', 'byte', 'kb', 'mb', 'gb', 'tb', 'pb', 'eb'];
+                const labels = ['Bit', 'Byte (B)', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
+
+                units.forEach((u, idx) => {
+                    const converted = bits / bases[u];
+                    const displayValue = converted > 0.01 ? converted.toFixed(6).replace(/\.?0+$/, '') : converted.toExponential(2);
+
+                    const card = document.createElement('div');
+                    card.className = 'result-card';
+                    card.innerHTML = `
+                        <div class="result-label">${labels[idx]}</div>
+                        <div class="result-value">${displayValue}</div>
+                        <button class="copy-btn">コピー</button>
+                    `;
+
+                    card.querySelector('.copy-btn').addEventListener('click', () => {
+                        copyToClipboard(displayValue);
+                    });
+
+                    results.appendChild(card);
+                });
+
+                this.updateTransferTimes(bits);
+            },
+
+            updateTransferTimes(bits) {
+                const speeds = [
+                    { name: '1 Mbps', bps: 1000000 },
+                    { name: '10 Mbps', bps: 10000000 },
+                    { name: '100 Mbps', bps: 100000000 },
+                    { name: '1 Gbps', bps: 1000000000 }
+                ];
+
+                const container = document.getElementById('transferTimes');
+                container.innerHTML = '';
+
+                speeds.forEach(speed => {
+                    const seconds = bits / speed.bps;
+                    const time = formatTime(seconds);
+
+                    const card = document.createElement('div');
+                    card.className = 'speed-card';
+                    card.innerHTML = `
+                        <div class="speed-label">${speed.name}</div>
+                        <div class="speed-value">${time}</div>
+                    `;
+
+                    container.appendChild(card);
+                });
+            }
+        };
+
+        document.getElementById('inputValue').addEventListener('input', () => converter.update());
+        document.getElementById('inputUnit').addEventListener('change', () => converter.update());
+
+        converter.update();
+    </script>
+</body>
+</html>

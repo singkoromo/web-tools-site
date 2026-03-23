@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSVビューア・エディタ | ToolBox</title>
+    <meta name="description" content="CSVファイルを表形式で表示・編集できるツール。セル編集、行列の追加削除、ダウンロード機能付き。">
+    <meta name="keywords" content="CSV, TSV, ビューア, エディタ, オンラインツール">
+    <meta name="author" content="ToolBox">
+    <link rel="canonical" href="./tools/csv-editor.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #4a90e2;
+        }
+
+        .ad-banner {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .ad-placeholder {
+            background: #e8e8e8;
+            padding: 2rem;
+            color: #999;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .tool-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tool-content {
+            padding: 2rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .control-group input[type="file"] {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .control-group select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            cursor: pointer;
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #f99;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #efe;
+            border: 1px solid #9f9;
+            color: #3c3;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #4a90e2;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #357abd;
+        }
+
+        td {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+        }
+
+        td input {
+            width: 100%;
+            border: none;
+            padding: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        td input:focus {
+            outline: none;
+            background: #fff9e6;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .row-number {
+            background: #f5f5f5;
+            font-weight: 600;
+            text-align: center;
+            width: 50px;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hide {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-header h1 {
+                font-size: 1.8rem;
+            }
+
+            button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">ホーム</a></li>
+                    <li><a href="../index.html#tools">ツール一覧</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Ad Banner 1 -->
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <!-- Tool Page -->
+    <div class="tool-page">
+        <div class="tool-header">
+            <h1>CSVビューア・エディタ</h1>
+            <p>CSVファイルを表形式で表示・編集します</p>
+        </div>
+
+        <div class="tool-content">
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <div class="button-group">
+                    <button class="btn-primary" id="addRowBtn">行追加</button>
+                    <button class="btn-primary" id="addColBtn">列追加</button>
+                    <button class="btn-danger" id="clearBtn">クリア</button>
+                </div>
+
+                <div class="control-group">
+                    <label for="csvFile">ファイル選択:</label>
+                    <input type="file" id="csvFile" accept=".csv,.tsv,.txt">
+                    <label for="delimiter">区切り文字:</label>
+                    <select id="delimiter">
+                        <option value=",">カンマ (,)</option>
+                        <option value="	">タブ (Tab)</option>
+                        <option value=";">セミコロン (;)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table id="csvTable">
+                    <thead>
+                        <tr id="headerRow">
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Download -->
+            <div class="button-group" style="margin-top: 1rem;">
+                <button class="btn-success" id="downloadCsvBtn">CSV ダウンロード</button>
+                <button class="btn-success" id="downloadTsvBtn">TSV ダウンロード</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Banner 2 -->
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 ToolBox</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" style="display: none;"></div>
+
+    <script>
+        const csvFile = document.getElementById('csvFile');
+        const delimiterSelect = document.getElementById('delimiter');
+        const csvTable = document.getElementById('csvTable');
+        const headerRow = document.getElementById('headerRow');
+        const tableBody = document.getElementById('tableBody');
+        const addRowBtn = document.getElementById('addRowBtn');
+        const addColBtn = document.getElementById('addColBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+        const downloadTsvBtn = document.getElementById('downloadTsvBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const toast = document.getElementById('toast');
+
+        let data = [];
+
+        function clearMessages() {
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+        }
+
+        function showError(message) {
+            clearMessages();
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            clearMessages();
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = 'block';
+            toast.classList.remove('hide');
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 2000);
+        }
+
+        function parseCSV(text, delimiter) {
+            const rows = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i + 1];
+
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        current += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === delimiter && !inQuotes) {
+                    rows.push(current.trim());
+                    current = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (current.trim()) {
+                        rows.push(current.trim());
+                    }
+                    current = '';
+                    if (char === '\r' && nextChar === '\n') i++;
+                } else {
+                    current += char;
+                }
+            }
+
+            if (current.trim()) {
+                rows.push(current.trim());
+            }
+
+            return rows;
+        }
+
+        function parseCSVData(text, delimiter) {
+            const lines = text.split(/\r?\n/).filter(line => line.trim());
+            const data = [];
+
+            lines.forEach(line => {
+                const fields = parseCSV(line, delimiter);
+                data.push(fields);
+            });
+
+            return data;
+        }
+
+        function renderTable() {
+            headerRow.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            if (data.length === 0) {
+                return;
+            }
+
+            // Render header
+            const th = document.createElement('th');
+            th.textContent = '#';
+            th.className = 'row-number';
+            headerRow.appendChild(th);
+
+            if (data[0]) {
+                data[0].forEach((cell, colIdx) => {
+                    const th = document.createElement('th');
+                    th.textContent = `列${colIdx + 1}`;
+                    headerRow.appendChild(th);
+                });
+                const th = document.createElement('th');
+                th.style.width = '50px';
+                th.textContent = '削除';
+                headerRow.appendChild(th);
+            }
+
+            // Render rows
+            data.forEach((row, rowIdx) => {
+                const tr = document.createElement('tr');
+
+                const tdNum = document.createElement('td');
+                tdNum.className = 'row-number';
+                tdNum.textContent = rowIdx + 1;
+                tr.appendChild(tdNum);
+
+                row.forEach((cell, colIdx) => {
+                    const td = document.createElement('td');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = cell || '';
+                    input.addEventListener('change', (e) => {
+                        data[rowIdx][colIdx] = e.target.value;
+                    });
+                    td.appendChild(input);
+                    tr.appendChild(td);
+                });
+
+                const tdDelete = document.createElement('td');
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '削除';
+                deleteBtn.addEventListener('click', () => {
+                    data.splice(rowIdx, 1);
+                    renderTable();
+                });
+                tdDelete.appendChild(deleteBtn);
+                tr.appendChild(tdDelete);
+
+                tableBody.appendChild(tr);
+            });
+        }
+
+        csvFile.addEventListener('change', (e) => {
+            clearMessages();
+            const file = e.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const delimiter = delimiterSelect.value;
+                    data = parseCSVData(event.target.result, delimiter);
+
+                    if (data.length === 0) {
+                        showError('CSVが空です');
+                        return;
+                    }
+
+                    // Pad rows to have same number of columns
+                    const maxCols = Math.max(...data.map(row => row.length));
+                    data.forEach(row => {
+                        while (row.length < maxCols) {
+                            row.push('');
+                        }
+                    });
+
+                    renderTable();
+                    showSuccess('CSVを読み込みました');
+                } catch (error) {
+                    showError('エラー: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        addRowBtn.addEventListener('click', () => {
+            if (data.length === 0) {
+                data.push(['']);
+            } else {
+                const cols = data[0].length;
+                data.push(Array(cols).fill(''));
+            }
+            renderTable();
+            showToast('行を追加しました');
+        });
+
+        addColBtn.addEventListener('click', () => {
+            if (data.length === 0) {
+                data.push(['']);
+            } else {
+                data.forEach(row => {
+                    row.push('');
+                });
+            }
+            renderTable();
+            showToast('列を追加しました');
+        });
+
+        clearBtn.addEventListener('click', () => {
+            data = [];
+            renderTable();
+            csvFile.value = '';
+            clearMessages();
+        });
+
+        function downloadCSV(delimiter = ',') {
+            if (data.length === 0) {
+                showError('ダウンロードするデータがありません');
+                return;
+            }
+
+            let csv = data.map(row => {
+                return row.map(cell => {
+                    const str = String(cell || '');
+                    if (str.includes(delimiter) || str.includes('"') || str.includes('\n')) {
+                        return '"' + str.replace(/"/g, '""') + '"';
+                    }
+                    return str;
+                }).join(delimiter);
+            }).join('\n');
+
+            const filename = delimiter === ',' ? 'output.csv' : 'output.tsv';
+            const blob = new Blob([csv], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('ファイルをダウンロードしました');
+        }
+
+        downloadCsvBtn.addEventListener('click', () => {
+            downloadCSV(',');
+        });
+
+        downloadTsvBtn.addEventListener('click', () => {
+            downloadCSV('\t');
+        });
+    </script>
+</body>
+</html>

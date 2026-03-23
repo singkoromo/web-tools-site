@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消費税計算機 - ToolBox</title>
+    <meta name="description" content="消費税（10%・8%）の計算ができます。税抜→税込、税込→税抜の計算と、複数商品のまとめ計算に対応。">
+    <meta name="keywords" content="消費税,税金計算,軽減税率,税込,税抜,計算機">
+    <meta property="og:title" content="消費税計算機 - ToolBox">
+    <meta property="og:description" content="消費税を簡単に計算。複数商品のまとめ計算にも対応します。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/tax-calculator.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/tax-calculator.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .mode-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .mode-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .mode-tab.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+        .mode-tab:hover {
+            border-color: #3b82f6;
+        }
+        .mode-content {
+            display: none;
+        }
+        .mode-content.active {
+            display: block;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        input[type="number"] {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        select {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #fff;
+        }
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .unit {
+            color: #6b7280;
+            font-weight: 500;
+            min-width: 2rem;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .btn-calculate {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .btn-calculate:hover {
+            background: #2563eb;
+        }
+        .btn-clear {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-clear:hover {
+            background: #d1d5db;
+        }
+        .btn-add {
+            background: #10b981;
+            color: #fff;
+        }
+        .btn-add:hover {
+            background: #059669;
+        }
+        .result-box {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+        .result-box.show {
+            display: block;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .result-item {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .result-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1f2937;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+        .item-list {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            margin-top: 1.5rem;
+        }
+        .item-row {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            gap: 0.5rem;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        .item-info {
+            flex: 1;
+        }
+        .item-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .item-price {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .item-remove {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .item-remove:hover {
+            background: #dc2626;
+        }
+        .ad-banner {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1>消費税計算機</h1>
+        <p style="color: #6b7280; margin-bottom: 2rem;">消費税（10%・8%）を簡単に計算できます。</p>
+
+        <div class="ad-banner">広告スペース</div>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode(0)">単品計算</button>
+            <button class="mode-tab" onclick="switchMode(1)">まとめ計算</button>
+        </div>
+
+        <!-- Mode 1: 単品計算 -->
+        <div class="mode-content active">
+            <div class="input-group">
+                <label class="input-label">価格</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode1-price" placeholder="例: 1000" step="1" min="0">
+                    <span class="unit">円</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">税率</label>
+                <select id="mode1-rate">
+                    <option value="10">10% (標準税率)</option>
+                    <option value="8">8% (軽減税率)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">計算方向</label>
+                <select id="mode1-direction">
+                    <option value="nontax2tax">税抜 → 税込</option>
+                    <option value="tax2nontax">税込 → 税抜</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateMode1()">計算する</button>
+                <button class="btn-clear" onclick="clearMode1()">クリア</button>
+            </div>
+
+            <div class="result-box" id="mode1-result">
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">税抜価格</div>
+                        <div class="result-value" id="mode1-nontax">0円</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">税額</div>
+                        <div class="result-value" id="mode1-tax">0円</div>
+                    </div>
+                    <div class="result-item" style="grid-column: 1 / -1;">
+                        <div class="result-label">税込価格</div>
+                        <div class="result-value" id="mode1-withtax">0円</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 2: まとめ計算 -->
+        <div class="mode-content">
+            <div class="input-group">
+                <label class="input-label">商品名</label>
+                <input type="text" id="mode2-name" placeholder="例: りんご" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">価格（税抜）</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode2-price" placeholder="例: 1000" step="1" min="0">
+                    <span class="unit">円</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">税率</label>
+                <select id="mode2-rate">
+                    <option value="10">10% (標準税率)</option>
+                    <option value="8">8% (軽減税率)</option>
+                </select>
+            </div>
+
+            <button class="btn-add" onclick="addItem()" style="width: 100%; margin-bottom: 1rem;">商品を追加</button>
+
+            <div class="item-list" id="itemList" style="display: none;">
+                <div id="itemsContainer"></div>
+            </div>
+
+            <div class="result-box" id="mode2-result" style="display: none; margin-top: 1rem;">
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">税抜合計</div>
+                        <div class="result-value" id="mode2-subtotal">0円</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">税額合計</div>
+                        <div class="result-value" id="mode2-taxtotal">0円</div>
+                    </div>
+                    <div class="result-item" style="grid-column: 1 / -1;">
+                        <div class="result-label">税込合計</div>
+                        <div class="result-value" id="mode2-total">0円</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-clear" onclick="clearMode2()" style="width: 100%; margin-top: 1rem;">すべてクリア</button>
+        </div>
+
+        <div class="ad-banner">広告スペース</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <div id="toast"></div>
+
+    <script>
+        let items = [];
+
+        function switchMode(mode) {
+            const contents = document.querySelectorAll('.mode-content');
+            const tabs = document.querySelectorAll('.mode-tab');
+            contents.forEach(c => c.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active'));
+            contents[mode].classList.add('active');
+            tabs[mode].classList.add('active');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: #fff; padding: 1rem 1.5rem; border-radius: 6px; z-index: 1000; display: block;';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function formatCurrency(value) {
+            return Math.round(value).toLocaleString('ja-JP') + '円';
+        }
+
+        // Mode 1
+        function calculateMode1() {
+            const price = parseFloat(document.getElementById('mode1-price').value);
+            const rate = parseInt(document.getElementById('mode1-rate').value);
+            const direction = document.getElementById('mode1-direction').value;
+
+            if (isNaN(price) || price < 0) {
+                showToast('有効な価格を入力してください');
+                return;
+            }
+
+            let nontax, tax, withtax;
+
+            if (direction === 'nontax2tax') {
+                nontax = price;
+                tax = Math.floor(price * rate / 100);
+                withtax = nontax + tax;
+            } else {
+                withtax = price;
+                nontax = Math.floor(price * 100 / (100 + rate));
+                tax = withtax - nontax;
+            }
+
+            document.getElementById('mode1-nontax').textContent = formatCurrency(nontax);
+            document.getElementById('mode1-tax').textContent = formatCurrency(tax);
+            document.getElementById('mode1-withtax').textContent = formatCurrency(withtax);
+            document.getElementById('mode1-result').classList.add('show');
+        }
+
+        function clearMode1() {
+            document.getElementById('mode1-price').value = '';
+            document.getElementById('mode1-result').classList.remove('show');
+        }
+
+        // Mode 2
+        function addItem() {
+            const name = document.getElementById('mode2-name').value.trim();
+            const price = parseFloat(document.getElementById('mode2-price').value);
+            const rate = parseInt(document.getElementById('mode2-rate').value);
+
+            if (!name) {
+                showToast('商品名を入力してください');
+                return;
+            }
+            if (isNaN(price) || price < 0) {
+                showToast('有効な価格を入力してください');
+                return;
+            }
+
+            items.push({ name, price, rate });
+            document.getElementById('mode2-name').value = '';
+            document.getElementById('mode2-price').value = '';
+            renderItems();
+            updateMode2Result();
+        }
+
+        function removeItem(index) {
+            items.splice(index, 1);
+            renderItems();
+            updateMode2Result();
+        }
+
+        function renderItems() {
+            const itemList = document.getElementById('itemList');
+            const container = document.getElementById('itemsContainer');
+
+            if (items.length === 0) {
+                itemList.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            itemList.style.display = 'block';
+            container.innerHTML = items.map((item, index) => {
+                const tax = Math.floor(item.price * item.rate / 100);
+                const withtax = item.price + tax;
+                return `
+                    <div class="item-row">
+                        <div class="item-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-price">${formatCurrency(item.price)} (${item.rate}%) → ${formatCurrency(withtax)}</div>
+                        </div>
+                        <button class="item-remove" onclick="removeItem(${index})">削除</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateMode2Result() {
+            if (items.length === 0) {
+                document.getElementById('mode2-result').style.display = 'none';
+                return;
+            }
+
+            let subtotal = 0;
+            let taxtotal = 0;
+
+            items.forEach(item => {
+                subtotal += item.price;
+                taxtotal += Math.floor(item.price * item.rate / 100);
+            });
+
+            const total = subtotal + taxtotal;
+
+            document.getElementById('mode2-subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('mode2-taxtotal').textContent = formatCurrency(taxtotal);
+            document.getElementById('mode2-total').textContent = formatCurrency(total);
+            document.getElementById('mode2-result').style.display = 'block';
+        }
+
+        function clearMode2() {
+            items = [];
+            document.getElementById('mode2-name').value = '';
+            document.getElementById('mode2-price').value = '';
+            document.getElementById('itemList').style.display = 'none';
+            document.getElementById('mode2-result').style.display = 'none';
+            renderItems();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('mode1-price').addEventListener('input', calculateMode1);
+            document.getElementById('mode1-rate').addEventListener('change', calculateMode1);
+            document.getElementById('mode1-direction').addEventListener('change', calculateMode1);
+        });
+    </script>
+</body>
+</html>

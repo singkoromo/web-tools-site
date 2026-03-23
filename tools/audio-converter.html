@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声形式変換 - ToolBox</title>
+    <meta name="description" content="オンライン音声形式変換ツール。MP3、WAV、OGG、WebMなど複数形式に対応。高品質で変換できます。">
+    <meta name="keywords" content="音声変換, MP3変換, WAV変換, OGG変換, 形式変換, 音声ツール">
+    <meta property="og:title" content="音声形式変換 - ToolBox">
+    <meta property="og:description" content="複数形式に対応した高品質な音声形式変換ツール。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/audio-converter.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/audio-converter.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page { padding: 2rem 1rem; }
+        .tool-container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .drop-zone {
+            border: 2px dashed #ccc; border-radius: 8px; padding: 2rem;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: #f9f9f9;
+        }
+        .drop-zone.dragover { border-color: #0066cc; background: #f0f7ff; }
+        .settings {
+            margin-top: 2rem; padding: 1.5rem; background: #f5f5f5;
+            border-radius: 8px; display: none;
+        }
+        .settings.show { display: block; }
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+        .setting-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        select {
+            padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;
+            width: 100%; max-width: 300px; font-size: 1rem;
+        }
+        .button-group {
+            display: flex; gap: 1rem; margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 0.75rem 1.5rem; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-primary:disabled {
+            background: #ccc; cursor: not-allowed;
+        }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #ccc; }
+        .progress-container {
+            margin-top: 1.5rem; display: none;
+        }
+        .progress-container.show { display: block; }
+        .progress-bar {
+            width: 100%; height: 8px; background: #e0e0e0;
+            border-radius: 4px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: #0066cc; width: 0%;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 0.5rem; font-size: 0.9rem; color: #666;
+        }
+        .file-info {
+            margin-top: 2rem; padding: 1rem; background: #f5f5f5;
+            border-radius: 8px; display: none;
+        }
+        .file-info.show { display: block; }
+        .info-row { display: flex; justify-content: space-between; margin: 0.5rem 0; }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 1rem 1.5rem; background: #333; color: white;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .note {
+            margin-top: 1rem; padding: 1rem; background: #fff3cd;
+            border-left: 4px solid #ffc107; border-radius: 4px;
+            font-size: 0.9rem; color: #856404;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg> ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<div class="tool-page">
+    <div class="tool-container">
+        <h1>音声形式変換</h1>
+        <p class="subtitle">MP3、WAV、OGGなどの音声ファイルを別の形式に変換</p>
+
+        <div class="drop-zone" id="dropZone">
+            <p>音声ファイルをドラッグ&ドロップするか、クリックして選択</p>
+            <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">対応入力形式: MP3, WAV, OGG, M4A, WebM など</p>
+            <input type="file" id="audioInput" accept="audio/*" style="display: none;">
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="info-row">
+                <span>ファイル名:</span>
+                <span id="infoFilename">-</span>
+            </div>
+            <div class="info-row">
+                <span>ファイルサイズ:</span>
+                <span id="infoFileSize">-</span>
+            </div>
+            <div class="info-row">
+                <span>再生時間:</span>
+                <span id="infoDuration">-</span>
+            </div>
+            <div class="info-row">
+                <span>サンプリングレート:</span>
+                <span id="infoSampleRate">-</span>
+            </div>
+            <div class="info-row">
+                <span>チャンネル:</span>
+                <span id="infoChannels">-</span>
+            </div>
+        </div>
+
+        <div class="settings" id="settings">
+            <div class="setting-group">
+                <label for="outputFormat">出力形式を選択</label>
+                <select id="outputFormat">
+                    <option value="wav">WAV (推奨 - 最高品質)</option>
+                    <option value="webm-opus">WebM/Opus (圧縮)</option>
+                    <option value="ogg-opus">OGG/Opus (圧縮)</option>
+                </select>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">※ ブラウザによってサポート状況が異なります</p>
+            </div>
+
+            <div class="setting-group">
+                <label for="bitrate">ビットレート（圧縮形式の場合）</label>
+                <select id="bitrate">
+                    <option value="64">低 (64 kbps)</option>
+                    <option value="128" selected>中 (128 kbps)</option>
+                    <option value="256">高 (256 kbps)</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" id="convertButton">変換開始</button>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">準備中...</div>
+            </div>
+
+            <div class="note">
+                <strong>注意:</strong> WAV形式は最高品質ですがファイルサイズが大きくなります。WebM/OpusやOGG/Opusは圧縮により品質を保ちながらファイルサイズを削減します。
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+class AudioConverter {
+    constructor() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.audioBuffer = null;
+        this.fileName = '';
+        this.fileSize = 0;
+
+        this.initElements();
+        this.attachEventListeners();
+    }
+
+    initElements() {
+        this.dropZone = document.getElementById('dropZone');
+        this.audioInput = document.getElementById('audioInput');
+        this.settings = document.getElementById('settings');
+        this.fileInfo = document.getElementById('fileInfo');
+        this.outputFormat = document.getElementById('outputFormat');
+        this.bitrate = document.getElementById('bitrate');
+        this.convertButton = document.getElementById('convertButton');
+        this.progressContainer = document.getElementById('progressContainer');
+        this.progressFill = document.getElementById('progressFill');
+        this.progressText = document.getElementById('progressText');
+    }
+
+    attachEventListeners() {
+        this.dropZone.addEventListener('click', () => this.audioInput.click());
+        this.dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.add('dragover');
+        });
+        this.dropZone.addEventListener('dragleave', () => {
+            this.dropZone.classList.remove('dragover');
+        });
+        this.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                this.handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        this.audioInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) this.handleFile(e.target.files[0]);
+        });
+
+        this.convertButton.addEventListener('click', () => this.convert());
+    }
+
+    async handleFile(file) {
+        this.fileName = file.name;
+        this.fileSize = file.size;
+        const arrayBuffer = await file.arrayBuffer();
+
+        try {
+            this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.displayFileInfo();
+            this.settings.classList.add('show');
+            this.fileInfo.classList.add('show');
+        } catch (error) {
+            this.showToast('音声ファイルのデコードに失敗しました');
+        }
+    }
+
+    displayFileInfo() {
+        document.getElementById('infoFilename').textContent = this.fileName;
+        document.getElementById('infoFileSize').textContent = `${(this.fileSize / 1024 / 1024).toFixed(2)} MB`;
+        document.getElementById('infoDuration').textContent = this.formatTime(this.audioBuffer.duration);
+        document.getElementById('infoSampleRate').textContent = `${this.audioBuffer.sampleRate} Hz`;
+        document.getElementById('infoChannels').textContent =
+            this.audioBuffer.numberOfChannels === 1 ? 'モノラル' : `ステレオ (${this.audioBuffer.numberOfChannels}ch)`;
+    }
+
+    async convert() {
+        const format = this.outputFormat.value;
+        this.progressContainer.classList.add('show');
+        this.convertButton.disabled = true;
+
+        try {
+            let blob;
+            if (format === 'wav') {
+                blob = await this.convertToWAV();
+            } else if (format === 'webm-opus') {
+                blob = await this.convertToWebMOpus();
+            } else if (format === 'ogg-opus') {
+                blob = await this.convertToOGGOpus();
+            }
+
+            if (blob) {
+                const extension = format === 'wav' ? 'wav' : format === 'webm-opus' ? 'webm' : 'ogg';
+                const newFileName = this.fileName.replace(/\.[^/.]+$/, `.${extension}`);
+                this.downloadBlob(blob, newFileName);
+                this.showToast('変換完了！ファイルをダウンロードしました');
+            }
+        } catch (error) {
+            this.showToast('変換に失敗しました: ' + error.message);
+        } finally {
+            this.progressContainer.classList.remove('show');
+            this.convertButton.disabled = false;
+        }
+    }
+
+    async convertToWAV() {
+        this.progressText.textContent = 'WAVに変換中...';
+        this.progressFill.style.width = '50%';
+
+        const blob = this.encodeWAV(this.audioBuffer);
+        this.progressFill.style.width = '100%';
+        this.progressText.textContent = '完了!';
+        return blob;
+    }
+
+    async convertToWebMOpus() {
+        this.progressText.textContent = 'WebM/Opusに変換中...';
+        this.progressFill.style.width = '25%';
+
+        return new Promise((resolve) => {
+            const mediaStream = new MediaStream();
+            const mediaStreamAudioDestination = this.audioContext.createMediaStreamAudioDestination();
+            const source = this.audioContext.createBufferSource();
+            source.buffer = this.audioBuffer;
+            source.connect(mediaStreamAudioDestination);
+            mediaStream.addTrack(mediaStreamAudioDestination.stream.getAudioTracks()[0]);
+
+            this.progressFill.style.width = '50%';
+
+            const mimeType = 'audio/webm;codecs=opus';
+            const mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
+            const chunks = [];
+
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                this.progressFill.style.width = '100%';
+                this.progressText.textContent = '完了!';
+                resolve(new Blob(chunks, { type: mimeType }));
+            };
+
+            source.start();
+            mediaRecorder.start();
+            setTimeout(() => {
+                source.stop();
+                mediaRecorder.stop();
+            }, this.audioBuffer.duration * 1000 + 100);
+        });
+    }
+
+    async convertToOGGOpus() {
+        this.progressText.textContent = 'OGG/Opusに変換中...';
+        this.progressFill.style.width = '25%';
+
+        return new Promise((resolve) => {
+            const mediaStreamAudioDestination = this.audioContext.createMediaStreamAudioDestination();
+            const source = this.audioContext.createBufferSource();
+            source.buffer = this.audioBuffer;
+            source.connect(mediaStreamAudioDestination);
+            const mediaStream = mediaStreamAudioDestination.stream;
+
+            this.progressFill.style.width = '50%';
+
+            const mimeType = 'audio/ogg;codecs=opus';
+            const mediaRecorder = new MediaRecorder(mediaStream, { mimeType });
+            const chunks = [];
+
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                this.progressFill.style.width = '100%';
+                this.progressText.textContent = '完了!';
+                resolve(new Blob(chunks, { type: mimeType }));
+            };
+
+            source.start();
+            mediaRecorder.start();
+            setTimeout(() => {
+                source.stop();
+                mediaRecorder.stop();
+            }, this.audioBuffer.duration * 1000 + 100);
+        });
+    }
+
+    encodeWAV(audioBuffer) {
+        const numberOfChannels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const format = 1;
+        const bitDepth = 16;
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numberOfChannels * bytesPerSample;
+
+        const channelData = [];
+        for (let i = 0; i < numberOfChannels; i++) {
+            channelData.push(audioBuffer.getChannelData(i));
+        }
+
+        const length = audioBuffer.length * numberOfChannels * bytesPerSample;
+        const buffer = new ArrayBuffer(44 + length);
+        const view = new DataView(buffer);
+
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + length, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(36, 'data');
+        view.setUint32(40, length, true);
+
+        let offset = 44;
+        const volume = 1;
+        for (let i = 0; i < audioBuffer.length; i++) {
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                let sample = Math.max(-1, Math.min(1, channelData[channel][i])) * volume;
+                sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                view.setInt16(offset, sample, true);
+                offset += 2;
+            }
+        }
+
+        return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = (seconds % 60).toFixed(2);
+        if (hours > 0) {
+            return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.padStart(5, '0')}`;
+        }
+        return `${minutes}:${secs.padStart(5, '0')}`;
+    }
+
+    showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new AudioConverter();
+});
+</script>
+</body>
+</html>

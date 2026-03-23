@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="テキストをASCIIアートに変換するブラウザツール。複数フォントスタイル、文字マップ、色付きASCII対応。">
+    <meta property="og:title" content="ASCIIアート生成ツール - ToolBox">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/ascii-art.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/ascii-art.html">
+    <title>ASCIIアート生成ツール - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .input-section { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 16px; }
+        .input-section input[type=text] { flex: 1; min-width: 200px; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 18px; font-family: inherit; font-weight: 600; }
+        .options-bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+        .options-bar label { font-size: 14px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .options-bar select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 13px; }
+        .options-bar input[type=range] { width: 80px; }
+        .ascii-output {
+            background: #1e1e2e; color: #cdd6f4;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            line-height: 1.2; padding: 20px; border-radius: 8px;
+            overflow-x: auto; white-space: pre; min-height: 150px;
+            user-select: all;
+        }
+        .btn-primary { padding: 10px 18px; background: #007bff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-secondary { padding: 10px 14px; background: #6c757d; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 13px; }
+        .btn-secondary:hover { background: #545b62; }
+        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .info-note { background: #e7f3ff; border-left: 4px solid #007bff; padding: 10px 14px; border-radius: 4px; font-size: 14px; color: #004085; margin-bottom: 16px; }
+        .font-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .font-tab { padding: 6px 12px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+        .font-tab.active { background: #007bff; color: #fff; border-color: #007bff; }
+        .canvas-section { margin-bottom: 16px; }
+        canvas { display: block; }
+        .pixel-size-label { font-size: 13px; color: #666; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+        <div class="tool-container">
+            <h1>ASCIIアート生成ツール</h1>
+            <div class="info-note">
+                テキストをASCIIアートに変換します。ピクセルマップ方式とBannerフォント方式を選択できます。
+            </div>
+
+            <div class="input-section">
+                <input type="text" id="inputText" placeholder="テキストを入力..." value="ToolBox" maxlength="30">
+            </div>
+
+            <div class="font-tabs" id="fontTabs">
+                <button class="font-tab active" data-mode="pixel">ピクセルマップ</button>
+                <button class="font-tab" data-mode="block">ブロック文字</button>
+                <button class="font-tab" data-mode="shadow">シャドウ</button>
+                <button class="font-tab" data-mode="banner">バナー</button>
+                <button class="font-tab" data-mode="image">画像→ASCII</button>
+            </div>
+
+            <div class="options-bar">
+                <label>文字セット：
+                    <select id="charSet">
+                        <option value="detailed">詳細 (@#S%?*+;:,.)</option>
+                        <option value="simple">シンプル (#=+-. )</option>
+                        <option value="block">ブロック (█▓▒░ )</option>
+                        <option value="dot">ドット (●○·  )</option>
+                        <option value="binary">バイナリ (1 0)</option>
+                    </select>
+                </label>
+                <label>スケール：
+                    <input type="range" id="scale" min="1" max="5" value="2">
+                    <span id="scaleVal" class="pixel-size-label">2</span>
+                </label>
+                <label>反転：<input type="checkbox" id="invertChars"></label>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-primary" id="generateBtn">🎨 生成</button>
+                <button class="btn-secondary" id="copyBtn">📋 コピー</button>
+                <button class="btn-secondary" id="downloadBtn">💾 テキストDL</button>
+            </div>
+
+            <div class="canvas-section" id="canvasSection" style="display:none;">
+                <canvas id="renderCanvas" style="display:none;"></canvas>
+            </div>
+
+            <div class="ascii-output" id="asciiOutput">テキストを入力して「生成」をクリックしてください</div>
+        </div>
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    let currentMode = 'pixel';
+
+    document.querySelectorAll('.font-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.font-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentMode = tab.dataset.mode;
+            if (currentMode === 'image') {
+                setupImageMode();
+            }
+        });
+    });
+
+    document.getElementById('scale').addEventListener('input', function() {
+        document.getElementById('scaleVal').textContent = this.value;
+    });
+
+    // === ASCII Character Sets ===
+    const CHAR_SETS = {
+        detailed: ['@', '#', 'S', '%', '?', '*', '+', ';', ':', ',', '.', ' '],
+        simple: ['#', '=', '+', '-', '.', ' '],
+        block: ['█', '▓', '▒', '░', ' '],
+        dot: ['●', '◉', '◎', '○', '·', ' '],
+        binary: ['1', '0', ' '],
+    };
+
+    // Simple 5x7 bitmap font for uppercase letters and digits
+    const BITMAP_FONT = {
+        'A': ['01110','10001','10001','11111','10001','10001','10001'],
+        'B': ['11110','10001','10001','11110','10001','10001','11110'],
+        'C': ['01111','10000','10000','10000','10000','10000','01111'],
+        'D': ['11110','10001','10001','10001','10001','10001','11110'],
+        'E': ['11111','10000','10000','11110','10000','10000','11111'],
+        'F': ['11111','10000','10000','11110','10000','10000','10000'],
+        'G': ['01111','10000','10000','10011','10001','10001','01111'],
+        'H': ['10001','10001','10001','11111','10001','10001','10001'],
+        'I': ['11111','00100','00100','00100','00100','00100','11111'],
+        'J': ['11111','00010','00010','00010','00010','10010','01100'],
+        'K': ['10001','10010','10100','11000','10100','10010','10001'],
+        'L': ['10000','10000','10000','10000','10000','10000','11111'],
+        'M': ['10001','11011','10101','10001','10001','10001','10001'],
+        'N': ['10001','11001','10101','10011','10001','10001','10001'],
+        'O': ['01110','10001','10001','10001','10001','10001','01110'],
+        'P': ['11110','10001','10001','11110','10000','10000','10000'],
+        'Q': ['01110','10001','10001','10001','10101','10011','01111'],
+        'R': ['11110','10001','10001','11110','10100','10010','10001'],
+        'S': ['01111','10000','10000','01110','00001','00001','11110'],
+        'T': ['11111','00100','00100','00100','00100','00100','00100'],
+        'U': ['10001','10001','10001','10001','10001','10001','01110'],
+        'V': ['10001','10001','10001','10001','10001','01010','00100'],
+        'W': ['10001','10001','10001','10101','10101','11011','10001'],
+        'X': ['10001','10001','01010','00100','01010','10001','10001'],
+        'Y': ['10001','10001','01010','00100','00100','00100','00100'],
+        'Z': ['11111','00001','00010','00100','01000','10000','11111'],
+        '0': ['01110','10001','10011','10101','11001','10001','01110'],
+        '1': ['00100','01100','00100','00100','00100','00100','11111'],
+        '2': ['01110','10001','00001','00110','01000','10000','11111'],
+        '3': ['11110','00001','00001','00110','00001','00001','11110'],
+        '4': ['00010','00110','01010','10010','11111','00010','00010'],
+        '5': ['11111','10000','10000','11110','00001','00001','11110'],
+        '6': ['01110','10000','10000','11110','10001','10001','01110'],
+        '7': ['11111','00001','00010','00100','01000','01000','01000'],
+        '8': ['01110','10001','10001','01110','10001','10001','01110'],
+        '9': ['01110','10001','10001','01111','00001','00001','01110'],
+        ' ': ['00000','00000','00000','00000','00000','00000','00000'],
+        '!': ['00100','00100','00100','00100','00100','00000','00100'],
+        '.': ['00000','00000','00000','00000','00000','00000','00100'],
+        ',': ['00000','00000','00000','00000','00110','00100','01000'],
+        '-': ['00000','00000','00000','11111','00000','00000','00000'],
+        '_': ['00000','00000','00000','00000','00000','00000','11111'],
+        '?': ['01110','10001','00001','00110','00100','00000','00100'],
+        '@': ['01110','10001','10111','10101','10111','10000','01110'],
+        '#': ['01010','01010','11111','01010','11111','01010','01010'],
+        '+': ['00000','00100','00100','11111','00100','00100','00000'],
+        '*': ['00000','10101','01110','11111','01110','10101','00000'],
+        '(': ['00110','01000','10000','10000','10000','01000','00110'],
+        ')': ['11000','00100','00001','00001','00001','00100','11000'],
+        '[': ['01110','01000','01000','01000','01000','01000','01110'],
+        ']': ['01110','00010','00010','00010','00010','00010','01110'],
+        '/': ['00001','00001','00010','00100','01000','10000','10000'],
+        '\\': ['10000','10000','01000','00100','00010','00001','00001'],
+        ':': ['00000','00100','00000','00000','00000','00100','00000'],
+        ';': ['00000','00100','00000','00000','00100','00100','01000'],
+    };
+
+    function renderPixelMode(text, fillChar, emptyChar, scale) {
+        const chars = text.toUpperCase().split('');
+        const rows = 7;
+        const lines = Array.from({length: rows}, () => []);
+
+        chars.forEach((ch, ci) => {
+            const bmp = BITMAP_FONT[ch] || BITMAP_FONT[' '];
+            for (let row = 0; row < rows; row++) {
+                const rowData = bmp[row] || '00000';
+                for (let col = 0; col < rowData.length; col++) {
+                    const bit = rowData[col] === '1';
+                    const cell = bit ? fillChar.repeat(scale) : ' '.repeat(scale);
+                    lines[row].push(cell);
+                }
+                if (ci < chars.length - 1) lines[row].push(' ');
+            }
+        });
+
+        return lines.map(l => l.join('')).join('\n');
+    }
+
+    function renderBlockMode(text, scale) {
+        // Use box-drawing characters for block-style letters
+        const chars = text.toUpperCase().split('');
+        const rows = 7;
+        const lines = Array.from({length: rows}, () => []);
+
+        chars.forEach((ch, ci) => {
+            const bmp = BITMAP_FONT[ch] || BITMAP_FONT[' '];
+            for (let row = 0; row < rows; row++) {
+                const rowData = bmp[row] || '00000';
+                for (let col = 0; col < rowData.length; col++) {
+                    const bit = rowData[col] === '1';
+                    lines[row].push(bit ? '█' : ' ');
+                }
+                if (ci < chars.length - 1) lines[row].push(' ');
+            }
+        });
+
+        return lines.map(l => l.join('')).join('\n');
+    }
+
+    function renderShadowMode(text) {
+        const main = renderPixelMode(text, '▓', ' ', 1);
+        // Simple shadow: offset by 1
+        const mainLines = main.split('\n');
+        const result = [];
+        for (let i = 0; i < mainLines.length; i++) {
+            const line = mainLines[i];
+            if (i < mainLines.length - 1) {
+                // Add shadow
+                result.push(line + '');
+            } else {
+                result.push(' ' + line.replace(/▓/g, '░'));
+            }
+        }
+        return mainLines.map((line, i) => {
+            if (i === mainLines.length - 1) return line;
+            return line;
+        }).join('\n');
+    }
+
+    function renderBannerMode(text) {
+        // Large block letters (double height)
+        const single = renderBlockMode(text, 1);
+        const lines = single.split('\n');
+        // Double each line
+        return lines.map(l => l + '\n' + l).join('\n');
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', generate);
+    document.getElementById('inputText').addEventListener('keydown', e => { if (e.key === 'Enter') generate(); });
+
+    function generate() {
+        const text = document.getElementById('inputText').value.trim();
+        if (!text) { showToast('テキストを入力してください'); return; }
+
+        const charSetKey = document.getElementById('charSet').value;
+        const scale = parseInt(document.getElementById('scale').value);
+        const invert = document.getElementById('invertChars').checked;
+        const chars = CHAR_SETS[charSetKey];
+        const fillChar = invert ? chars[chars.length - 2] : chars[0];
+
+        let result;
+        try {
+            if (currentMode === 'pixel') result = renderPixelMode(text, fillChar, ' ', scale);
+            else if (currentMode === 'block') result = renderBlockMode(text, scale);
+            else if (currentMode === 'shadow') result = renderShadowMode(text);
+            else if (currentMode === 'banner') result = renderBannerMode(text);
+            else if (currentMode === 'image') { showToast('画像をアップロードしてください'); return; }
+            else result = renderPixelMode(text, fillChar, ' ', scale);
+        } catch(e) { showToast('生成エラー: ' + e.message); return; }
+
+        document.getElementById('asciiOutput').textContent = result;
+        showToast('生成完了');
+    }
+
+    // Image to ASCII
+    function setupImageMode() {
+        const section = document.getElementById('canvasSection');
+        section.style.display = 'block';
+        section.innerHTML = `
+            <div style="margin-bottom:12px;">
+                <label style="font-size:14px;font-weight:600;">画像ファイルをアップロード：</label><br><br>
+                <input type="file" id="imageInput" accept="image/*" style="margin-bottom:8px;">
+                <br>
+                <label style="font-size:13px;">幅（文字数）：<input type="range" id="imgWidth" min="40" max="200" value="80" style="width:100px;"> <span id="imgWidthVal">80</span></label>
+                <button class="btn-primary" id="imgConvertBtn" style="margin-left:10px;">変換</button>
+            </div>
+            <canvas id="renderCanvas" style="display:none;"></canvas>`;
+
+        document.getElementById('imgWidth').addEventListener('input', function() {
+            document.getElementById('imgWidthVal').textContent = this.value;
+        });
+        document.getElementById('imageInput').addEventListener('change', e => {
+            if (e.target.files[0]) loadImageForAscii(e.target.files[0]);
+        });
+        document.getElementById('imgConvertBtn').addEventListener('click', convertImageToAscii);
+    }
+
+    let loadedImage = null;
+    function loadImageForAscii(file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => { loadedImage = img; showToast('画像を読み込みました'); };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function convertImageToAscii() {
+        if (!loadedImage) { showToast('画像をアップロードしてください'); return; }
+        const width = parseInt(document.getElementById('imgWidth')?.value || 80);
+        const ratio = loadedImage.height / loadedImage.width;
+        const height = Math.floor(ratio * width * 0.5); // Adjust for char aspect ratio
+
+        const canvas = document.getElementById('renderCanvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(loadedImage, 0, 0, width, height);
+
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const charSetKey = document.getElementById('charSet').value;
+        const chars = CHAR_SETS[charSetKey];
+        const invert = document.getElementById('invertChars').checked;
+
+        let result = '';
+        for (let y = 0; y < height; y++) {
+            let line = '';
+            for (let x = 0; x < width; x++) {
+                const idx = (y * width + x) * 4;
+                const r = imageData.data[idx];
+                const g = imageData.data[idx+1];
+                const b = imageData.data[idx+2];
+                const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                const level = invert ? brightness : 1 - brightness;
+                const charIdx = Math.min(Math.floor(level * chars.length), chars.length - 1);
+                line += chars[charIdx];
+            }
+            result += line + '\n';
+        }
+
+        document.getElementById('asciiOutput').textContent = result;
+        showToast('変換完了');
+    }
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+        const text = document.getElementById('asciiOutput').textContent;
+        if (text === 'テキストを入力して「生成」をクリックしてください') { showToast('先に生成してください'); return; }
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        const text = document.getElementById('asciiOutput').textContent;
+        if (text === 'テキストを入力して「生成」をクリックしてください') { showToast('先に生成してください'); return; }
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = 'ascii-art.txt'; a.click(); URL.revokeObjectURL(a.href);
+    });
+
+    // Auto-generate on load
+    generate();
+    </script>
+</body>
+</html>

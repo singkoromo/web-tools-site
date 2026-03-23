@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID生成器 - ToolBox</title>
+    <meta name="description" content="UUID v4 を無料で生成できるツール。複数のUUIDを一括生成、大文字小文字の切り替え、ハイフンの有無を選択できます。">
+    <meta name="keywords" content="UUID生成, UUID v4, ツール, 無料">
+    <meta property="og:title" content="UUID生成器 - ToolBox">
+    <meta property="og:description" content="UUID v4 を無料で生成できるツール。複数のUUIDを一括生成、大文字小文字の切り替え、ハイフンの有無を選択できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/uuid-generator.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/uuid-generator.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .tool-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+        }
+        .controls {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .control-group {
+            margin-bottom: 16px;
+        }
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+        .control-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        input[type="number"] {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Inter, sans-serif;
+            max-width: 120px;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        .checkbox-item label {
+            cursor: pointer;
+            user-select: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: Inter, sans-serif;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+        .btn-secondary {
+            background: #e8e8e8;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #d5d5d5;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .results {
+            margin-bottom: 30px;
+        }
+        .result-item {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        .result-content {
+            flex: 1;
+            color: #333;
+        }
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .history-section {
+            margin-top: 40px;
+        }
+        .history-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+        .history-list {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #666;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .empty-state {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+        }
+        .ad-banner {
+            background: #f0f0f0;
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            margin: 30px 0;
+            border-radius: 4px;
+            color: #666;
+            font-size: 13px;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        footer {
+            background: #f5f5f5;
+            padding: 30px 20px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1 class="tool-title">UUID生成器</h1>
+
+        <div class="ad-banner">
+            広告スペース
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">生成数</label>
+                <div class="input-row">
+                    <input type="number" id="count" min="1" max="100" value="1">
+                    <span style="color: #666; font-size: 13px;">1～100</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">オプション</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="uppercase" checked>
+                        <label for="uppercase">大文字</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hyphens" checked>
+                        <label for="hyphens">ハイフン付き</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="generateUUIDs()">生成する</button>
+                <button class="btn-secondary" onclick="copyAll()">すべてコピー</button>
+                <button class="btn-secondary" onclick="clearAll()">クリア</button>
+            </div>
+        </div>
+
+        <div class="results" id="results"></div>
+
+        <div class="history-section">
+            <div class="history-title">生成履歴</div>
+            <div class="history-list" id="history">
+                <div class="empty-state">履歴なし</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        広告スペース
+    </div>
+
+    <footer>
+        © 2026 ToolBox. All rights reserved.
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let generatedUUIDs = [];
+        let historyList = [];
+
+        function generateUUID() {
+            const arr = new Uint8Array(16);
+            crypto.getRandomValues(arr);
+            arr[6] = (arr[6] & 0x0f) | 0x40;
+            arr[8] = (arr[8] & 0x3f) | 0x80;
+
+            let uuid = '';
+            for (let i = 0; i < 16; i++) {
+                uuid += arr[i].toString(16).padStart(2, '0');
+                if (i === 3 || i === 5 || i === 7 || i === 9) {
+                    uuid += '-';
+                }
+            }
+
+            const uppercase = document.getElementById('uppercase').checked;
+            const hyphens = document.getElementById('hyphens').checked;
+
+            if (uppercase) {
+                uuid = uuid.toUpperCase();
+            } else {
+                uuid = uuid.toLowerCase();
+            }
+
+            if (!hyphens) {
+                uuid = uuid.replace(/-/g, '');
+            }
+
+            return uuid;
+        }
+
+        function generateUUIDs() {
+            const count = Math.min(Math.max(parseInt(document.getElementById('count').value) || 1, 1), 100);
+            generatedUUIDs = [];
+
+            for (let i = 0; i < count; i++) {
+                const uuid = generateUUID();
+                generatedUUIDs.push(uuid);
+                historyList.unshift(uuid);
+            }
+
+            if (historyList.length > 50) {
+                historyList = historyList.slice(0, 50);
+            }
+
+            renderResults();
+            updateHistory();
+        }
+
+        function renderResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (generatedUUIDs.length === 0) {
+                resultsDiv.innerHTML = '<div class="empty-state">UUIDを生成してください</div>';
+                return;
+            }
+
+            generatedUUIDs.forEach((uuid) => {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.innerHTML = `
+                    <div class="result-content">${uuid}</div>
+                    <div class="result-actions">
+                        <button class="btn-secondary btn-small" onclick="copyToClipboard('${uuid}')">コピー</button>
+                    </div>
+                `;
+                resultsDiv.appendChild(item);
+            });
+        }
+
+        function updateHistory() {
+            const historyDiv = document.getElementById('history');
+            if (historyList.length === 0) {
+                historyDiv.innerHTML = '<div class="empty-state">履歴なし</div>';
+                return;
+            }
+
+            historyDiv.innerHTML = '';
+            historyList.slice(0, 20).forEach((uuid) => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <span>${uuid}</span>
+                    <button class="btn-secondary btn-small" onclick="copyToClipboard('${uuid}')">コピー</button>
+                `;
+                historyDiv.appendChild(item);
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function copyAll() {
+            if (generatedUUIDs.length === 0) {
+                showToast('生成されたUUIDがありません');
+                return;
+            }
+            const text = generatedUUIDs.join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('すべてコピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function clearAll() {
+            generatedUUIDs = [];
+            document.getElementById('results').innerHTML = '<div class="empty-state">UUIDを生成してください</div>';
+            showToast('クリアしました');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Auto-generate on page load
+        window.addEventListener('load', () => {
+            generateUUIDs();
+        });
+    </script>
+</body>
+</html>

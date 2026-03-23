@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JWTトークンを生成・デコードするツール。ヘッダー、ペイロード、署名設定をGUIで設定できます。">
+    <meta name="keywords" content="JWT, JSON Web Token, トークン, 認証, IT・インフラ">
+    <meta name="author" content="ToolBox">
+    <meta name="theme-color" content="#007bff">
+    <title>JWT生成・デコード - ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .ad-banner {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .ad-placeholder {
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-page h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .tab-button:hover {
+            color: #007bff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea {
+            font-family: 'JetBrains Mono', monospace;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .payload-fields {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .field-item {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .field-item input {
+            flex: 1;
+        }
+
+        .field-item button {
+            padding: 0.75rem 1rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .field-item button:hover {
+            background: #c82333;
+        }
+
+        .output-section {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .output-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .jwt-output {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            color: #333;
+            user-select: all;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .decoded-output {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            color: #333;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-copy {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        footer {
+            background: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .tool-page {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav>
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-page">
+            <h1>JWT生成・デコード</h1>
+
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('generate')">JWT生成</button>
+                <button class="tab-button" onclick="switchTab('decode')">JWT デコード</button>
+            </div>
+
+            <!-- Generate Tab -->
+            <div id="generate" class="tab-content active">
+                <div class="form-section">
+                    <h2>ペイロード設定</h2>
+                    <div class="form-group">
+                        <label for="subject">Subject (sub):</label>
+                        <input type="text" id="subject" placeholder="user123" oninput="generateJwt()">
+                    </div>
+                    <div class="form-group">
+                        <label for="issuer">Issuer (iss):</label>
+                        <input type="text" id="issuer" placeholder="https://example.com" oninput="generateJwt()">
+                    </div>
+                    <div class="form-group">
+                        <label for="audience">Audience (aud):</label>
+                        <input type="text" id="audience" placeholder="my-app" oninput="generateJwt()">
+                    </div>
+                    <div class="form-group">
+                        <label for="expiresIn">有効期限 (秒):</label>
+                        <input type="number" id="expiresIn" placeholder="3600" value="3600" oninput="generateJwt()">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>カスタムクレーム</h2>
+                    <div class="payload-fields" id="payloadFields">
+                    </div>
+                    <button type="button" class="btn-generate" onclick="addPayloadField()" style="width: 100%; margin-top: 0.5rem;">+ クレームを追加</button>
+                </div>
+
+                <div class="form-section">
+                    <h2>署名設定</h2>
+                    <div class="form-group">
+                        <label for="secret">秘密鍵 (Secret):</label>
+                        <textarea id="secret" placeholder="your-secret-key-here" oninput="generateJwt()"></textarea>
+                    </div>
+                </div>
+
+                <div class="output-section">
+                    <h3>生成されたJWT:</h3>
+                    <div class="jwt-output" id="jwtOutput">JWT がここに表示されます</div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-copy" onclick="copyJwt()">クリップボードにコピー</button>
+                    <button class="btn-generate" id="generateButton" onclick="generateJwt()">生成</button>
+                </div>
+            </div>
+
+            <!-- Decode Tab -->
+            <div id="decode" class="tab-content">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="jwtInput">デコードするJWT:</label>
+                        <textarea id="jwtInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="secretDecode">秘密鍵 (署名検証用、オプション):</label>
+                        <textarea id="secretDecode" placeholder="your-secret-key-here" style="min-height: 80px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="output-section">
+                    <h3>デコード結果:</h3>
+                    <div class="decoded-output" id="decodedOutput">JWT をペーストして「デコード」をクリックしてください</div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-generate" onclick="decodeJwt()">デコード</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 ToolBox
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        const toast = document.getElementById('toast');
+        const payloadFields = document.getElementById('payloadFields');
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function addPayloadField() {
+            const div = document.createElement('div');
+            div.className = 'field-item';
+            div.innerHTML = `
+                <input type="text" placeholder="キー名" class="field-key" oninput="generateJwt()">
+                <input type="text" placeholder="値" class="field-value" oninput="generateJwt()">
+                <button type="button" onclick="this.parentElement.remove(); generateJwt();">削除</button>
+            `;
+            payloadFields.appendChild(div);
+        }
+
+        function generateJwt() {
+            const header = {
+                alg: 'HS256',
+                typ: 'JWT'
+            };
+
+            const now = Math.floor(Date.now() / 1000);
+            const expiresIn = parseInt(document.getElementById('expiresIn').value) || 3600;
+
+            const payload = {
+                iat: now,
+                exp: now + expiresIn
+            };
+
+            const sub = document.getElementById('subject').value;
+            if (sub) payload.sub = sub;
+
+            const iss = document.getElementById('issuer').value;
+            if (iss) payload.iss = iss;
+
+            const aud = document.getElementById('audience').value;
+            if (aud) payload.aud = aud;
+
+            // Add custom fields
+            const fieldItems = payloadFields.querySelectorAll('.field-item');
+            fieldItems.forEach(item => {
+                const key = item.querySelector('.field-key').value;
+                const value = item.querySelector('.field-value').value;
+                if (key && value) {
+                    payload[key] = isNaN(value) ? value : value;
+                }
+            });
+
+            const secret = document.getElementById('secret').value;
+
+            try {
+                const headerEncoded = btoa(JSON.stringify(header)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                const payloadEncoded = btoa(JSON.stringify(payload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+
+                let signature = '';
+                if (secret) {
+                    const message = headerEncoded + '.' + payloadEncoded;
+                    const hash = CryptoJS.HmacSHA256(message, secret);
+                    signature = CryptoJS.enc.Base64.stringify(hash).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+                }
+
+                const jwt = headerEncoded + '.' + payloadEncoded + (secret ? '.' + signature : '');
+                document.getElementById('jwtOutput').textContent = jwt;
+            } catch (error) {
+                showToast('JWT生成エラー: ' + error.message);
+            }
+        }
+
+        function copyJwt() {
+            const jwt = document.getElementById('jwtOutput').textContent;
+            if (jwt && jwt !== 'JWT がここに表示されます') {
+                navigator.clipboard.writeText(jwt).then(() => {
+                    showToast('JWTをコピーしました');
+                }).catch(() => {
+                    showToast('コピーに失敗しました');
+                });
+            }
+        }
+
+        function decodeJwt() {
+            const jwtInput = document.getElementById('jwtInput').value.trim();
+            const parts = jwtInput.split('.');
+
+            if (parts.length < 2) {
+                showToast('無効なJWT形式です');
+                return;
+            }
+
+            try {
+                const header = JSON.parse(atob(parts[0]));
+                const payload = JSON.parse(atob(parts[1]));
+
+                let result = '【Header】\n' + JSON.stringify(header, null, 2) + '\n\n';
+                result += '【Payload】\n' + JSON.stringify(payload, null, 2);
+
+                if (parts.length === 3) {
+                    result += '\n\n【Signature】\n' + parts[2];
+                }
+
+                document.getElementById('decodedOutput').textContent = result;
+                showToast('デコード完了');
+            } catch (error) {
+                document.getElementById('decodedOutput').textContent = 'デコードエラー: ' + error.message;
+                showToast('デコードに失敗しました');
+            }
+        }
+
+        // Initialize
+        addPayloadField();
+    </script>
+</body>
+</html>

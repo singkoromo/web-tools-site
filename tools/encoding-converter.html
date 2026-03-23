@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字コード変換 - ToolBox</title>
+    <meta name="description" content="テキストをさまざまな文字コードで表示・変換するツール">
+    <meta name="keywords" content="文字コード, UTF-8, Shift_JIS, EUC-JP, Unicode">
+    <meta property="og:url" content="https://web-tool-site.com/tools/encoding-converter.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="文字コード変換 - ToolBox">
+    <meta property="og:description" content="テキストをさまざまな文字コードで表示・変換するツール">
+    <link rel="canonical" href="https://web-tool-site.com/tools/encoding-converter.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .input-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-section textarea {
+            width: 100%;
+            height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        .input-section textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .result-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .result-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid #667eea;
+        }
+        .result-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 3px;
+            color: #333;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 0.5rem;
+        }
+        .copy-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 0.4rem 0.8rem;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 1rem;
+            border-left: 3px solid #667eea;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .char-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .char-table th,
+        .char-table td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        .char-table th {
+            background: #f0f0f0;
+            font-weight: 600;
+            color: #333;
+        }
+        .char-table td {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .char-table .char-display {
+            font-size: 1.1rem;
+            font-family: inherit;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 3rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="tool-title">文字コード変換</h1>
+
+        <div class="ad-banner">広告スペース: 文字コード変換ツール</div>
+
+        <div class="input-section">
+            <h2 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #333;">テキスト入力</h2>
+            <textarea id="textInput" placeholder="変換したいテキストを入力してください..."></textarea>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="result-section">
+            <h2 class="result-title">エンコーディング</h2>
+            <div id="encodingResults"></div>
+        </div>
+
+        <div class="result-section">
+            <h2 class="result-title">文字情報</h2>
+            <table class="char-table" id="charTable">
+                <thead>
+                    <tr>
+                        <th>文字</th>
+                        <th>Unicode (U+XXXX)</th>
+                        <th>UTF-8 (hex)</th>
+                        <th>Decimal</th>
+                    </tr>
+                </thead>
+                <tbody id="charTableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="ad-banner">広告スペース: 文字コード変換ツール下部</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            showToast('コピーしました');
+        }
+
+        function encodeToUTF8(str) {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(str);
+            return Array.from(bytes).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+        }
+
+        function getUnicodeCodePoint(char) {
+            return 'U+' + char.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
+        }
+
+        function textToDecimal(str) {
+            return Array.from(str).map(char => char.charCodeAt(0)).join(', ');
+        }
+
+        function textToURLEncoding(str) {
+            return encodeURIComponent(str);
+        }
+
+        function textToBase64(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+
+        function updateEncodings() {
+            const text = document.getElementById('textInput').value;
+
+            if (!text) {
+                document.getElementById('encodingResults').innerHTML = '';
+                document.getElementById('charTableBody').innerHTML = '';
+                document.getElementById('statsGrid').innerHTML = '';
+                return;
+            }
+
+            // Stats
+            const statsGrid = document.getElementById('statsGrid');
+            const utf8Bytes = new TextEncoder().encode(text).length;
+            const charCount = text.length;
+
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">文字数</div>
+                    <div class="stat-value">${charCount}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">UTF-8 バイト数</div>
+                    <div class="stat-value">${utf8Bytes}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Base64 サイズ</div>
+                    <div class="stat-value">${Math.ceil(utf8Bytes * 4 / 3)}</div>
+                </div>
+            `;
+
+            // Encoding results
+            const utf8 = encodeToUTF8(text);
+            const urlEncoded = textToURLEncoding(text);
+            const base64 = textToBase64(text);
+
+            const encodingDiv = document.getElementById('encodingResults');
+            encodingDiv.innerHTML = `
+                <div class="result-card">
+                    <div class="result-label">UTF-8 (16進数)</div>
+                    <div class="result-value">${utf8}</div>
+                    <button class="copy-btn">コピー</button>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">URL エンコーディング</div>
+                    <div class="result-value">${urlEncoded}</div>
+                    <button class="copy-btn">コピー</button>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Base64</div>
+                    <div class="result-value">${base64}</div>
+                    <button class="copy-btn">コピー</button>
+                </div>
+            `;
+
+            const buttons = encodingDiv.querySelectorAll('.copy-btn');
+            const values = [utf8, urlEncoded, base64];
+            buttons.forEach((btn, idx) => {
+                btn.addEventListener('click', () => copyToClipboard(values[idx]));
+            });
+
+            // Character table
+            const tbody = document.getElementById('charTableBody');
+            tbody.innerHTML = '';
+
+            Array.from(text).forEach((char, idx) => {
+                if (idx > 100) return; // Limit to first 100 chars
+
+                const unicode = getUnicodeCodePoint(char);
+                const utf8Hex = Array.from(new TextEncoder().encode(char))
+                    .map(b => b.toString(16).toUpperCase().padStart(2, '0'))
+                    .join(' ');
+                const decimal = char.charCodeAt(0);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="char-display">${char === ' ' ? '(space)' : char}</td>
+                    <td>${unicode}</td>
+                    <td>${utf8Hex}</td>
+                    <td>${decimal}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        document.getElementById('textInput').addEventListener('input', updateEncodings);
+    </script>
+</body>
+</html>

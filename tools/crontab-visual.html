@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ビジュアルインターフェースでcron式を生成するツール。分・時・日・月・曜日をGUIで選択して、次の実行予定を確認できます。">
+    <meta name="keywords" content="cron, crontab, スケジュール, IT・インフラ, Linux">
+    <meta name="author" content="ToolBox">
+    <meta name="theme-color" content="#007bff">
+    <title>ビジュアルCrontab生成 - ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .ad-banner {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .ad-placeholder {
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-page h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .time-selector {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .time-field {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .time-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .time-field select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .time-field select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #007bff;
+            background: white;
+            color: #007bff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .output-section {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .output-section h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .cron-expression {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            color: #007bff;
+            user-select: all;
+            margin-bottom: 1rem;
+        }
+
+        .next-runs {
+            background: white;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .next-runs h4 {
+            color: #333;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .next-runs ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .next-runs li {
+            padding: 0.5rem 0;
+            color: #555;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .next-runs li:last-child {
+            border-bottom: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-copy {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        footer {
+            background: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .tool-page {
+                padding: 1.5rem;
+            }
+
+            .time-selector {
+                flex-direction: column;
+            }
+
+            .time-field {
+                min-width: unset;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav>
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-page">
+            <h1>ビジュアルCrontab生成</h1>
+
+            <div class="form-section">
+                <h2>よく使うプリセット</h2>
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="loadPreset('* * * * *')">毎分</button>
+                    <button class="preset-btn" onclick="loadPreset('0 * * * *')">毎時0分</button>
+                    <button class="preset-btn" onclick="loadPreset('0 0 * * *')">毎日午前0時</button>
+                    <button class="preset-btn" onclick="loadPreset('0 9 * * *')">毎日午前9時</button>
+                    <button class="preset-btn" onclick="loadPreset('0 0 1 * *')">毎月1日</button>
+                    <button class="preset-btn" onclick="loadPreset('0 0 * * 0')">毎週日曜</button>
+                    <button class="preset-btn" onclick="loadPreset('0 0 * * 1-5')">平日毎日</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>時刻設定</h2>
+                <div class="time-selector">
+                    <div class="time-field">
+                        <label for="minute">分 (0-59)</label>
+                        <select id="minute" onchange="updateCron()">
+                            <option value="*">毎分</option>
+                            <option value="0">0</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                        </select>
+                    </div>
+                    <div class="time-field">
+                        <label for="hour">時 (0-23)</label>
+                        <select id="hour" onchange="updateCron()">
+                            <option value="*">毎時</option>
+                            <option value="0">0時</option>
+                            <option value="6">6時</option>
+                            <option value="9">9時</option>
+                            <option value="12">12時</option>
+                            <option value="18">18時</option>
+                        </select>
+                    </div>
+                    <div class="time-field">
+                        <label for="day">日 (1-31)</label>
+                        <select id="day" onchange="updateCron()">
+                            <option value="*">毎日</option>
+                            <option value="1">1日</option>
+                            <option value="15">15日</option>
+                            <option value="L">末日</option>
+                        </select>
+                    </div>
+                    <div class="time-field">
+                        <label for="month">月 (1-12)</label>
+                        <select id="month" onchange="updateCron()">
+                            <option value="*">毎月</option>
+                            <option value="1">1月</option>
+                            <option value="6">6月</option>
+                            <option value="12">12月</option>
+                        </select>
+                    </div>
+                    <div class="time-field">
+                        <label for="dow">曜日 (0-6)</label>
+                        <select id="dow" onchange="updateCron()">
+                            <option value="*">毎日</option>
+                            <option value="0">日曜</option>
+                            <option value="1">月曜</option>
+                            <option value="2">火曜</option>
+                            <option value="3">水曜</option>
+                            <option value="4">木曜</option>
+                            <option value="5">金曜</option>
+                            <option value="6">土曜</option>
+                            <option value="1-5">平日</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h3>生成されたcron式:</h3>
+                <div class="cron-expression" id="cronOutput">* * * * *</div>
+
+                <div class="next-runs">
+                    <h4>次の実行予定（5件）:</h4>
+                    <ul id="nextRunsList">
+                        <li>実行予定がここに表示されます</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-copy" id="copyButton">クリップボードにコピー</button>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 ToolBox
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        function updateCron() {
+            const minute = document.getElementById('minute').value;
+            const hour = document.getElementById('hour').value;
+            const day = document.getElementById('day').value;
+            const month = document.getElementById('month').value;
+            const dow = document.getElementById('dow').value;
+
+            const cron = `${minute} ${hour} ${day} ${month} ${dow}`;
+            document.getElementById('cronOutput').textContent = cron;
+
+            updateNextRuns(minute, hour, day, month, dow);
+        }
+
+        function loadPreset(cronExpr) {
+            const parts = cronExpr.split(' ');
+            document.getElementById('minute').value = parts[0];
+            document.getElementById('hour').value = parts[1];
+            document.getElementById('day').value = parts[2];
+            document.getElementById('month').value = parts[3];
+            document.getElementById('dow').value = parts[4];
+            updateCron();
+        }
+
+        function updateNextRuns(minute, hour, day, month, dow) {
+            const nextRuns = [];
+            let count = 0;
+            let current = new Date();
+
+            // Simple simulation of next 5 runs
+            for (let i = 0; i < 520 && count < 5; i++) {
+                current = new Date(current.getTime() + 60000); // Add 1 minute
+
+                let isMatch = true;
+                if (minute !== '*' && current.getMinutes() !== parseInt(minute)) isMatch = false;
+                if (hour !== '*' && current.getHours() !== parseInt(hour)) isMatch = false;
+                if (day !== '*' && day !== 'L' && current.getDate() !== parseInt(day)) isMatch = false;
+                if (month !== '*' && current.getMonth() + 1 !== parseInt(month)) isMatch = false;
+                if (dow !== '*' && dow !== '1-5') {
+                    if (current.getDay() !== parseInt(dow)) isMatch = false;
+                } else if (dow === '1-5' && (current.getDay() === 0 || current.getDay() === 6)) {
+                    isMatch = false;
+                }
+
+                if (isMatch) {
+                    nextRuns.push(current.toLocaleString('ja-JP'));
+                    count++;
+                }
+            }
+
+            const list = document.getElementById('nextRunsList');
+            list.innerHTML = nextRuns.map(run => `<li>${run}</li>`).join('');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        document.getElementById('copyButton').addEventListener('click', () => {
+            const cron = document.getElementById('cronOutput').textContent;
+            navigator.clipboard.writeText(cron).then(() => {
+                showToast('cron式をコピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        });
+
+        // Initialize
+        updateCron();
+    </script>
+</body>
+</html>

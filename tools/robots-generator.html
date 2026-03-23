@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="robots.txtファイルを簡単に生成できるツール。クローラー設定、Allow/Disallow、Sitemap指定に対応。">
+    <meta name="keywords" content="robots.txt, SEO, クローラー, Sitemap, IT・インフラ">
+    <meta name="author" content="ToolBox">
+    <meta name="theme-color" content="#007bff">
+    <title>robots.txt生成 - ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .ad-banner {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .ad-placeholder {
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-page h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .rules-container {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .rule-item {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .rule-item input {
+            flex: 1;
+        }
+
+        .rule-item button {
+            padding: 0.75rem 1rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .rule-item button:hover {
+            background: #c82333;
+        }
+
+        .rule-type {
+            flex: 0 0 80px;
+            padding: 0.75rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .output-section {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .output-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .robots-output {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            color: #333;
+            user-select: all;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-copy {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-download {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        footer {
+            background: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .tool-page {
+                padding: 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: unset;
+            }
+
+            .rule-item {
+                flex-direction: column;
+            }
+
+            .rule-item input,
+            .rule-type,
+            .rule-item button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav>
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-page">
+            <h1>robots.txt生成</h1>
+
+            <div class="form-section">
+                <h2>User-Agent設定</h2>
+                <div class="form-group">
+                    <label for="userAgent">User-Agent:</label>
+                    <select id="userAgent" onchange="updateRobots()">
+                        <option value="*">全てのボット (*)</option>
+                        <option value="Googlebot">Googlebot</option>
+                        <option value="Bingbot">Bingbot</option>
+                        <option value="AhrefsBot">AhrefsBot</option>
+                        <option value="SemrushBot">SemrushBot</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Allow/Disallow ルール</h2>
+                <div class="rules-container" id="rulesContainer">
+                </div>
+                <button type="button" class="btn-generate" onclick="addRuleField()" style="width: 100%; margin-top: 0.5rem;">+ ルールを追加</button>
+            </div>
+
+            <div class="form-section">
+                <h2>Crawl-delay設定</h2>
+                <div class="form-group">
+                    <label for="crawlDelay">Crawl-delay (秒、デフォルト0):</label>
+                    <input type="text" id="crawlDelay" placeholder="0" onchange="updateRobots()" value="0">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Sitemap設定</h2>
+                <div class="form-group">
+                    <label for="sitemapUrl">Sitemap URL:</label>
+                    <input type="text" id="sitemapUrl" placeholder="https://example.com/sitemap.xml" onchange="updateRobots()">
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h3>生成されたrobots.txt:</h3>
+                <div class="robots-output" id="robotsOutput">User-agent: *
+Disallow: </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-copy" id="copyButton">クリップボードにコピー</button>
+                <button class="btn-download" id="downloadButton">ダウンロード</button>
+                <button class="btn-generate" id="generateButton">生成</button>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 ToolBox
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const rulesContainer = document.getElementById('rulesContainer');
+        const robotsOutput = document.getElementById('robotsOutput');
+        const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const generateButton = document.getElementById('generateButton');
+        const toast = document.getElementById('toast');
+
+        function addRuleField() {
+            const div = document.createElement('div');
+            div.className = 'rule-item';
+            div.innerHTML = `
+                <select class="rule-type" onchange="updateRobots()">
+                    <option value="Allow">Allow</option>
+                    <option value="Disallow">Disallow</option>
+                </select>
+                <input type="text" placeholder="/admin/" class="rule-path" oninput="updateRobots()">
+                <button type="button" onclick="this.parentElement.remove(); updateRobots();">削除</button>
+            `;
+            rulesContainer.appendChild(div);
+        }
+
+        function updateRobots() {
+            const userAgent = document.getElementById('userAgent').value;
+            const crawlDelay = document.getElementById('crawlDelay').value;
+            const sitemapUrl = document.getElementById('sitemapUrl').value;
+
+            let content = `User-agent: ${userAgent}\n`;
+
+            // Add rules
+            const ruleItems = rulesContainer.querySelectorAll('.rule-item');
+            if (ruleItems.length > 0) {
+                ruleItems.forEach(item => {
+                    const type = item.querySelector('.rule-type').value;
+                    const path = item.querySelector('.rule-path').value;
+                    if (path) {
+                        content += `${type}: ${path}\n`;
+                    }
+                });
+            } else {
+                content += `Disallow: \n`;
+            }
+
+            // Add crawl-delay
+            if (crawlDelay && crawlDelay !== '0') {
+                content += `Crawl-delay: ${crawlDelay}\n`;
+            }
+
+            // Add sitemap
+            if (sitemapUrl) {
+                content += `\nSitemap: ${sitemapUrl}\n`;
+            }
+
+            robotsOutput.textContent = content;
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        generateButton.addEventListener('click', updateRobots);
+
+        copyButton.addEventListener('click', () => {
+            const content = robotsOutput.textContent;
+            if (content) {
+                navigator.clipboard.writeText(content).then(() => {
+                    showToast('robots.txtをコピーしました');
+                }).catch(() => {
+                    showToast('コピーに失敗しました');
+                });
+            }
+        });
+
+        downloadButton.addEventListener('click', () => {
+            const content = robotsOutput.textContent;
+            if (content) {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'robots.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('robots.txtをダウンロードしました');
+            }
+        });
+
+        // Add initial rule
+        addRuleField();
+        updateRobots();
+    </script>
+</body>
+</html>

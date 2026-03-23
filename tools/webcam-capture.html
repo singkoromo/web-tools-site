@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webカメラ撮影 - ToolBox</title>
+    <meta name="description" content="Webカメラで写真を撮影します。フィルターやタイマー機能付き。PNG/JPEG形式で保存できます。">
+    <meta name="keywords" content="Webカメラ、撮影、写真、フィルター、ツール、無料">
+    <meta property="og:title" content="Webカメラ撮影 - ToolBox">
+    <meta property="og:description" content="Webカメラで写真を撮影するオンラインツール">
+    <meta property="og:url" content="https://web-tool-site.com/tools/webcam-capture.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/webcam-capture.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .camera-setup { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+        .camera-setting { display: flex; flex-direction: column; gap: 0.5rem; }
+        .camera-setting label { font-weight: 500; color: #333; font-size: 0.95rem; }
+        .camera-setting select, .camera-setting input { padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.375rem; font-family: Inter, sans-serif; }
+        .toggle-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+        .toggle-label input { width: 1.2rem; height: 1.2rem; cursor: pointer; }
+        .camera-preview { width: 100%; max-width: 100%; border-radius: 0.5rem; background: #000; margin: 1.5rem 0; position: relative; }
+        .video-feed { width: 100%; height: auto; display: block; }
+        .placeholder { width: 100%; height: 400px; background: #1f2937; display: flex; align-items: center; justify-content: center; color: #9ca3af; }
+        .camera-controls { display: flex; gap: 1rem; justify-content: center; margin: 1.5rem 0; flex-wrap: wrap; }
+        .timer-display { text-align: center; font-size: 3rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ef4444; display: none; margin: 1rem 0; }
+        .filter-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem; margin: 2rem 0; }
+        .filter-btn { padding: 0.75rem; border: 2px solid #ddd; border-radius: 0.375rem; background: white; cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: all 0.2s; }
+        .filter-btn:hover { border-color: #3b82f6; background: #f0f9ff; }
+        .filter-btn.active { border-color: #3b82f6; background: #3b82f6; color: white; }
+        .output-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+        .output-control { display: flex; flex-direction: column; gap: 0.5rem; }
+        .output-control label { font-weight: 500; color: #333; }
+        .output-control select, .output-control input { padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.375rem; font-family: Inter, sans-serif; }
+        .captured-photo { max-width: 100%; max-height: 500px; border-radius: 0.5rem; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none; }
+        .info-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; font-size: 0.9rem; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <div class="ad-banner">スポンサー</div>
+
+            <h1>Webカメラ撮影</h1>
+            <p class="subtitle">Webカメラで写真を撮影します。フィルターやタイマー機能付き。</p>
+
+            <div class="info-box">
+                <strong>注意:</strong> このツールはカメラへのアクセスを要求します。プライバシーを保護するため、撮影したすべてのデータはお客様のコンピュータのみに保存されます。
+            </div>
+
+            <div class="camera-setup">
+                <div class="camera-setting">
+                    <label>カメラを選択</label>
+                    <select id="cameraSelect" onchange="switchCamera()">
+                        <option value="">デフォルト</option>
+                    </select>
+                </div>
+                <div class="camera-setting">
+                    <label>解像度</label>
+                    <select id="resolution">
+                        <option value="auto">自動</option>
+                        <option value="1920x1080">1920x1080 (Full HD)</option>
+                        <option value="1280x720">1280x720 (HD)</option>
+                        <option value="640x480">640x480 (VGA)</option>
+                    </select>
+                </div>
+                <div class="camera-setting">
+                    <label>ミラー表示</label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="mirrorMode" checked onchange="updatePreview()">
+                        水平反転（セルフィー用）
+                    </label>
+                </div>
+                <div class="camera-setting">
+                    <label>タイマー</label>
+                    <select id="timerSelect">
+                        <option value="none">なし</option>
+                        <option value="3">3秒</option>
+                        <option value="5">5秒</option>
+                        <option value="10">10秒</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="initBtn" onclick="initCamera()" style="margin: 1rem 0;">カメラを開始</button>
+
+            <div id="cameraView" style="display: none;">
+                <div class="camera-preview">
+                    <video id="cameraStream" class="video-feed" playsinline autoplay muted></video>
+                    <canvas id="previewCanvas" style="display: none;"></canvas>
+                </div>
+
+                <div class="timer-display" id="timerDisplay">3</div>
+
+                <div class="camera-controls">
+                    <button class="btn btn-success" id="captureBtn" onclick="capturePhoto()">📷 撮影</button>
+                    <button class="btn btn-secondary" id="resetBtn" onclick="resetCamera()">リセット</button>
+                </div>
+
+                <h3>フィルター</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="applyFilter('none')">なし</button>
+                    <button class="filter-btn" onclick="applyFilter('grayscale')">グレースケール</button>
+                    <button class="filter-btn" onclick="applyFilter('sepia')">セピア</button>
+                    <button class="filter-btn" onclick="applyFilter('blur')">ぼかし</button>
+                    <button class="filter-btn" onclick="applyFilter('brightness')">明るさ</button>
+                    <button class="filter-btn" onclick="applyFilter('contrast')">コントラスト</button>
+                </div>
+
+                <div id="filterControls" style="display: none; margin: 1rem 0;">
+                    <label>強度: <span id="filterValue">50</span>%</label>
+                    <input type="range" id="filterSlider" min="0" max="100" value="50" onchange="applyFilter(currentFilter)">
+                </div>
+            </div>
+
+            <div id="photoResult" style="display: none;">
+                <h3>撮影結果</h3>
+                <img id="capturedPhoto" class="captured-photo">
+
+                <div class="output-controls">
+                    <div class="output-control">
+                        <label>出力形式</label>
+                        <select id="outputFormat">
+                            <option value="png">PNG</option>
+                            <option value="jpeg">JPEG</option>
+                        </select>
+                    </div>
+                    <div class="output-control">
+                        <label id="jpegQualityLabel" style="display: none;">JPEG品質</label>
+                        <input type="range" id="jpegQuality" min="0.1" max="1" step="0.1" value="0.9" style="display: none;" onchange="updateQualityDisplay()">
+                        <small id="qualityValue" style="display: none;"></small>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="downloadPhoto()">ダウンロード</button>
+                    <button class="btn btn-secondary" onclick="captureAnother()">もう一枚撮る</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner" style="margin-top: 2rem;">スポンサー</div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let stream = null;
+        let currentFilter = 'none';
+        let capturedData = null;
+
+        document.getElementById('outputFormat').addEventListener('change', (e) => {
+            if (e.target.value === 'jpeg') {
+                document.getElementById('jpegQualityLabel').style.display = 'block';
+                document.getElementById('jpegQuality').style.display = 'block';
+                document.getElementById('qualityValue').style.display = 'block';
+                updateQualityDisplay();
+            } else {
+                document.getElementById('jpegQualityLabel').style.display = 'none';
+                document.getElementById('jpegQuality').style.display = 'none';
+                document.getElementById('qualityValue').style.display = 'none';
+            }
+        });
+
+        async function initCamera() {
+            try {
+                const resolution = document.getElementById('resolution').value;
+                const constraints = {
+                    audio: false,
+                    video: {
+                        facingMode: 'user'
+                    }
+                };
+
+                if (resolution !== 'auto') {
+                    const [w, h] = resolution.split('x').map(Number);
+                    constraints.video.width = { ideal: w };
+                    constraints.video.height = { ideal: h };
+                }
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('cameraStream');
+                video.srcObject = stream;
+
+                document.getElementById('cameraView').style.display = 'block';
+                document.getElementById('initBtn').textContent = 'カメラを停止';
+                document.getElementById('initBtn').onclick = stopCamera;
+
+                // Enumerate cameras
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const cameras = devices.filter(device => device.kind === 'videoinput');
+                const select = document.getElementById('cameraSelect');
+                select.innerHTML = '';
+                cameras.forEach((camera, index) => {
+                    const option = document.createElement('option');
+                    option.value = camera.deviceId;
+                    option.text = camera.label || `Camera ${index + 1}`;
+                    select.appendChild(option);
+                });
+
+                showToast('カメラが起動しました');
+            } catch (e) {
+                showToast('カメラにアクセスできません: ' + e.message, 'error');
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('cameraView').style.display = 'none';
+            document.getElementById('photoResult').style.display = 'none';
+            document.getElementById('initBtn').textContent = 'カメラを開始';
+            document.getElementById('initBtn').onclick = initCamera;
+            showToast('カメラを停止しました');
+        }
+
+        async function switchCamera() {
+            const deviceId = document.getElementById('cameraSelect').value;
+            if (!deviceId) return;
+
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            try {
+                const constraints = {
+                    audio: false,
+                    video: { deviceId: { exact: deviceId } }
+                };
+                const resolution = document.getElementById('resolution').value;
+                if (resolution !== 'auto') {
+                    const [w, h] = resolution.split('x').map(Number);
+                    constraints.video.width = { ideal: w };
+                    constraints.video.height = { ideal: h };
+                }
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                document.getElementById('cameraStream').srcObject = stream;
+                showToast('カメラを切り替えました');
+            } catch (e) {
+                showToast('カメラの切り替えに失敗しました', 'error');
+            }
+        }
+
+        function updatePreview() {
+            const video = document.getElementById('cameraStream');
+            if (document.getElementById('mirrorMode').checked) {
+                video.style.transform = 'scaleX(-1)';
+            } else {
+                video.style.transform = 'none';
+            }
+        }
+
+        function applyFilter(filterName) {
+            currentFilter = filterName;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const video = document.getElementById('cameraStream');
+            const filters = {
+                'none': 'none',
+                'grayscale': 'grayscale(100%)',
+                'sepia': 'sepia(100%)',
+                'blur': `blur(${document.getElementById('filterSlider').value * 0.2}px)`,
+                'brightness': `brightness(${50 + parseInt(document.getElementById('filterSlider').value) / 2}%)`,
+                'contrast': `contrast(${50 + parseInt(document.getElementById('filterSlider').value) / 2}%)`
+            };
+
+            video.style.filter = filters[filterName];
+
+            if (['blur', 'brightness', 'contrast'].includes(filterName)) {
+                document.getElementById('filterControls').style.display = 'block';
+            } else {
+                document.getElementById('filterControls').style.display = 'none';
+            }
+        }
+
+        function updateQualityDisplay() {
+            const quality = parseFloat(document.getElementById('jpegQuality').value);
+            document.getElementById('qualityValue').textContent = Math.round(quality * 100) + '%';
+        }
+
+        function capturePhoto() {
+            const timerValue = document.getElementById('timerSelect').value;
+
+            if (timerValue !== 'none') {
+                const duration = parseInt(timerValue);
+                document.getElementById('timerDisplay').style.display = 'block';
+                let countdown = duration;
+                document.getElementById('timerDisplay').textContent = countdown;
+
+                const interval = setInterval(() => {
+                    countdown--;
+                    if (countdown > 0) {
+                        document.getElementById('timerDisplay').textContent = countdown;
+                    } else {
+                        clearInterval(interval);
+                        document.getElementById('timerDisplay').style.display = 'none';
+                        takeCapture();
+                    }
+                }, 1000);
+            } else {
+                takeCapture();
+            }
+        }
+
+        function takeCapture() {
+            const canvas = document.createElement('canvas');
+            const video = document.getElementById('cameraStream');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const ctx = canvas.getContext('2d');
+
+            if (document.getElementById('mirrorMode').checked) {
+                ctx.scale(-1, 1);
+                ctx.drawImage(video, -canvas.width, 0);
+            } else {
+                ctx.drawImage(video, 0, 0);
+            }
+
+            // Apply filter to canvas
+            if (currentFilter !== 'none') {
+                const filters = {
+                    'grayscale': 'grayscale(100%)',
+                    'sepia': 'sepia(100%)',
+                    'blur': `blur(${document.getElementById('filterSlider').value * 0.2}px)`,
+                    'brightness': `brightness(${50 + parseInt(document.getElementById('filterSlider').value) / 2}%)`,
+                    'contrast': `contrast(${50 + parseInt(document.getElementById('filterSlider').value) / 2}%)`
+                };
+                ctx.filter = filters[currentFilter];
+                ctx.drawImage(canvas, 0, 0);
+            }
+
+            capturedData = canvas.toDataURL();
+            document.getElementById('capturedPhoto').src = capturedData;
+            document.getElementById('photoResult').style.display = 'block';
+            showToast('写真を撮影しました');
+        }
+
+        function downloadPhoto() {
+            const format = document.getElementById('outputFormat').value;
+
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.href = capturedData;
+                link.download = `photo-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+                link.click();
+            } else {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    const quality = parseFloat(document.getElementById('jpegQuality').value);
+                    canvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `photo-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.jpg`;
+                        link.click();
+                        URL.revokeObjectURL(url);
+                    }, 'image/jpeg', quality);
+                };
+                img.src = capturedData;
+            }
+
+            showToast('ダウンロードを開始しました');
+        }
+
+        function captureAnother() {
+            document.getElementById('photoResult').style.display = 'none';
+            showToast('もう一枚撮影できます');
+        }
+
+        function resetCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('cameraView').style.display = 'none';
+            document.getElementById('photoResult').style.display = 'none';
+            document.getElementById('initBtn').textContent = 'カメラを開始';
+            document.getElementById('initBtn').onclick = initCamera;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + (type === 'error' ? 'error' : 'success');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+</body>
+</html>

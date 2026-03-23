@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声結合 - ToolBox</title>
+    <meta name="description" content="複数の音声ファイルを1つに結合するオンラインツール。ギャップやクロスフェード設定で自然な接続が可能。">
+    <meta name="keywords" content="音声結合, 音声ファイル結合, MP3結合, 複数ファイル結合, 音声編集">
+    <meta property="og:title" content="音声結合 - ToolBox">
+    <meta property="og:description" content="複数の音声ファイルを簡単に結合できるツール。ギャップやクロスフェード対応。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/audio-merger.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/audio-merger.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page { padding: 2rem 1rem; }
+        .tool-container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .drop-zone {
+            border: 2px dashed #ccc; border-radius: 8px; padding: 2rem;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: #f9f9f9;
+        }
+        .drop-zone.dragover { border-color: #0066cc; background: #f0f7ff; }
+        .file-list {
+            margin-top: 2rem; display: none;
+        }
+        .file-list.show { display: block; }
+        .file-item {
+            padding: 1rem; background: #f5f5f5; border-radius: 8px;
+            margin-bottom: 0.75rem; display: flex;
+            justify-content: space-between; align-items: center;
+            gap: 1rem;
+        }
+        .file-info-text {
+            flex: 1;
+        }
+        .file-name { font-weight: 600; }
+        .file-duration { font-size: 0.9rem; color: #666; }
+        .file-actions {
+            display: flex; gap: 0.5rem;
+        }
+        button {
+            padding: 0.5rem 1rem; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #ccc; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-small.btn-secondary { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+        .settings {
+            margin-top: 2rem; padding: 1.5rem; background: #f9f9f9;
+            border-radius: 8px; display: none;
+        }
+        .settings.show { display: block; }
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+        .setting-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        select {
+            padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;
+            font-size: 1rem; width: 100%; max-width: 300px;
+        }
+        .info-box {
+            margin-top: 2rem; padding: 1rem; background: #e8f4fd;
+            border-left: 4px solid #0066cc; border-radius: 4px;
+            display: none;
+        }
+        .info-box.show { display: block; }
+        .info-row { display: flex; justify-content: space-between; margin: 0.5rem 0; }
+        .button-group {
+            display: flex; gap: 1rem; margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .progress-container {
+            margin-top: 1.5rem; display: none;
+        }
+        .progress-container.show { display: block; }
+        .progress-bar {
+            width: 100%; height: 8px; background: #e0e0e0;
+            border-radius: 4px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: #0066cc; width: 0%;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 0.5rem; font-size: 0.9rem; color: #666;
+        }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 1rem 1.5rem; background: #333; color: white;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg> ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<div class="tool-page">
+    <div class="tool-container">
+        <h1>音声結合</h1>
+        <p class="subtitle">複数の音声ファイルを1つに結合。ギャップやクロスフェード設定で自然な接続</p>
+
+        <div class="drop-zone" id="dropZone">
+            <p>複数の音声ファイルをドラッグ&ドロップするか、クリックして選択</p>
+            <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">対応形式: MP3, WAV, OGG, M4A, WebM など</p>
+            <input type="file" id="audioInput" accept="audio/*" multiple style="display: none;">
+        </div>
+
+        <div class="file-list" id="fileList">
+            <h3 style="margin-bottom: 1rem;">読み込まれたファイル</h3>
+            <div id="fileItems"></div>
+        </div>
+
+        <div class="settings" id="settings">
+            <div class="setting-group">
+                <label for="gapTime">トラック間のギャップ</label>
+                <select id="gapTime">
+                    <option value="0">なし (0秒)</option>
+                    <option value="0.5">短い (0.5秒)</option>
+                    <option value="1" selected>通常 (1秒)</option>
+                    <option value="2">長い (2秒)</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label for="crossfade">クロスフェード</label>
+                <select id="crossfade">
+                    <option value="0" selected>なし</option>
+                    <option value="0.5">短い (0.5秒)</option>
+                    <option value="1">通常 (1秒)</option>
+                </select>
+            </div>
+
+            <div class="info-box" id="infoBox">
+                <div class="info-row">
+                    <span>ファイル数:</span>
+                    <strong id="infoFileCount">0</strong>
+                </div>
+                <div class="info-row">
+                    <span>総再生時間:</span>
+                    <strong id="infoTotalDuration">0:00</strong>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" id="mergeButton">結合実行</button>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">準備中...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+class AudioMerger {
+    constructor() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.files = [];
+        this.audioBuffers = [];
+
+        this.initElements();
+        this.attachEventListeners();
+    }
+
+    initElements() {
+        this.dropZone = document.getElementById('dropZone');
+        this.audioInput = document.getElementById('audioInput');
+        this.fileList = document.getElementById('fileList');
+        this.fileItems = document.getElementById('fileItems');
+        this.settings = document.getElementById('settings');
+        this.infoBox = document.getElementById('infoBox');
+        this.gapTime = document.getElementById('gapTime');
+        this.crossfade = document.getElementById('crossfade');
+        this.mergeButton = document.getElementById('mergeButton');
+        this.progressContainer = document.getElementById('progressContainer');
+        this.progressFill = document.getElementById('progressFill');
+        this.progressText = document.getElementById('progressText');
+    }
+
+    attachEventListeners() {
+        this.dropZone.addEventListener('click', () => this.audioInput.click());
+        this.dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.add('dragover');
+        });
+        this.dropZone.addEventListener('dragleave', () => {
+            this.dropZone.classList.remove('dragover');
+        });
+        this.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            this.handleFiles(files);
+        });
+
+        this.audioInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            this.handleFiles(files);
+        });
+
+        this.mergeButton.addEventListener('click', () => this.merge());
+    }
+
+    async handleFiles(newFiles) {
+        for (const file of newFiles) {
+            this.files.push(file);
+        }
+
+        this.audioBuffers = [];
+        for (let i = 0; i < this.files.length; i++) {
+            this.progressText.textContent = `ファイルをデコード中... (${i + 1}/${this.files.length})`;
+            this.progressContainer.classList.add('show');
+            const buffer = await this.decodeFile(this.files[i]);
+            if (buffer) this.audioBuffers.push(buffer);
+        }
+
+        this.renderFileList();
+        this.updateInfo();
+        this.progressContainer.classList.remove('show');
+    }
+
+    async decodeFile(file) {
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            return await this.audioContext.decodeAudioData(arrayBuffer);
+        } catch (error) {
+            this.showToast(`ファイル ${file.name} のデコードに失敗しました`);
+            return null;
+        }
+    }
+
+    renderFileList() {
+        this.fileItems.innerHTML = '';
+        this.files.forEach((file, index) => {
+            const duration = this.audioBuffers[index] ? this.formatTime(this.audioBuffers[index].duration) : '?';
+            const div = document.createElement('div');
+            div.className = 'file-item';
+            div.innerHTML = `
+                <div class="file-info-text">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-duration">${duration}</div>
+                </div>
+                <div class="file-actions">
+                    ${index > 0 ? `<button class="btn-secondary btn-small" onclick="merger.moveUp(${index})">↑</button>` : ''}
+                    ${index < this.files.length - 1 ? `<button class="btn-secondary btn-small" onclick="merger.moveDown(${index})">↓</button>` : ''}
+                    <button class="btn-danger btn-small" onclick="merger.removeFile(${index})">削除</button>
+                </div>
+            `;
+            this.fileItems.appendChild(div);
+        });
+
+        if (this.files.length > 0) {
+            this.fileList.classList.add('show');
+            this.settings.classList.add('show');
+            this.infoBox.classList.add('show');
+        } else {
+            this.fileList.classList.remove('show');
+            this.settings.classList.remove('show');
+            this.infoBox.classList.remove('show');
+        }
+    }
+
+    moveUp(index) {
+        if (index > 0) {
+            [this.files[index - 1], this.files[index]] = [this.files[index], this.files[index - 1]];
+            [this.audioBuffers[index - 1], this.audioBuffers[index]] = [this.audioBuffers[index], this.audioBuffers[index - 1]];
+            this.renderFileList();
+            this.updateInfo();
+        }
+    }
+
+    moveDown(index) {
+        if (index < this.files.length - 1) {
+            [this.files[index + 1], this.files[index]] = [this.files[index], this.files[index + 1]];
+            [this.audioBuffers[index + 1], this.audioBuffers[index]] = [this.audioBuffers[index], this.audioBuffers[index + 1]];
+            this.renderFileList();
+            this.updateInfo();
+        }
+    }
+
+    removeFile(index) {
+        this.files.splice(index, 1);
+        this.audioBuffers.splice(index, 1);
+        this.renderFileList();
+        this.updateInfo();
+    }
+
+    updateInfo() {
+        const fileCount = this.files.length;
+        const gap = parseFloat(this.gapTime.value) * (fileCount - 1);
+        const totalDuration = this.audioBuffers.reduce((sum, buf) => sum + buf.duration, 0) + gap;
+
+        document.getElementById('infoFileCount').textContent = fileCount;
+        document.getElementById('infoTotalDuration').textContent = this.formatTime(totalDuration);
+    }
+
+    async merge() {
+        if (this.files.length === 0) {
+            this.showToast('ファイルを追加してください');
+            return;
+        }
+
+        this.mergeButton.disabled = true;
+        this.progressContainer.classList.add('show');
+        this.progressText.textContent = 'ファイルを結合中...';
+        this.progressFill.style.width = '20%';
+
+        try {
+            const gap = parseFloat(this.gapTime.value);
+            const crossfadeDuration = parseFloat(this.crossfade.value);
+            const totalLength = this.calculateTotalLength();
+
+            const offlineContext = new OfflineAudioContext(
+                this.audioBuffers[0].numberOfChannels,
+                Math.ceil(totalLength * this.audioBuffers[0].sampleRate),
+                this.audioBuffers[0].sampleRate
+            );
+
+            this.progressFill.style.width = '40%';
+
+            let currentTime = 0;
+            for (let i = 0; i < this.audioBuffers.length; i++) {
+                const buffer = this.audioBuffers[i];
+                const source = offlineContext.createBufferSource();
+                source.buffer = buffer;
+
+                if (crossfadeDuration > 0 && i > 0) {
+                    const gainNode = offlineContext.createGain();
+                    gainNode.gain.setValueAtTime(0, currentTime - crossfadeDuration);
+                    gainNode.gain.linearRampToValueAtTime(1, currentTime);
+                    source.connect(gainNode);
+                    gainNode.connect(offlineContext.destination);
+                } else {
+                    source.connect(offlineContext.destination);
+                }
+
+                source.start(currentTime);
+                currentTime += buffer.duration + gap;
+            }
+
+            this.progressFill.style.width = '60%';
+            const renderedBuffer = await offlineContext.startRendering();
+
+            this.progressFill.style.width = '80%';
+            const blob = this.encodeWAV(renderedBuffer);
+
+            this.progressFill.style.width = '100%';
+            this.downloadBlob(blob, 'merged_audio.wav');
+            this.showToast('結合完了！ファイルをダウンロードしました');
+        } catch (error) {
+            this.showToast('結合に失敗しました: ' + error.message);
+        } finally {
+            this.progressContainer.classList.remove('show');
+            this.mergeButton.disabled = false;
+        }
+    }
+
+    calculateTotalLength() {
+        const gap = parseFloat(this.gapTime.value);
+        const crossfade = parseFloat(this.crossfade.value);
+        let total = 0;
+        for (let i = 0; i < this.audioBuffers.length; i++) {
+            total += this.audioBuffers[i].duration;
+            if (i < this.audioBuffers.length - 1) total += gap;
+        }
+        return total;
+    }
+
+    encodeWAV(audioBuffer) {
+        const numberOfChannels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const format = 1;
+        const bitDepth = 16;
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numberOfChannels * bytesPerSample;
+
+        const channelData = [];
+        for (let i = 0; i < numberOfChannels; i++) {
+            channelData.push(audioBuffer.getChannelData(i));
+        }
+
+        const length = audioBuffer.length * numberOfChannels * bytesPerSample;
+        const buffer = new ArrayBuffer(44 + length);
+        const view = new DataView(buffer);
+
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + length, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(36, 'data');
+        view.setUint32(40, length, true);
+
+        let offset = 44;
+        const volume = 1;
+        for (let i = 0; i < audioBuffer.length; i++) {
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                let sample = Math.max(-1, Math.min(1, channelData[channel][i])) * volume;
+                sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                view.setInt16(offset, sample, true);
+                offset += 2;
+            }
+        }
+
+        return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = (seconds % 60).toFixed(2);
+        return `${minutes}:${secs.padStart(5, '0')}`;
+    }
+
+    showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+let merger;
+document.addEventListener('DOMContentLoaded', () => {
+    merger = new AudioMerger();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JavaScriptやCSS、HTMLコードを圧縮してファイルサイズを削減します。">
+    <meta property="og:title" content="コード圧縮ツール - ToolBox">
+    <meta property="og:description" content="JavaScript、CSS、HTMLコードを圧縮してファイルサイズを削減。圧縮率表示対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/code-minifier.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/code-minifier.html">
+    <title>コード圧縮ツール - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            min-height: 200px;
+            resize: vertical;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            display: none;
+        }
+        .output-section.active {
+            display: block;
+        }
+        .output-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .output-text {
+            background: white;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🛠️ ToolBox</h1>
+                <nav class="nav">
+                    <a href="/">ホーム</a>
+                    <a href="/#tools">ツール一覧</a>
+                    <a href="/about">について</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <div class="tool-page">
+        <div class="container">
+            <div class="tool-container">
+                <h1>コード圧縮ツール</h1>
+                <p class="description">JavaScriptやCSS、HTMLコードをコメントや不要な空白を除去して圧縮し、ファイルサイズを削減します。</p>
+
+                <div class="tool-tabs">
+                    <button class="tab-btn active" data-tab="js">JavaScript</button>
+                    <button class="tab-btn" data-tab="css">CSS</button>
+                    <button class="tab-btn" data-tab="html">HTML</button>
+                </div>
+
+                <div id="js" class="tab-content active">
+                    <div class="form-group">
+                        <label for="jsInput">JavaScriptコード</label>
+                        <textarea id="jsInput" placeholder="圧縮したいJavaScriptコードを入力してください..."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button onclick="minifyJS()">圧縮実行</button>
+                        <button onclick="clearJS()">クリア</button>
+                    </div>
+                </div>
+
+                <div id="css" class="tab-content">
+                    <div class="form-group">
+                        <label for="cssInput">CSSコード</label>
+                        <textarea id="cssInput" placeholder="圧縮したいCSSコードを入力してください..."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button onclick="minifyCSS()">圧縮実行</button>
+                        <button onclick="clearCSS()">クリア</button>
+                    </div>
+                </div>
+
+                <div id="html" class="tab-content">
+                    <div class="form-group">
+                        <label for="htmlInput">HTMLコード</label>
+                        <textarea id="htmlInput" placeholder="圧縮したいHTMLコードを入力してください..."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button onclick="minifyHTML()">圧縮実行</button>
+                        <button onclick="clearHTML()">クリア</button>
+                    </div>
+                </div>
+
+                <div class="stats" id="stats" style="display: none;">
+                    <div class="stat-box">
+                        <div class="stat-value" id="originalSize">0</div>
+                        <div class="stat-label">圧縮前 (bytes)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="minifiedSize">0</div>
+                        <div class="stat-label">圧縮後 (bytes)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="reduction">0%</div>
+                        <div class="stat-label">削減率</div>
+                    </div>
+                </div>
+
+                <div class="output-section" id="outputSection">
+                    <div class="output-label">圧縮済みコード</div>
+                    <div class="output-text" id="output"></div>
+                    <div class="button-group" style="margin-top: 10px;">
+                        <button onclick="copyOutput()">コピー</button>
+                        <button onclick="downloadOutput()">ダウンロード</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let currentType = 'js';
+        let lastOutput = '';
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                currentType = e.target.dataset.tab;
+                document.getElementById(currentType).classList.add('active');
+            });
+        });
+
+        function minifyJS() {
+            const input = document.getElementById('jsInput').value;
+            if (!input.trim()) {
+                showToast('コードを入力してください', 'error');
+                return;
+            }
+
+            let minified = input
+                .replace(/\/\*[\s\S]*?\*\//g, '')
+                .replace(/\/\/.*$/gm, '')
+                .replace(/\n\s+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .replace(/\s*([{}();,:])\s*/g, '$1')
+                .trim();
+
+            showOutput(input, minified);
+        }
+
+        function minifyCSS() {
+            const input = document.getElementById('cssInput').value;
+            if (!input.trim()) {
+                showToast('コードを入力してください', 'error');
+                return;
+            }
+
+            let minified = input
+                .replace(/\/\*[\s\S]*?\*\//g, '')
+                .replace(/\n/g, '')
+                .replace(/\s+/g, ' ')
+                .replace(/\s*([{}:;,>+~])\s*/g, '$1')
+                .trim();
+
+            showOutput(input, minified);
+        }
+
+        function minifyHTML() {
+            const input = document.getElementById('htmlInput').value;
+            if (!input.trim()) {
+                showToast('コードを入力してください', 'error');
+                return;
+            }
+
+            let minified = input
+                .replace(/<!--[\s\S]*?-->/g, '')
+                .replace(/>\s+</g, '><')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            showOutput(input, minified);
+        }
+
+        function showOutput(original, minified) {
+            lastOutput = minified;
+            document.getElementById('output').textContent = minified;
+
+            const originalSize = new Blob([original]).size;
+            const minifiedSize = new Blob([minified]).size;
+            const reduction = Math.round((1 - minifiedSize / originalSize) * 100);
+
+            document.getElementById('originalSize').textContent = originalSize;
+            document.getElementById('minifiedSize').textContent = minifiedSize;
+            document.getElementById('reduction').textContent = reduction + '%';
+
+            document.getElementById('stats').style.display = 'grid';
+            document.getElementById('outputSection').classList.add('active');
+
+            showToast('圧縮完了', 'success');
+        }
+
+        function clearJS() {
+            document.getElementById('jsInput').value = '';
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('outputSection').classList.remove('active');
+        }
+
+        function clearCSS() {
+            document.getElementById('cssInput').value = '';
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('outputSection').classList.remove('active');
+        }
+
+        function clearHTML() {
+            document.getElementById('htmlInput').value = '';
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('outputSection').classList.remove('active');
+        }
+
+        function copyOutput() {
+            navigator.clipboard.writeText(lastOutput).then(() => {
+                showToast('コピーしました', 'success');
+            });
+        }
+
+        function downloadOutput() {
+            const ext = currentType === 'js' ? '.js' : (currentType === 'css' ? '.css' : '.html');
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(lastOutput));
+            element.setAttribute('download', 'minified' + ext);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            showToast('ダウンロード開始', 'success');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

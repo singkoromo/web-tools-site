@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GUIでGitコマンドを生成します。ブランチ作成、マージ、リベース、チェリーピックなどをサポート。">
+    <meta property="og:title" content="Gitコマンド生成ツール - ToolBox">
+    <meta property="og:description" content="Gitコマンドを簡単生成。ブランチ作成、マージ、リベース、チェリーピック対応。コマンド解説付き。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/git-command.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/git-command.html">
+    <title>Gitコマンド生成ツール - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], select, textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+        select {
+            cursor: pointer;
+        }
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        .operation-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .operation-btn {
+            padding: 15px;
+            background: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        .operation-btn:hover {
+            border-color: #2563eb;
+            background: #f0f7ff;
+        }
+        .operation-btn.active {
+            border-color: #2563eb;
+            background: #dbeafe;
+        }
+        .op-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+        .op-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        .params-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .params-section.active {
+            display: block;
+        }
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            display: none;
+        }
+        .output-section.active {
+            display: block;
+        }
+        .output-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .command-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+        .command-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .checkbox-item input {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🛠️ ToolBox</h1>
+                <nav class="nav">
+                    <a href="/">ホーム</a>
+                    <a href="/#tools">ツール一覧</a>
+                    <a href="/about">について</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <div class="tool-page">
+        <div class="container">
+            <div class="tool-container">
+                <h1>Gitコマンド生成ツール</h1>
+                <p class="description">やりたい操作をGUIで選択してパラメータを入力するだけで、対応するGitコマンドが自動生成されます。</p>
+
+                <h3>操作選択</h3>
+                <div class="operation-list">
+                    <div class="operation-btn active" onclick="selectOperation('branch-create', this)">
+                        <div class="op-title">ブランチ作成</div>
+                        <div class="op-desc">新しいブランチを作成</div>
+                    </div>
+                    <div class="operation-btn" onclick="selectOperation('branch-switch', this)">
+                        <div class="op-title">ブランチ切り替え</div>
+                        <div class="op-desc">既存ブランチに切り替え</div>
+                    </div>
+                    <div class="operation-btn" onclick="selectOperation('merge', this)">
+                        <div class="op-title">マージ</div>
+                        <div class="op-desc">ブランチをマージ</div>
+                    </div>
+                    <div class="operation-btn" onclick="selectOperation('rebase', this)">
+                        <div class="op-title">リベース</div>
+                        <div class="op-desc">コミット履歴を整理</div>
+                    </div>
+                    <div class="operation-btn" onclick="selectOperation('cherry-pick', this)">
+                        <div class="op-title">チェリーピック</div>
+                        <div class="op-desc">特定コミットを適用</div>
+                    </div>
+                    <div class="operation-btn" onclick="selectOperation('stash', this)">
+                        <div class="op-title">スタッシュ</div>
+                        <div class="op-desc">変更を一時保存</div>
+                    </div>
+                    <div class="operation-btn" onclick="selectOperation('tag', this)">
+                        <div class="op-title">タグ作成</div>
+                        <div class="op-desc">リリース版にタグ</div>
+                    </div>
+                    <div class="operation-btn" onclick="selectOperation('reset', this)">
+                        <div class="op-title">リセット</div>
+                        <div class="op-desc">コミットを取り消し</div>
+                    </div>
+                </div>
+
+                <div id="params" class="params-section active"></div>
+
+                <div id="output" class="output-section active">
+                    <div class="output-label">生成されたコマンド</div>
+                    <div class="command-box" id="command">git branch feature-name</div>
+                    <div class="command-description" id="description">新しいブランチ「feature-name」を作成します</div>
+                    <div class="button-group">
+                        <button onclick="copyCommand()">コピー</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let currentOperation = 'branch-create';
+
+        const operations = {
+            'branch-create': {
+                title: 'ブランチ作成',
+                html: `
+                    <div class="form-group">
+                        <label for="branchName">ブランチ名</label>
+                        <input type="text" id="branchName" placeholder="feature/add-login" value="feature-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="baseBranch">ベースブランチ</label>
+                        <input type="text" id="baseBranch" placeholder="main" value="">
+                    </div>
+                `,
+                generate: () => {
+                    const name = document.getElementById('branchName').value || 'feature-name';
+                    const base = document.getElementById('baseBranch').value;
+                    const cmd = base ? `git checkout -b ${name} ${base}` : `git branch ${name}`;
+                    const desc = base
+                        ? `${base}をベースに新しいブランチ「${name}」を作成して切り替えます`
+                        : `新しいブランチ「${name}」を作成します`;
+                    return { cmd, desc };
+                }
+            },
+            'branch-switch': {
+                title: 'ブランチ切り替え',
+                html: `
+                    <div class="form-group">
+                        <label for="switchBranch">切り替え先ブランチ</label>
+                        <input type="text" id="switchBranch" placeholder="main" value="main">
+                    </div>
+                `,
+                generate: () => {
+                    const name = document.getElementById('switchBranch').value || 'main';
+                    const cmd = `git checkout ${name}`;
+                    const desc = `ブランチを「${name}」に切り替えます`;
+                    return { cmd, desc };
+                }
+            },
+            'merge': {
+                title: 'マージ',
+                html: `
+                    <div class="form-group">
+                        <label for="mergeBranch">マージするブランチ</label>
+                        <input type="text" id="mergeBranch" placeholder="feature/add-login" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>オプション</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="noFF" onchange="generateCommand()">
+                                <label for="noFF">--no-ff (マージコミット作成)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="squash" onchange="generateCommand()">
+                                <label for="squash">--squash (コミット統合)</label>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                generate: () => {
+                    const branch = document.getElementById('mergeBranch').value || 'feature-branch';
+                    const noFF = document.getElementById('noFF').checked ? ' --no-ff' : '';
+                    const squash = document.getElementById('squash').checked ? ' --squash' : '';
+                    const cmd = `git merge${noFF}${squash} ${branch}`;
+                    const desc = `ブランチ「${branch}」を現在のブランチにマージします`;
+                    return { cmd, desc };
+                }
+            },
+            'rebase': {
+                title: 'リベース',
+                html: `
+                    <div class="form-group">
+                        <label for="rebaseBranch">リベース対象ブランチ</label>
+                        <input type="text" id="rebaseBranch" placeholder="main" value="main">
+                    </div>
+                `,
+                generate: () => {
+                    const branch = document.getElementById('rebaseBranch').value || 'main';
+                    const cmd = `git rebase ${branch}`;
+                    const desc = `現在のブランチを「${branch}」にリベースします`;
+                    return { cmd, desc };
+                }
+            },
+            'cherry-pick': {
+                title: 'チェリーピック',
+                html: `
+                    <div class="form-group">
+                        <label for="commitHash">コミットハッシュ</label>
+                        <input type="text" id="commitHash" placeholder="a1b2c3d" value="">
+                    </div>
+                `,
+                generate: () => {
+                    const hash = document.getElementById('commitHash').value || 'commit-hash';
+                    const cmd = `git cherry-pick ${hash}`;
+                    const desc = `コミット「${hash}」を現在のブランチに適用します`;
+                    return { cmd, desc };
+                }
+            },
+            'stash': {
+                title: 'スタッシュ',
+                html: `
+                    <div class="form-group">
+                        <label for="stashOperation">操作</label>
+                        <select id="stashOperation" onchange="generateCommand()">
+                            <option value="save">変更を保存</option>
+                            <option value="list">保存一覧</option>
+                            <option value="pop">最新を復元</option>
+                            <option value="drop">削除</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="stashMessage">メッセージ（保存時のみ）</label>
+                        <input type="text" id="stashMessage" placeholder="WIP on feature" value="">
+                    </div>
+                `,
+                generate: () => {
+                    const op = document.getElementById('stashOperation').value;
+                    const msg = document.getElementById('stashMessage').value;
+                    let cmd = 'git stash ' + op;
+                    let desc = '';
+                    if (op === 'save') {
+                        cmd += msg ? ` "${msg}"` : '';
+                        desc = `現在の変更を保存します`;
+                    } else if (op === 'list') {
+                        desc = `保存されたスタッシュの一覧を表示します`;
+                    } else if (op === 'pop') {
+                        desc = `最新のスタッシュを復元します`;
+                    } else if (op === 'drop') {
+                        desc = `最新のスタッシュを削除します`;
+                    }
+                    return { cmd, desc };
+                }
+            },
+            'tag': {
+                title: 'タグ作成',
+                html: `
+                    <div class="form-group">
+                        <label for="tagName">タグ名</label>
+                        <input type="text" id="tagName" placeholder="v1.0.0" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="tagMessage">メッセージ</label>
+                        <input type="text" id="tagMessage" placeholder="Release version 1.0.0" value="">
+                    </div>
+                `,
+                generate: () => {
+                    const name = document.getElementById('tagName').value || 'v1.0.0';
+                    const msg = document.getElementById('tagMessage').value;
+                    const cmd = msg ? `git tag -a ${name} -m "${msg}"` : `git tag ${name}`;
+                    const desc = `「${name}」というタグを作成します`;
+                    return { cmd, desc };
+                }
+            },
+            'reset': {
+                title: 'リセット',
+                html: `
+                    <div class="form-group">
+                        <label for="resetMode">リセットモード</label>
+                        <select id="resetMode" onchange="generateCommand()">
+                            <option value="soft">soft - インデックスを保持</option>
+                            <option value="mixed">mixed - インデックスをリセット</option>
+                            <option value="hard">hard - 全て破棄（注意）</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="resetTarget">リセット対象</label>
+                        <input type="text" id="resetTarget" placeholder="HEAD~1" value="HEAD~1">
+                    </div>
+                `,
+                generate: () => {
+                    const mode = document.getElementById('resetMode').value || 'mixed';
+                    const target = document.getElementById('resetTarget').value || 'HEAD~1';
+                    const cmd = `git reset --${mode} ${target}`;
+                    const desc = `「${target}」にリセットします（モード: ${mode}）`;
+                    return { cmd, desc };
+                }
+            }
+        };
+
+        function selectOperation(op, element) {
+            currentOperation = op;
+            document.querySelectorAll('.operation-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            const paramsDiv = document.getElementById('params');
+            paramsDiv.innerHTML = operations[op].html;
+
+            generateCommand();
+        }
+
+        function generateCommand() {
+            const { cmd, desc } = operations[currentOperation].generate();
+            document.getElementById('command').textContent = cmd;
+            document.getElementById('description').textContent = desc;
+        }
+
+        function copyCommand() {
+            const cmd = document.getElementById('command').textContent;
+            navigator.clipboard.writeText(cmd).then(() => {
+                showToast('コピーしました', 'success');
+            });
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 初期生成
+        generateCommand();
+    </script>
+</body>
+</html>

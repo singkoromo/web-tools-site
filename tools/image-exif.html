@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="JPEG画像のEXIF情報（撮影日時、カメラ機種、GPS座標、F値、ISOなど）をブラウザ上で確認できるツール。">
+    <meta property="og:title" content="画像EXIF情報ビューア - ToolBox">
+    <meta property="og:description" content="JPEG/TIFF画像のEXIFメタデータを一覧表示。GPS座標も確認可能。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/image-exif.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/image-exif.html">
+    <title>画像EXIF情報ビューア - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .drop-zone {
+            border: 2px dashed #007bff; border-radius: 8px;
+            padding: 40px; text-align: center; cursor: pointer;
+            background: #f8f9ff; transition: background 0.2s; margin-bottom: 20px;
+        }
+        .drop-zone:hover, .drop-zone.drag-over { background: #e8f0ff; }
+        .drop-zone input[type="file"] { display: none; }
+        .dz-icon { font-size: 48px; margin-bottom: 12px; }
+        .preview-area { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-start; }
+        .preview-img { max-width: 280px; max-height: 280px; border-radius: 8px; border: 1px solid #ddd; }
+        .info-note { background: #e7f3ff; border-left: 4px solid #007bff; padding: 12px; border-radius: 4px; font-size: 14px; color: #004085; margin-bottom: 20px; }
+        .exif-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 4px; }
+        .exif-table th, .exif-table td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        .exif-table th { background: #f8f9fa; font-weight: 600; width: 38%; }
+        .exif-table tr:hover td { background: #f0f4ff; }
+        .section-title { font-weight: 700; font-size: 15px; color: #333; margin: 20px 0 8px; padding: 6px 12px; background: linear-gradient(135deg, #e8f4ff, #f0e8ff); border-radius: 6px; }
+        .gps-link { color: #007bff; text-decoration: none; }
+        .gps-link:hover { text-decoration: underline; }
+        .no-exif { text-align: center; padding: 30px; color: #666; font-size: 15px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+        <div class="tool-container">
+            <h1>画像EXIF情報ビューア</h1>
+            <div class="info-note">
+                JPEG画像のEXIFメタデータ（撮影日時・カメラ情報・GPS座標・F値・ISOなど）を表示します。ブラウザ内で処理されサーバーに送信されません。
+            </div>
+
+            <div class="drop-zone" id="dropZone">
+                <div class="dz-icon">📷</div>
+                <p><strong>画像ファイルをドロップ</strong>またはクリックして選択</p>
+                <p style="color:#888;font-size:13px;">JPEG / TIFF 対応</p>
+                <input type="file" id="fileInput" accept="image/jpeg,image/tiff,.jpg,.jpeg,.tif,.tiff">
+            </div>
+
+            <div id="resultArea"></div>
+        </div>
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault(); dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) processFile(file);
+    });
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0]); });
+
+    function processFile(file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const buf = e.target.result;
+            const objUrl = URL.createObjectURL(file);
+            const exif = parseExif(new DataView(buf));
+            renderResult(exif, objUrl, file.name, file.size);
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // === EXIF parser ===
+    const TAG_NAMES = {
+        0x010E:'画像の説明', 0x010F:'カメラメーカー', 0x0110:'カメラモデル',
+        0x0112:'方向', 0x011A:'X解像度', 0x011B:'Y解像度', 0x0128:'解像度単位',
+        0x0131:'ソフトウェア', 0x0132:'日時', 0x013B:'作成者', 0x013E:'白色点',
+        0x0213:'YCbCr位置決め', 0x8769:'ExifIFD', 0x8825:'GPSIFD',
+        // Exif Sub IFD
+        0x829A:'露出時間(s)', 0x829D:'F値', 0x8822:'露出プログラム',
+        0x8827:'ISO感度', 0x9000:'Exifバージョン', 0x9003:'撮影日時',
+        0x9004:'デジタル化日時', 0x9101:'コンポーネント', 0x9102:'圧縮BPP',
+        0x9201:'シャッタースピード(APEX)', 0x9202:'絞り値(APEX)',
+        0x9204:'露出補正(EV)', 0x9205:'最大絞り値', 0x9206:'被写体距離(m)',
+        0x9207:'測光モード', 0x9208:'光源', 0x9209:'フラッシュ',
+        0x920A:'焦点距離(mm)', 0x9214:'被写体エリア',
+        0x927C:'メーカーノート', 0x9286:'ユーザーコメント',
+        0xA000:'FlashPix Ver', 0xA001:'色空間',
+        0xA002:'画像幅(px)', 0xA003:'画像高さ(px)',
+        0xA217:'センサー種類', 0xA300:'ファイルソース', 0xA301:'シーン種類',
+        0xA401:'カスタムレンダリング', 0xA402:'露出モード',
+        0xA403:'ホワイトバランス', 0xA404:'デジタルズーム',
+        0xA405:'35mm換算焦点距離(mm)', 0xA406:'シーンタイプ',
+        0xA407:'ゲイン制御', 0xA408:'コントラスト',
+        0xA409:'彩度', 0xA40A:'シャープネス', 0xA40C:'被写体距離範囲',
+        0xA420:'画像ユニークID',
+    };
+    const GPS_TAG_NAMES = {
+        0x0000:'GPSバージョン', 0x0001:'緯度基準(N/S)', 0x0002:'緯度(DMS)',
+        0x0003:'経度基準(E/W)', 0x0004:'経度(DMS)',
+        0x0005:'高度基準', 0x0006:'高度(m)',
+        0x0007:'GPS時刻(UTC)', 0x0008:'測位衛星', 0x0009:'GPS状態',
+        0x000A:'測位方法', 0x000B:'DOP', 0x000C:'速度単位',
+        0x000D:'速度', 0x000E:'進行方向基準', 0x000F:'進行方向',
+        0x0012:'方位基準', 0x0013:'方位(°)', 0x001D:'GPS日付',
+        0x001F:'GPS位置情報の精度',
+    };
+
+    function parseExif(view) {
+        if (view.getUint16(0) !== 0xFFD8) return null; // not JPEG
+        let off = 2;
+        while (off < view.byteLength - 4) {
+            const marker = view.getUint16(off);
+            const segLen = view.getUint16(off + 2);
+            if (marker === 0xFFE1) {
+                const hdr = [off+4,off+5,off+6,off+7].map(i => String.fromCharCode(view.getUint8(i))).join('');
+                if (hdr === 'Exif') return parseTIFF(view, off + 10);
+            }
+            if ((marker & 0xFF00) !== 0xFF00 || segLen < 2) break;
+            off += 2 + segLen;
+        }
+        return null;
+    }
+
+    function parseTIFF(view, base) {
+        const order = view.getUint16(base);
+        const le = order === 0x4949;
+        const r16 = o => view.getUint16(base + o, le);
+        const r32 = o => view.getUint32(base + o, le);
+        const rs32 = o => view.getInt32(base + o, le);
+
+        function readStr(o, len) {
+            let s = '';
+            for (let i = 0; i < len; i++) {
+                const c = view.getUint8(base + o + i);
+                if (c === 0) break;
+                s += String.fromCharCode(c);
+            }
+            return s.trim();
+        }
+        function readRat(o) {
+            const n = r32(o), d = r32(o + 4);
+            return d === 0 ? null : n / d;
+        }
+        function formatRat(o) {
+            const v = readRat(o); if (v === null) return '0';
+            return v % 1 === 0 ? String(v) : v.toFixed(5).replace(/\.?0+$/, '');
+        }
+
+        function getVal(tag, type, count, rawVOff, ifdEntryOff) {
+            const sizes = [0,1,1,2,4,8,0,1,0,4,8];
+            const total = (sizes[type] || 1) * count;
+            const vOff = total > 4 ? rawVOff : (ifdEntryOff - base);
+
+            if (type === 2) return readStr(vOff, count);
+            if (type === 3) {
+                if (count === 1) return r16(vOff);
+                return Array.from({length: Math.min(count,8)}, (_,i) => r16(vOff+i*2)).join(', ');
+            }
+            if (type === 4) {
+                if (count === 1) return r32(vOff);
+                return Array.from({length: Math.min(count,4)}, (_,i) => r32(vOff+i*4)).join(', ');
+            }
+            if (type === 5) {
+                if (count === 1) return formatRat(vOff);
+                return Array.from({length: Math.min(count,4)}, (_,i) => formatRat(vOff+i*8)).join(', ');
+            }
+            if (type === 9) return rs32(vOff);
+            if (type === 10) {
+                const n = rs32(vOff), d = rs32(vOff+4);
+                return d === 0 ? 0 : (n/d).toFixed(5).replace(/\.?0+$/, '');
+            }
+            if (type === 7) {
+                try {
+                    return readStr(vOff, Math.min(count, 64));
+                } catch { return `(${count} bytes)`; }
+            }
+            return `(type=${type})`;
+        }
+
+        function readIFD(ifdOff, tagNames) {
+            const result = {};
+            if (ifdOff + 2 > view.byteLength - base) return result;
+            const cnt = r16(ifdOff);
+            for (let i = 0; i < cnt; i++) {
+                const eBase = ifdOff + 2 + i * 12;
+                if (base + eBase + 12 > view.byteLength) break;
+                const tag = r16(eBase);
+                const type = r16(eBase + 2);
+                const count = r32(eBase + 4);
+                const vOff = r32(eBase + 8);
+                if (tag === 0x8769) { Object.assign(result, readIFD(vOff, TAG_NAMES)); continue; }
+                if (tag === 0x8825) { result.__gps = readIFD(vOff, GPS_TAG_NAMES); continue; }
+                const name = tagNames[tag];
+                if (!name) continue;
+                try { result[name] = getVal(tag, type, count, vOff, base + eBase + 8); } catch {}
+            }
+            return result;
+        }
+
+        try {
+            const ifd0 = r32(4);
+            return readIFD(ifd0, TAG_NAMES);
+        } catch { return null; }
+    }
+
+    function dmsToDD(dms, ref) {
+        if (!dms) return null;
+        const parts = String(dms).split(',').map(s => parseFloat(s.trim()));
+        if (parts.length < 3 || isNaN(parts[0])) return null;
+        let deg = parts[0] + parts[1] / 60 + parts[2] / 3600;
+        if (ref === 'S' || ref === 'W') deg = -deg;
+        return deg;
+    }
+
+    const ORIENT_LABELS = ['','正常','水平反転','180°回転','垂直反転','右上','右下','左下','左上'];
+    const METERING_LABELS = {0:'不明',1:'平均',2:'中央重点平均',3:'スポット',4:'マルチスポット',5:'パターン',6:'部分'};
+    const EXPOSURE_LABELS = {0:'自動',1:'マニュアル',2:'自動ブラケット'};
+    const WB_LABELS = {0:'自動',1:'マニュアル'};
+    const SCENE_LABELS = {0:'標準',1:'風景',2:'ポートレート',3:'夜景'};
+    const FLASH_LABELS = {0:'発光なし',1:'発光',5:'ストロボなし発光',7:'ストロボあり発光',9:'強制発光',0xD:'強制発光・ストロボなし',0xF:'強制発光・ストロボあり',0x10:'発光禁止',0x18:'自動・発光なし',0x19:'自動・発光',0x1D:'自動・発光・ストロボなし',0x1F:'自動・発光・ストロボあり',0x20:'フラッシュなし',0x41:'赤目軽減',0x45:'赤目軽減・ストロボなし',0x47:'赤目軽減・ストロボあり',0x49:'強制発光・赤目軽減',0x4D:'強制発光・赤目軽減',0x4F:'強制発光・赤目軽減',0x59:'自動・赤目軽減',0x5D:'自動・赤目軽減',0x5F:'自動・赤目軽減'};
+
+    function formatValue(key, val) {
+        if (key === '方向') return `${ORIENT_LABELS[val] || val} (${val})`;
+        if (key === '測光モード') return `${METERING_LABELS[val] || val}`;
+        if (key === '露出モード') return `${EXPOSURE_LABELS[val] || val}`;
+        if (key === 'ホワイトバランス') return `${WB_LABELS[val] || val}`;
+        if (key === 'シーンタイプ') return `${SCENE_LABELS[val] || val}`;
+        if (key === 'フラッシュ') return `${FLASH_LABELS[val] || '不明'} (0x${(+val).toString(16)})`;
+        if (key === '色空間') return val === 1 ? 'sRGB' : val === 0xFFFF ? 'Uncalibrated' : val;
+        if (key === '露出プログラム') { const m = {0:'不明',1:'マニュアル',2:'プログラム',3:'絞り優先',4:'シャッター優先',5:'創作',6:'動体優先',7:'ポートレート',8:'風景'}; return m[val] || val; }
+        if (key === 'F値') return `f/${parseFloat(val).toFixed(1)}`;
+        if (key === '焦点距離(mm)' || key === '35mm換算焦点距離(mm)') return `${parseFloat(val).toFixed(1)} mm`;
+        if (key === '露出時間(s)') {
+            const v = parseFloat(val);
+            return v < 1 ? `1/${Math.round(1/v)}秒` : `${v}秒`;
+        }
+        if (key === '高度(m)') return `${parseFloat(val).toFixed(1)} m`;
+        return val;
+    }
+
+    function renderResult(exif, imgUrl, fileName, fileSize) {
+        const area = document.getElementById('resultArea');
+        area.innerHTML = '';
+
+        const prev = document.createElement('div');
+        prev.className = 'preview-area';
+        const img = document.createElement('img');
+        img.src = imgUrl; img.className = 'preview-img'; img.alt = 'プレビュー';
+        prev.appendChild(img);
+        const fi = document.createElement('div');
+        fi.innerHTML = `<h3 style="margin:0 0 8px">ファイル情報</h3>
+            <table class="exif-table">
+                <tr><th>ファイル名</th><td>${fileName}</td></tr>
+                <tr><th>ファイルサイズ</th><td>${(fileSize/1024).toFixed(1)} KB</td></tr>
+            </table>`;
+        prev.appendChild(fi);
+        area.appendChild(prev);
+
+        if (!exif) {
+            area.innerHTML += '<div class="no-exif">⚠️ EXIFデータが見つかりませんでした。<br>デジカメやスマートフォンで撮影したJPEGをお試しください。</div>';
+            return;
+        }
+
+        const gps = exif.__gps; delete exif.__gps;
+
+        const sects = [
+            ['📸 カメラ情報', ['カメラメーカー','カメラモデル','ソフトウェア','作成者','画像の説明']],
+            ['📅 日時情報', ['撮影日時','デジタル化日時','日時']],
+            ['⚙️ 撮影設定', ['露出時間(s)','F値','ISO感度','焦点距離(mm)','35mm換算焦点距離(mm)','フラッシュ','測光モード','露出モード','露出プログラム','露出補正(EV)','ホワイトバランス','光源','被写体距離(m)']],
+            ['🖼️ 画像情報', ['画像幅(px)','画像高さ(px)','色空間','X解像度','Y解像度','解像度単位','方向','コントラスト','彩度','シャープネス','シーンタイプ','センサー種類','デジタルズーム']],
+        ];
+
+        for (const [title, keys] of sects) {
+            const entries = keys.filter(k => exif[k] !== undefined && String(exif[k]).trim() !== '');
+            if (!entries.length) continue;
+            const d = document.createElement('div');
+            d.innerHTML = `<div class="section-title">${title}</div>
+                <table class="exif-table">${entries.map(k =>
+                    `<tr><th>${k}</th><td>${formatValue(k, exif[k])}</td></tr>`).join('')}
+                </table>`;
+            area.appendChild(d);
+        }
+
+        if (gps && Object.keys(gps).length > 0) {
+            const lat = dmsToDD(gps['緯度(DMS)'], gps['緯度基準(N/S)']);
+            const lon = dmsToDD(gps['経度(DMS)'], gps['経度基準(E/W)']);
+            let html = `<div class="section-title">📍 GPS情報</div><table class="exif-table">`;
+            for (const [k,v] of Object.entries(gps)) html += `<tr><th>${k}</th><td>${formatValue(k,v)}</td></tr>`;
+            if (lat !== null && lon !== null) {
+                html += `<tr><th>地図で確認</th><td>
+                    <a class="gps-link" href="https://www.google.com/maps?q=${lat.toFixed(6)},${lon.toFixed(6)}" target="_blank" rel="noopener">
+                    📍 ${lat.toFixed(6)}, ${lon.toFixed(6)} — Googleマップで開く</a></td></tr>`;
+            }
+            html += '</table>';
+            const d = document.createElement('div'); d.innerHTML = html;
+            area.appendChild(d);
+        }
+
+        const shownKeys = sects.flatMap(([,k]) => k);
+        const others = Object.entries(exif).filter(([k]) => !shownKeys.includes(k) && !k.startsWith('__'));
+        if (others.length) {
+            const d = document.createElement('div');
+            d.innerHTML = `<div class="section-title">📋 その他のEXIFデータ</div>
+                <table class="exif-table">${others.map(([k,v]) =>
+                    `<tr><th>${k}</th><td>${formatValue(k,v)}</td></tr>`).join('')}</table>`;
+            area.appendChild(d);
+        }
+
+        showToast('EXIFデータを読み込みました');
+    }
+    </script>
+</body>
+</html>

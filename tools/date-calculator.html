@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日付計算 - ToolBox</title>
+    <meta name="description" content="2つの日付の差分、日付に対する加算・減算、曜日の調べなど、日付に関する計算ができます。">
+    <meta name="keywords" content="日付計算,日数計算,曜日,カレンダー,計算機">
+    <meta property="og:title" content="日付計算 - ToolBox">
+    <meta property="og:description" content="日付の差分、加算・減算、曜日を簡単に計算します。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/date-calculator.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/date-calculator.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .mode-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .mode-tab {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 150px;
+        }
+        .mode-tab.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+        .mode-tab:hover {
+            border-color: #3b82f6;
+        }
+        .mode-content {
+            display: none;
+        }
+        .mode-content.active {
+            display: block;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        input[type="date"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        input[type="date"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .quick-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .quick-btn {
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .quick-btn:hover {
+            background: #e5e7eb;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .btn-calculate {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .btn-calculate:hover {
+            background: #2563eb;
+        }
+        .btn-clear {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-clear:hover {
+            background: #d1d5db;
+        }
+        .result-box {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+        .result-box.show {
+            display: block;
+        }
+        .result-main {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .result-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1f2937;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .info-box {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .info-value {
+            font-weight: 700;
+            color: #1f2937;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: right;
+        }
+        .ad-banner {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1>日付計算</h1>
+        <p style="color: #6b7280; margin-bottom: 2rem;">日付に関する様々な計算ができます。</p>
+
+        <div class="ad-banner">広告スペース</div>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode(0)">日付の差</button>
+            <button class="mode-tab" onclick="switchMode(1)">加算・減算</button>
+            <button class="mode-tab" onclick="switchMode(2)">曜日</button>
+        </div>
+
+        <!-- Mode 1: 2つの日付の差 -->
+        <div class="mode-content active">
+            <div class="input-group">
+                <label class="input-label">開始日</label>
+                <input type="date" id="mode1-date1">
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setMode1Date1Today()">今日</button>
+                    <button class="quick-btn" onclick="setMode1Date1Tomorrow()">明日</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">終了日</label>
+                <input type="date" id="mode1-date2">
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setMode1Date2Today()">今日</button>
+                    <button class="quick-btn" onclick="setMode1Date2Tomorrow()">明日</button>
+                    <button class="quick-btn" onclick="setMode1Date2NextWeek()">来週</button>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateMode1()">計算する</button>
+                <button class="btn-clear" onclick="clearMode1()">クリア</button>
+            </div>
+            <div class="result-box" id="mode1-result">
+                <div class="result-main">
+                    <div class="result-label">日数差</div>
+                    <div class="result-value" id="mode1-value">0</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-item">
+                        <span class="info-label">年月日</span>
+                        <span class="info-value" id="mode1-ymd">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">今年の経過日数</span>
+                        <span class="info-value" id="mode1-dayofyear">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">年末まで</span>
+                        <span class="info-value" id="mode1-daystoend">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 2: 日付に加算・減算 -->
+        <div class="mode-content">
+            <div class="input-group">
+                <label class="input-label">基準日</label>
+                <input type="date" id="mode2-date">
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setMode2DateToday()">今日</button>
+                    <button class="quick-btn" onclick="setMode2DateTomorrow()">明日</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">日数（+は未来、-は過去）</label>
+                <input type="number" id="mode2-days" placeholder="例: 30" step="1">
+            </div>
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateMode2()">計算する</button>
+                <button class="btn-clear" onclick="clearMode2()">クリア</button>
+            </div>
+            <div class="result-box" id="mode2-result">
+                <div class="result-main">
+                    <div class="result-label">計算結果</div>
+                    <div class="result-value" id="mode2-value">-</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-item">
+                        <span class="info-label">曜日</span>
+                        <span class="info-value" id="mode2-day">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">うるう年</span>
+                        <span class="info-value" id="mode2-leapyear">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 3: 曜日を調べる -->
+        <div class="mode-content">
+            <div class="input-group">
+                <label class="input-label">日付</label>
+                <input type="date" id="mode3-date">
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setMode3DateToday()">今日</button>
+                    <button class="quick-btn" onclick="setMode3DateTomorrow()">明日</button>
+                    <button class="quick-btn" onclick="setMode3DateNextMonth()">来月</button>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateMode3()">調べる</button>
+                <button class="btn-clear" onclick="clearMode3()">クリア</button>
+            </div>
+            <div class="result-box" id="mode3-result">
+                <div class="result-main">
+                    <div class="result-label">曜日</div>
+                    <div class="result-value" id="mode3-value" style="font-size: 2rem;">-</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-item">
+                        <span class="info-label">今年の何日目</span>
+                        <span class="info-value" id="mode3-dayofyear">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">年末まで</span>
+                        <span class="info-value" id="mode3-daystoend">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">うるう年</span>
+                        <span class="info-value" id="mode3-leapyear">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">広告スペース</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <div id="toast"></div>
+
+    <script>
+        function switchMode(mode) {
+            const contents = document.querySelectorAll('.mode-content');
+            const tabs = document.querySelectorAll('.mode-tab');
+            contents.forEach(c => c.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active'));
+            contents[mode].classList.add('active');
+            tabs[mode].classList.add('active');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: #fff; padding: 1rem 1.5rem; border-radius: 6px; z-index: 1000; display: block;';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getDayOfWeek(date) {
+            const days = ['日', '月', '火', '水', '木', '金', '土'];
+            return days[date.getDay()];
+        }
+
+        function getDayOfYear(date) {
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start;
+            return Math.floor(diff / (1000 * 60 * 60 * 24));
+        }
+
+        function getDaysToEndOfYear(date) {
+            const endOfYear = new Date(date.getFullYear(), 11, 31);
+            const diff = endOfYear - date;
+            return Math.floor(diff / (1000 * 60 * 60 * 24));
+        }
+
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        }
+
+        // Mode 1 functions
+        function setMode1Date1Today() {
+            document.getElementById('mode1-date1').value = formatDate(new Date());
+        }
+        function setMode1Date1Tomorrow() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('mode1-date1').value = formatDate(tomorrow);
+        }
+        function setMode1Date2Today() {
+            document.getElementById('mode1-date2').value = formatDate(new Date());
+        }
+        function setMode1Date2Tomorrow() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('mode1-date2').value = formatDate(tomorrow);
+        }
+        function setMode1Date2NextWeek() {
+            const nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            document.getElementById('mode1-date2').value = formatDate(nextWeek);
+        }
+
+        function calculateMode1() {
+            const date1 = document.getElementById('mode1-date1').value;
+            const date2 = document.getElementById('mode1-date2').value;
+            if (!date1 || !date2) {
+                showToast('日付を選択してください');
+                return;
+            }
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+            const diff = Math.abs(d2 - d1);
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            const laterDate = d2 > d1 ? d2 : d1;
+            const dayOfYear = getDayOfYear(laterDate);
+            const daysToEnd = getDaysToEndOfYear(laterDate);
+
+            document.getElementById('mode1-value').textContent = days;
+            document.getElementById('mode1-ymd').textContent = Math.floor(days / 365) + '年 ' + Math.floor((days % 365) / 30) + '月 ' + (days % 30) + '日';
+            document.getElementById('mode1-dayofyear').textContent = dayOfYear + '日目';
+            document.getElementById('mode1-daystoend').textContent = daysToEnd + '日';
+            document.getElementById('mode1-result').classList.add('show');
+        }
+
+        function clearMode1() {
+            document.getElementById('mode1-date1').value = '';
+            document.getElementById('mode1-date2').value = '';
+            document.getElementById('mode1-result').classList.remove('show');
+        }
+
+        // Mode 2 functions
+        function setMode2DateToday() {
+            document.getElementById('mode2-date').value = formatDate(new Date());
+        }
+        function setMode2DateTomorrow() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('mode2-date').value = formatDate(tomorrow);
+        }
+
+        function calculateMode2() {
+            const dateStr = document.getElementById('mode2-date').value;
+            const days = parseInt(document.getElementById('mode2-days').value);
+            if (!dateStr || isNaN(days)) {
+                showToast('日付と日数を入力してください');
+                return;
+            }
+            const date = new Date(dateStr);
+            const resultDate = new Date(date);
+            resultDate.setDate(resultDate.getDate() + days);
+
+            document.getElementById('mode2-value').textContent = formatDate(resultDate);
+            document.getElementById('mode2-day').textContent = getDayOfWeek(resultDate);
+            document.getElementById('mode2-leapyear').textContent = isLeapYear(resultDate.getFullYear()) ? 'はい' : 'いいえ';
+            document.getElementById('mode2-result').classList.add('show');
+        }
+
+        function clearMode2() {
+            document.getElementById('mode2-date').value = '';
+            document.getElementById('mode2-days').value = '';
+            document.getElementById('mode2-result').classList.remove('show');
+        }
+
+        // Mode 3 functions
+        function setMode3DateToday() {
+            document.getElementById('mode3-date').value = formatDate(new Date());
+        }
+        function setMode3DateTomorrow() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('mode3-date').value = formatDate(tomorrow);
+        }
+        function setMode3DateNextMonth() {
+            const nextMonth = new Date();
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            document.getElementById('mode3-date').value = formatDate(nextMonth);
+        }
+
+        function calculateMode3() {
+            const dateStr = document.getElementById('mode3-date').value;
+            if (!dateStr) {
+                showToast('日付を選択してください');
+                return;
+            }
+            const date = new Date(dateStr);
+            document.getElementById('mode3-value').textContent = getDayOfWeek(date) + '曜日';
+            document.getElementById('mode3-dayofyear').textContent = getDayOfYear(date) + '日目';
+            document.getElementById('mode3-daystoend').textContent = getDaysToEndOfYear(date) + '日';
+            document.getElementById('mode3-leapyear').textContent = isLeapYear(date.getFullYear()) ? 'はい' : 'いいえ';
+            document.getElementById('mode3-result').classList.add('show');
+        }
+
+        function clearMode3() {
+            document.getElementById('mode3-date').value = '';
+            document.getElementById('mode3-result').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

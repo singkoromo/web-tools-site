@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単語頻度カウンター - ToolBox</title>
+    <meta name="description" content="テキスト内の単語の出現頻度を分析し、統計情報とグラフで可視化できるツールです。日本語と英語に対応しています。">
+    <meta property="og:title" content="単語頻度カウンター - ToolBox">
+    <meta property="og:description" content="テキスト内の単語の出現頻度を分析できるツールです。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/word-frequency.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/word-frequency.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-section {
+            margin: 20px 0;
+        }
+        .textarea-group {
+            margin-bottom: 20px;
+        }
+        .textarea-wrapper label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+        }
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+            min-height: 200px;
+            box-sizing: border-box;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .option-group label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+        }
+        .option-group input,
+        .option-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            margin: 0;
+            font-size: 14px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-copy {
+            background: #28a745;
+        }
+        .btn-copy:hover {
+            background: #1e7e34;
+        }
+        .results {
+            display: none;
+        }
+        .results.active {
+            display: block;
+        }
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+        .results-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        .sort-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .sort-btn {
+            padding: 8px 12px;
+            background: #e9ecef;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .sort-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .sort-btn:hover {
+            background: #f0f0f0;
+        }
+        .sort-btn.active:hover {
+            background: #0056b3;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        th {
+            background: #f5f5f5;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e5e5;
+            font-size: 13px;
+        }
+        tr:hover {
+            background: #fafafa;
+        }
+        .word-cell {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+        }
+        .count-cell {
+            text-align: center;
+            font-weight: 600;
+            color: #007bff;
+        }
+        .bar-cell {
+            padding: 10px 12px;
+        }
+        .bar {
+            background: #007bff;
+            height: 20px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding-left: 5px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #007bff;
+            margin: 8px 0;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        @media (max-width: 768px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .sort-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tool-page">
+        <header class="header">
+            <div class="header-inner">
+                <a href="../index.html" class="logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                    ToolBox
+                </a>
+                <nav class="nav">
+                    <a href="../index.html">ホーム</a>
+                    <a href="../index.html#tools">ツール一覧</a>
+                </nav>
+            </div>
+        </header>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-container">
+            <h1>単語頻度カウンター</h1>
+            <p>テキスト内の単語の出現頻度を分析し、統計情報とグラフで可視化します。</p>
+
+            <div class="tool-section">
+                <div class="textarea-group">
+                    <label>入力テキスト</label>
+                    <textarea id="input" placeholder="分析するテキストを入力してください..."></textarea>
+                </div>
+
+                <div class="options">
+                    <div class="option-group">
+                        <label><input type="checkbox" id="ignoreCase"> 大文字小文字を区別しない</label>
+                        <label><input type="checkbox" id="ignoreCommon"> 一般的な単語を除外</label>
+                    </div>
+                    <div class="option-group">
+                        <label>最小頻度フィルタ</label>
+                        <input type="number" id="minFrequency" min="1" value="1">
+                    </div>
+                    <div class="option-group">
+                        <label>表示件数</label>
+                        <select id="topN">
+                            <option value="10">TOP 10</option>
+                            <option value="20">TOP 20</option>
+                            <option value="50">TOP 50</option>
+                            <option value="100">TOP 100</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn" onclick="analyze()">分析</button>
+                </div>
+
+                <div class="results" id="results">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-label">総単語数</div>
+                            <div class="stat-value" id="totalWords">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">ユニーク単語</div>
+                            <div class="stat-value" id="uniqueWords">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">最頻出単語</div>
+                            <div class="stat-value" id="topWord">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">最高頻度</div>
+                            <div class="stat-value" id="topCount">0</div>
+                        </div>
+                    </div>
+
+                    <div class="results-header">
+                        <div class="results-title">単語一覧</div>
+                        <div class="sort-buttons">
+                            <button class="sort-btn active" onclick="sortBy('frequency')">頻度順</button>
+                            <button class="sort-btn" onclick="sortBy('alpha')">アルファベット順</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%">単語</th>
+                                    <th style="width: 15%; text-align: center;">出現数</th>
+                                    <th style="width: 15%; text-align: center;">割合</th>
+                                    <th style="width: 40%;">グラフ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <button class="btn btn-copy" onclick="copyResults()">結果をコピー</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let analysisData = [];
+        let sortMode = 'frequency';
+
+        const commonWords = new Set([
+            'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+            'from', 'as', 'is', 'was', 'are', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did',
+            'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must', 'shall',
+            'その', 'これ', 'あれ', 'この', 'その', 'あの', 'ここ', 'そこ', 'あそこ', 'こう', 'そう', 'ああ',
+            'です', 'ます', 'である', 'ある', 'いる', 'する', 'した', 'される', 'なる', 'なった',
+            'は', 'を', 'に', 'へ', 'から', 'まで', 'より', 'で', 'も', 'や', 'など', 'とか'
+        ]);
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        function isJapanese(text) {
+            return /[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF]/.test(text);
+        }
+
+        function tokenize(text) {
+            const ignoreCase = document.getElementById('ignoreCase').checked;
+            const ignoreCommon = document.getElementById('ignoreCommon').checked;
+
+            if (ignoreCase) {
+                text = text.toLowerCase();
+            }
+
+            let words = [];
+            const tokens = text.match(/[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF]+|[a-zA-Z]+/g) || [];
+
+            for (let token of tokens) {
+                if (ignoreCommon && commonWords.has(token.toLowerCase())) {
+                    continue;
+                }
+                if (token.length > 0) {
+                    words.push(token);
+                }
+            }
+
+            return words;
+        }
+
+        function analyze() {
+            const input = document.getElementById('input').value;
+            if (!input.trim()) {
+                showToast('テキストを入力してください');
+                return;
+            }
+
+            const words = tokenize(input);
+            const minFrequency = Math.max(1, parseInt(document.getElementById('minFrequency').value) || 1);
+
+            const frequency = {};
+            for (let word of words) {
+                frequency[word] = (frequency[word] || 0) + 1;
+            }
+
+            analysisData = Object.entries(frequency)
+                .filter(([word, count]) => count >= minFrequency)
+                .map(([word, count]) => ({
+                    word,
+                    count,
+                    percentage: ((count / words.length) * 100).toFixed(2)
+                }));
+
+            const stats = {
+                totalWords: words.length,
+                uniqueWords: Object.keys(frequency).length,
+                topWord: analysisData.length > 0 ? analysisData[0].word : '-',
+                topCount: analysisData.length > 0 ? analysisData[0].count : 0
+            };
+
+            document.getElementById('totalWords').textContent = stats.totalWords;
+            document.getElementById('uniqueWords').textContent = stats.uniqueWords;
+            document.getElementById('topWord').textContent = stats.topWord;
+            document.getElementById('topCount').textContent = stats.topCount;
+
+            sortMode = 'frequency';
+            updateTable();
+
+            document.getElementById('results').classList.add('active');
+            showToast('分析が完了しました');
+        }
+
+        function updateTable() {
+            const topN = parseInt(document.getElementById('topN').value);
+            const sorted = [...analysisData].sort((a, b) => {
+                if (sortMode === 'frequency') {
+                    return b.count - a.count;
+                } else {
+                    return a.word.localeCompare(b.word);
+                }
+            }).slice(0, topN);
+
+            const maxCount = analysisData.length > 0 ? analysisData[0].count : 1;
+            let html = '';
+
+            for (let item of sorted) {
+                const barWidth = (item.count / maxCount) * 100;
+                html += `<tr>
+                    <td class="word-cell">${escapeHtml(item.word)}</td>
+                    <td class="count-cell">${item.count}</td>
+                    <td style="text-align: center;">${item.percentage}%</td>
+                    <td class="bar-cell"><div class="bar" style="width: ${barWidth}%">${item.count}</div></td>
+                </tr>`;
+            }
+
+            document.getElementById('tbody').innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sortBy(mode) {
+            sortMode = mode;
+            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            updateTable();
+        }
+
+        function copyResults() {
+            const topN = parseInt(document.getElementById('topN').value);
+            const sorted = [...analysisData].sort((a, b) => b.count - a.count).slice(0, topN);
+
+            let text = '単語\t出現数\t割合\n';
+            for (let item of sorted) {
+                text += `${item.word}\t${item.count}\t${item.percentage}%\n`;
+            }
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        document.getElementById('topN').addEventListener('change', updateTable);
+    </script>
+</body>
+</html>

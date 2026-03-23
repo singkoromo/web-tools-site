@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画回転・反転 - ToolBox</title>
+    <meta name="description" content="動画を回転または反転させて保存します。横向き・縦向き動画の変換に対応。">
+    <meta name="keywords" content="動画、回転、反転、編集、ツール、無料">
+    <meta property="og:title" content="動画回転・反転 - ToolBox">
+    <meta property="og:description" content="動画を回転・反転するオンラインツール">
+    <meta property="og:url" content="https://web-tool-site.com/tools/video-rotate.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/video-rotate.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .transform-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0; }
+        .control-group { display: flex; flex-direction: column; gap: 1rem; }
+        .control-group h4 { margin: 0 0 1rem 0; color: #333; }
+        .button-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .rotate-btn { padding: 0.75rem 1rem; border: 2px solid #ddd; border-radius: 0.375rem; background: white; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .rotate-btn:hover { border-color: #3b82f6; background: #f0f9ff; }
+        .rotate-btn.active { border-color: #3b82f6; background: #3b82f6; color: white; }
+        .flip-btn { padding: 0.75rem 1rem; border: 2px solid #ddd; border-radius: 0.375rem; background: white; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .flip-btn:hover { border-color: #3b82f6; background: #f0f9ff; }
+        .flip-btn.active { border-color: #3b82f6; background: #3b82f6; color: white; }
+        .preview-container { margin: 2rem 0; text-align: center; }
+        .preview-label { font-weight: 500; color: #666; margin-bottom: 1rem; }
+        .video-preview { max-width: 100%; max-height: 500px; border-radius: 0.5rem; background: #f3f4f6; }
+        .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin: 1rem 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); width: 0%; transition: width 0.3s; }
+        .info-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; font-size: 0.9rem; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <div class="ad-banner">スポンサー</div>
+
+            <h1>動画回転・反転</h1>
+            <p class="subtitle">動画を回転したり反転したりして、自由な向きに変換します。</p>
+
+            <div class="drop-zone" id="dropZone">
+                <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <p>動画ファイルをドラッグ&ドロップするか、クリックして選択</p>
+                <small>対応形式: MP4, WebM, MOV (最大 500MB)</small>
+                <input type="file" id="videoFile" accept="video/*" style="display: none;">
+            </div>
+
+            <div id="videoInfo" style="display: none;">
+                <div class="info-box">
+                    <strong>ファイル名:</strong> <span id="fileName"></span>
+                </div>
+
+                <div class="transform-controls">
+                    <div class="control-group">
+                        <h4>回転</h4>
+                        <div class="button-group">
+                            <button class="rotate-btn active" onclick="selectRotation(0)">0°</button>
+                            <button class="rotate-btn" onclick="selectRotation(90)">右 90°</button>
+                            <button class="rotate-btn" onclick="selectRotation(180)">180°</button>
+                            <button class="rotate-btn" onclick="selectRotation(270)">左 90°</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <h4>反転</h4>
+                        <div class="button-group">
+                            <button class="flip-btn" id="horizontalFlipBtn" onclick="toggleHorizontalFlip()">⟨→ 水平反転</button>
+                            <button class="flip-btn" id="verticalFlipBtn" onclick="toggleVerticalFlip()">⟨↓ 垂直反転</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-container">
+                    <div class="preview-label">プレビュー</div>
+                    <video id="videoElement" class="video-preview" controls></video>
+                </div>
+
+                <button class="btn btn-primary" onclick="applyTransform()">回転・反転して保存</button>
+
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div id="progressText" style="text-align: center; color: #666; margin: 1rem 0; display: none; font-weight: 500;"></div>
+
+                <div id="resultSection" style="display: none; margin-top: 2rem;">
+                    <h3>変換完了</h3>
+                    <video id="resultVideo" class="video-preview" controls style="margin: 1rem 0;"></video>
+                    <button class="btn btn-primary" onclick="downloadTransformedVideo()">WebMをダウンロード</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner" style="margin-top: 2rem;">スポンサー</div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let video = document.getElementById('videoElement');
+        let dropZone = document.getElementById('dropZone');
+        let currentRotation = 0;
+        let horizontalFlip = false;
+        let verticalFlip = false;
+        let transformedBlob = null;
+
+        dropZone.addEventListener('click', () => document.getElementById('videoFile').click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.background = '#f3f4f6'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.background = ''; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) loadVideo(files[0]);
+        });
+
+        document.getElementById('videoFile').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) loadVideo(e.target.files[0]);
+        });
+
+        function loadVideo(file) {
+            const url = URL.createObjectURL(file);
+            video.src = url;
+            video.onloadedmetadata = () => {
+                document.getElementById('videoInfo').style.display = 'block';
+                document.getElementById('fileName').textContent = file.name;
+                dropZone.style.display = 'none';
+                updatePreview();
+                showToast('動画が読み込まれました');
+            };
+        }
+
+        function selectRotation(degrees) {
+            currentRotation = degrees;
+            document.querySelectorAll('.rotate-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            updatePreview();
+        }
+
+        function toggleHorizontalFlip() {
+            horizontalFlip = !horizontalFlip;
+            document.getElementById('horizontalFlipBtn').classList.toggle('active');
+            updatePreview();
+        }
+
+        function toggleVerticalFlip() {
+            verticalFlip = !verticalFlip;
+            document.getElementById('verticalFlipBtn').classList.toggle('active');
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const videoElement = video;
+            let transforms = [];
+
+            if (horizontalFlip) transforms.push('scaleX(-1)');
+            if (verticalFlip) transforms.push('scaleY(-1)');
+            if (currentRotation !== 0) transforms.push(`rotate(${currentRotation}deg)`);
+
+            videoElement.style.transform = transforms.length > 0 ? transforms.join(' ') : 'none';
+        }
+
+        function applyTransform() {
+            if (currentRotation === 0 && !horizontalFlip && !verticalFlip) {
+                showToast('変更が加えられていません', 'error');
+                return;
+            }
+
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('progressText').style.display = 'block';
+
+            transformVideo();
+        }
+
+        function transformVideo() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            let width = video.videoWidth;
+            let height = video.videoHeight;
+
+            // Swap dimensions if rotating 90 or 270 degrees
+            if (currentRotation === 90 || currentRotation === 270) {
+                [width, height] = [height, width];
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const stream = canvas.captureStream(30);
+            const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            const chunks = [];
+
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+
+            mediaRecorder.onstop = () => {
+                transformedBlob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(transformedBlob);
+                document.getElementById('resultVideo').src = url;
+                document.getElementById('resultSection').style.display = 'block';
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('progressText').style.display = 'none';
+                showToast('変換完了');
+            };
+
+            mediaRecorder.start();
+
+            let currentTime = 0;
+            const frameInterval = 1000 / 30;
+            const duration = video.duration;
+
+            function drawFrame() {
+                video.currentTime = currentTime;
+                video.onseeked = () => {
+                    ctx.save();
+
+                    // Move to center
+                    ctx.translate(width / 2, height / 2);
+
+                    // Apply rotation
+                    if (currentRotation !== 0) {
+                        ctx.rotate((currentRotation * Math.PI) / 180);
+                    }
+
+                    // Apply flips
+                    if (horizontalFlip) ctx.scale(-1, 1);
+                    if (verticalFlip) ctx.scale(1, -1);
+
+                    // Draw video centered
+                    ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2);
+
+                    ctx.restore();
+
+                    const progress = (currentTime / duration) * 100;
+                    document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+                    document.getElementById('progressText').textContent = `進捗: ${Math.min(Math.floor(progress), 100)}%`;
+
+                    currentTime += frameInterval / 1000;
+                    if (currentTime < duration) {
+                        requestAnimationFrame(drawFrame);
+                    } else {
+                        mediaRecorder.stop();
+                    }
+                };
+            }
+
+            drawFrame();
+        }
+
+        function downloadTransformedVideo() {
+            if (!transformedBlob) return;
+            const url = URL.createObjectURL(transformedBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'transformed-video.webm';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('ダウンロードを開始しました');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + (type === 'error' ? 'error' : 'success');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+</body>
+</html>

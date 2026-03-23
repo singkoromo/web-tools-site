@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SRT・VTT・ASS字幕ファイルを相互変換するブラウザツール。データはサーバーに送信されません。">
+    <meta property="og:title" content="字幕フォーマット変換 - ToolBox">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/subtitle-converter.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/subtitle-converter.html">
+    <title>字幕フォーマット変換 - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .converter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 700px) { .converter-grid { grid-template-columns: 1fr; } }
+        .panel { display: flex; flex-direction: column; gap: 10px; }
+        .panel label { font-weight: 600; font-size: 14px; }
+        .panel select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 14px; }
+        textarea { width: 100%; min-height: 320px; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 13px; resize: vertical; box-sizing: border-box; }
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-primary { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-secondary { padding: 10px 20px; background: #6c757d; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; }
+        .btn-secondary:hover { background: #545b62; }
+        .info-note { background: #e7f3ff; border-left: 4px solid #007bff; padding: 12px; border-radius: 4px; font-size: 14px; color: #004085; margin-bottom: 20px; }
+        .file-drop { border: 2px dashed #007bff; border-radius: 6px; padding: 16px; text-align: center; cursor: pointer; font-size: 13px; color: #555; transition: background 0.2s; }
+        .file-drop:hover { background: #f0f4ff; }
+        .file-drop input { display: none; }
+        .stats { font-size: 13px; color: #666; padding: 4px 0; }
+        .arrow-btn { font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: none; border: none; padding: 0 8px; color: #007bff; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+        <div class="tool-container">
+            <h1>字幕フォーマット変換</h1>
+            <div class="info-note">
+                SRT / WebVTT / ASS 字幕ファイルを相互変換します。テキストを貼り付けるかファイルを読み込んでください。
+            </div>
+
+            <div class="converter-grid">
+                <div class="panel">
+                    <label>入力フォーマット</label>
+                    <select id="inputFormat">
+                        <option value="srt">SRT (.srt)</option>
+                        <option value="vtt">WebVTT (.vtt)</option>
+                        <option value="ass">ASS/SSA (.ass/.ssa)</option>
+                    </select>
+                    <div class="file-drop" id="fileDrop">
+                        📂 ファイルをドロップ or クリックして選択
+                        <input type="file" id="fileInput" accept=".srt,.vtt,.ass,.ssa">
+                    </div>
+                    <textarea id="inputText" placeholder="字幕テキストを貼り付けてください..."></textarea>
+                    <div class="stats" id="inputStats"></div>
+                </div>
+
+                <div class="panel">
+                    <label>出力フォーマット</label>
+                    <select id="outputFormat">
+                        <option value="vtt">WebVTT (.vtt)</option>
+                        <option value="srt">SRT (.srt)</option>
+                        <option value="ass">ASS (.ass)</option>
+                        <option value="txt">テキストのみ (.txt)</option>
+                    </select>
+                    <div class="btn-row" style="margin-top:2px;">
+                        <button class="btn-primary" id="convertBtn">🔄 変換</button>
+                        <button class="btn-secondary" id="copyBtn">📋 コピー</button>
+                        <button class="btn-secondary" id="downloadBtn">💾 ダウンロード</button>
+                    </div>
+                    <textarea id="outputText" readonly placeholder="変換結果がここに表示されます..."></textarea>
+                    <div class="stats" id="outputStats"></div>
+                </div>
+            </div>
+        </div>
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // File drop
+    const fileDrop = document.getElementById('fileDrop');
+    const fileInput = document.getElementById('fileInput');
+    fileDrop.addEventListener('click', () => fileInput.click());
+    fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.style.background = '#e8f0ff'; });
+    fileDrop.addEventListener('dragleave', () => fileDrop.style.background = '');
+    fileDrop.addEventListener('drop', e => {
+        e.preventDefault(); fileDrop.style.background = '';
+        const file = e.dataTransfer.files[0]; if (file) loadFile(file);
+    });
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
+
+    function loadFile(file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const fmtMap = { srt: 'srt', vtt: 'vtt', ass: 'ass', ssa: 'ass' };
+        if (fmtMap[ext]) document.getElementById('inputFormat').value = fmtMap[ext];
+        const reader = new FileReader();
+        reader.onload = e => { document.getElementById('inputText').value = e.target.result; updateInputStats(); };
+        reader.readAsText(file, 'UTF-8');
+    }
+
+    document.getElementById('inputText').addEventListener('input', updateInputStats);
+
+    function updateInputStats() {
+        const text = document.getElementById('inputText').value;
+        const fmt = document.getElementById('inputFormat').value;
+        let count = 0;
+        if (fmt === 'srt') count = (text.match(/^\d+\s*$/gm) || []).length;
+        else if (fmt === 'vtt') count = (text.match(/-->/g) || []).length;
+        else if (fmt === 'ass') count = (text.match(/^Dialogue:/gm) || []).length;
+        document.getElementById('inputStats').textContent = count > 0 ? `${count} 件の字幕` : '';
+    }
+
+    // === Parsers ===
+    function parseSRT(text) {
+        const blocks = text.trim().split(/\n\s*\n/);
+        return blocks.map(block => {
+            const lines = block.trim().split('\n');
+            if (lines.length < 2) return null;
+            let i = 0;
+            if (/^\d+$/.test(lines[0].trim())) i = 1;
+            const timeLine = lines[i];
+            const match = timeLine.match(/(\d{2}:\d{2}:\d{2}[,\.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,\.]\d{3})/);
+            if (!match) return null;
+            const text = lines.slice(i + 1).join('\n').replace(/<[^>]+>/g, '').trim();
+            return { start: match[1].replace(',', '.'), end: match[2].replace(',', '.'), text };
+        }).filter(Boolean);
+    }
+
+    function parseVTT(text) {
+        const lines = text.split('\n');
+        const cues = [];
+        let i = 0;
+        if (lines[0].startsWith('WEBVTT')) i = 1;
+        while (i < lines.length) {
+            const line = lines[i].trim();
+            const match = line.match(/(\d{2}:\d{2}:\d{2}\.\d{3}|\d{2}:\d{2}\.\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}\.\d{3}|\d{2}:\d{2}\.\d{3})/);
+            if (match) {
+                const textLines = [];
+                i++;
+                while (i < lines.length && lines[i].trim() !== '') {
+                    textLines.push(lines[i].replace(/<[^>]+>/g, ''));
+                    i++;
+                }
+                let start = match[1], end = match[2];
+                // Normalize to HH:MM:SS.mmm
+                if (start.split(':').length === 2) start = '00:' + start;
+                if (end.split(':').length === 2) end = '00:' + end;
+                cues.push({ start, end, text: textLines.join('\n').trim() });
+            } else { i++; }
+        }
+        return cues;
+    }
+
+    function parseASS(text) {
+        const cues = [];
+        const lines = text.split('\n');
+        let formatLine = null;
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('Format:') && trimmed.includes('Start')) {
+                formatLine = trimmed.replace('Format:', '').split(',').map(s => s.trim());
+            }
+            if (trimmed.startsWith('Dialogue:')) {
+                const parts = trimmed.replace('Dialogue:', '').split(',');
+                const startIdx = formatLine ? formatLine.indexOf('Start') : 1;
+                const endIdx = formatLine ? formatLine.indexOf('End') : 2;
+                const textIdx = formatLine ? formatLine.indexOf('Text') : 9;
+                if (parts.length > Math.max(startIdx, endIdx, textIdx)) {
+                    const start = assTimeToSec(parts[startIdx].trim());
+                    const end = assTimeToSec(parts[endIdx].trim());
+                    const rawText = parts.slice(textIdx).join(',').trim().replace(/\{[^}]+\}/g, '').replace(/\\[nN]/g, '\n');
+                    cues.push({ start: secToVTT(start), end: secToVTT(end), text: rawText });
+                }
+            }
+        }
+        return cues;
+    }
+
+    function assTimeToSec(t) {
+        const m = t.match(/(\d+):(\d{2}):(\d{2})\.(\d{2})/);
+        if (!m) return 0;
+        return +m[1]*3600 + +m[2]*60 + +m[3] + +m[4]/100;
+    }
+    function secToVTT(s) {
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
+        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${sec.toFixed(3).padStart(6,'0')}`;
+    }
+    function vttTimeToSec(t) {
+        const parts = t.split(':');
+        if (parts.length === 2) parts.unshift('0');
+        return +parts[0]*3600 + +parts[1]*60 + parseFloat(parts[2]);
+    }
+    function secToASS(s) {
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
+        return `${h}:${String(m).padStart(2,'0')}:${sec.toFixed(2).padStart(5,'0')}`;
+    }
+
+    // === Serializers ===
+    function toSRT(cues) {
+        return cues.map((c, i) =>
+            `${i+1}\n${c.start.replace('.', ',')} --> ${c.end.replace('.', ',')}\n${c.text}\n`
+        ).join('\n');
+    }
+    function toVTT(cues) {
+        return 'WEBVTT\n\n' + cues.map((c, i) =>
+            `${i+1}\n${c.start} --> ${c.end}\n${c.text}\n`
+        ).join('\n');
+    }
+    function toASS(cues) {
+        const header = `[Script Info]
+ScriptType: v4.00+
+Collisions: Normal
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,2,0,2,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;
+        const events = cues.map(c => {
+            const start = secToASS(vttTimeToSec(c.start));
+            const end = secToASS(vttTimeToSec(c.end));
+            return `Dialogue: 0,${start},${end},Default,,0,0,0,,${c.text.replace(/\n/g, '\\N')}`;
+        });
+        return header + '\n' + events.join('\n');
+    }
+    function toTXT(cues) {
+        return cues.map(c => c.text).join('\n\n');
+    }
+
+    document.getElementById('convertBtn').addEventListener('click', () => {
+        const input = document.getElementById('inputText').value.trim();
+        if (!input) { showToast('テキストを入力してください'); return; }
+        const inFmt = document.getElementById('inputFormat').value;
+        const outFmt = document.getElementById('outputFormat').value;
+
+        let cues;
+        try {
+            if (inFmt === 'srt') cues = parseSRT(input);
+            else if (inFmt === 'vtt') cues = parseVTT(input);
+            else cues = parseASS(input);
+        } catch(e) { showToast('解析エラー: ' + e.message); return; }
+
+        if (!cues.length) { showToast('字幕が見つかりませんでした'); return; }
+
+        let output;
+        if (outFmt === 'srt') output = toSRT(cues);
+        else if (outFmt === 'vtt') output = toVTT(cues);
+        else if (outFmt === 'ass') output = toASS(cues);
+        else output = toTXT(cues);
+
+        document.getElementById('outputText').value = output;
+        document.getElementById('outputStats').textContent = `${cues.length} 件の字幕を変換`;
+        showToast(`${cues.length} 件変換完了`);
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+        const text = document.getElementById('outputText').value;
+        if (!text) { showToast('変換結果がありません'); return; }
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        const text = document.getElementById('outputText').value;
+        if (!text) { showToast('変換結果がありません'); return; }
+        const fmt = document.getElementById('outputFormat').value;
+        const ext = fmt === 'txt' ? 'txt' : fmt;
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `subtitle.${ext}`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    });
+    </script>
+</body>
+</html>

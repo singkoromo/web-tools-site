@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="cURLコマンドをGUIで構築・解析するブラウザツール。ヘッダー、認証、ボディ設定に対応。">
+    <meta property="og:title" content="cURLコマンドビルダー - ToolBox">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/curl-builder.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/curl-builder.html">
+    <title>cURLコマンドビルダー - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .form-section { margin-bottom: 20px; }
+        .form-section h3 { font-size: 14px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
+        .form-row label { font-size: 13px; font-weight: 600; min-width: 80px; }
+        .form-row input[type=text], .form-row select, .form-row textarea { padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 13px; }
+        .form-row input[type=text] { flex: 1; }
+        .url-row { display: flex; gap: 8px; align-items: center; }
+        .url-row select { padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; font-size: 14px; font-weight: 700; background: #f8f9fa; min-width: 100px; }
+        .url-row input { flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        .kv-table { width: 100%; }
+        .kv-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .kv-row input { flex: 1; padding: 7px 10px; border: 1px solid #ddd; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        .kv-row .del-btn { padding: 6px 10px; background: #dc3545; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .kv-row .del-btn:hover { background: #c82333; }
+        .add-row-btn { padding: 6px 14px; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; font-family: inherit; margin-top: 4px; }
+        .add-row-btn:hover { background: #e9ecef; }
+        .curl-output {
+            background: #1e1e2e; color: #cba6f7;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            padding: 16px; border-radius: 8px; white-space: pre-wrap;
+            word-break: break-all; min-height: 80px; line-height: 1.6;
+            cursor: pointer; user-select: all;
+        }
+        .curl-output .flag { color: #89b4fa; }
+        .curl-output .url { color: #a6e3a1; }
+        .curl-output .string { color: #f9e2af; }
+        .btn-primary { padding: 10px 18px; background: #007bff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; }
+        .btn-primary:hover { background: #0056b3; }
+        .btn-secondary { padding: 10px 14px; background: #6c757d; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 13px; }
+        .btn-secondary:hover { background: #545b62; }
+        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .info-note { background: #e7f3ff; border-left: 4px solid #007bff; padding: 10px 14px; border-radius: 4px; font-size: 14px; color: #004085; margin-bottom: 16px; }
+        .parse-area textarea { width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; resize: vertical; box-sizing: border-box; }
+        .tabs { display: flex; gap: 2px; margin-bottom: 16px; border-bottom: 2px solid #ddd; }
+        .tab-btn { padding: 10px 18px; background: none; border: none; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+        .tab-btn.active { color: #007bff; border-bottom-color: #007bff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        textarea.body-ta { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; resize: vertical; box-sizing: border-box; }
+        .copy-hint { font-size: 12px; color: #888; margin-top: 6px; }
+        .option-check { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; margin-right: 14px; }
+        .options-inline { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 8px 0; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+        <div class="tool-container">
+            <h1>cURLコマンドビルダー</h1>
+            <div class="info-note">GUIでcURLコマンドを作成するか、既存のcURL文字列をインポートして編集できます。</div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="build">ビルダー</button>
+                <button class="tab-btn" data-tab="import">cURLからインポート</button>
+            </div>
+
+            <!-- Builder Tab -->
+            <div class="tab-content active" id="tab-build">
+                <div class="form-section">
+                    <h3>URL・メソッド</h3>
+                    <div class="url-row">
+                        <select id="method">
+                            <option>GET</option><option>POST</option><option>PUT</option>
+                            <option>PATCH</option><option>DELETE</option><option>HEAD</option>
+                            <option>OPTIONS</option>
+                        </select>
+                        <input type="text" id="url" placeholder="https://api.example.com/endpoint" value="https://api.example.com/users">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>ヘッダー</h3>
+                    <div class="kv-table" id="headersTable"></div>
+                    <button class="add-row-btn" id="addHeaderBtn">+ ヘッダーを追加</button>
+                </div>
+
+                <div class="form-section">
+                    <h3>認証</h3>
+                    <div class="form-row">
+                        <label>方式：</label>
+                        <select id="authType" onchange="updateAuth()">
+                            <option value="none">なし</option>
+                            <option value="bearer">Bearer Token</option>
+                            <option value="basic">Basic 認証</option>
+                            <option value="apikey">API Key (Header)</option>
+                        </select>
+                    </div>
+                    <div id="authFields"></div>
+                </div>
+
+                <div class="form-section">
+                    <h3>リクエストボディ</h3>
+                    <div class="form-row">
+                        <label>タイプ：</label>
+                        <select id="bodyType" onchange="updateBodyType()">
+                            <option value="none">なし</option>
+                            <option value="json">JSON</option>
+                            <option value="form">フォームデータ</option>
+                            <option value="raw">raw テキスト</option>
+                        </select>
+                    </div>
+                    <div id="bodyArea"></div>
+                </div>
+
+                <div class="form-section">
+                    <h3>オプション</h3>
+                    <div class="options-inline">
+                        <label class="option-check"><input type="checkbox" id="optVerbose"> -v (verbose)</label>
+                        <label class="option-check"><input type="checkbox" id="optInsecure"> -k (SSL無視)</label>
+                        <label class="option-check"><input type="checkbox" id="optFollowRedirects" checked> -L (リダイレクト追従)</label>
+                        <label class="option-check"><input type="checkbox" id="optSilent"> -s (silent)</label>
+                        <label class="option-check"><input type="checkbox" id="optCompressed"> --compressed</label>
+                        <label class="option-check"><input type="checkbox" id="optInclude"> -i (レスポンスヘッダー表示)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Tab -->
+            <div class="tab-content" id="tab-import">
+                <div class="parse-area">
+                    <label style="font-weight:600;font-size:14px;display:block;margin-bottom:8px;">cURL文字列を貼り付け：</label>
+                    <textarea id="importInput" placeholder="curl -X POST https://api.example.com/users \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer mytoken' \
+  -d '{&quot;name&quot;:&quot;John&quot;}'"></textarea>
+                    <button class="btn-primary" id="importBtn" style="margin-top:8px;">⬆️ インポート</button>
+                </div>
+            </div>
+
+            <div class="btn-row" style="margin-top:20px;">
+                <button class="btn-primary" id="buildBtn">⚡ cURLを生成</button>
+                <button class="btn-secondary" id="copyBtn">📋 コピー</button>
+                <button class="btn-secondary" id="resetBtn">🗑️ リセット</button>
+            </div>
+
+            <div>
+                <label style="font-weight:600;font-size:14px;display:block;margin-bottom:6px;">生成されたcURLコマンド（クリックでコピー）</label>
+                <div class="curl-output" id="curlOutput">ビルダーで設定して「生成」をクリック</div>
+                <p class="copy-hint">クリックで全選択、コピーしてターミナルで実行できます</p>
+            </div>
+        </div>
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Headers
+    let headerRows = [];
+    function addHeaderRow(key = '', value = '') {
+        const row = { id: Date.now() + Math.random(), key, value };
+        headerRows.push(row);
+        renderHeaders();
+    }
+    function removeHeaderRow(id) {
+        headerRows = headerRows.filter(r => r.id !== id);
+        renderHeaders();
+    }
+    function renderHeaders() {
+        const container = document.getElementById('headersTable');
+        container.innerHTML = '';
+        headerRows.forEach(row => {
+            const div = document.createElement('div');
+            div.className = 'kv-row';
+            const kInput = document.createElement('input');
+            kInput.type = 'text'; kInput.placeholder = 'Header名（例: Content-Type）';
+            kInput.value = row.key;
+            kInput.addEventListener('input', e => { row.key = e.target.value; });
+            const vInput = document.createElement('input');
+            vInput.type = 'text'; vInput.placeholder = '値';
+            vInput.value = row.value;
+            vInput.addEventListener('input', e => { row.value = e.target.value; });
+            const del = document.createElement('button');
+            del.className = 'del-btn'; del.textContent = '×';
+            del.addEventListener('click', () => removeHeaderRow(row.id));
+            div.append(kInput, vInput, del);
+            container.appendChild(div);
+        });
+    }
+    document.getElementById('addHeaderBtn').addEventListener('click', () => addHeaderRow());
+
+    // Default headers
+    addHeaderRow('Content-Type', 'application/json');
+    addHeaderRow('Accept', 'application/json');
+
+    // Auth
+    function updateAuth() {
+        const type = document.getElementById('authType').value;
+        const area = document.getElementById('authFields');
+        area.innerHTML = '';
+        if (type === 'bearer') {
+            area.innerHTML = `<div class="form-row"><label>Token：</label><input type="text" id="authToken" placeholder="your-token-here" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:13px;"></div>`;
+        } else if (type === 'basic') {
+            area.innerHTML = `
+                <div class="form-row"><label>ユーザー名：</label><input type="text" id="authUser" placeholder="username" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;font-family:inherit;font-size:13px;"></div>
+                <div class="form-row"><label>パスワード：</label><input type="text" id="authPass" placeholder="password" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;font-family:inherit;font-size:13px;"></div>`;
+        } else if (type === 'apikey') {
+            area.innerHTML = `
+                <div class="form-row"><label>Header名：</label><input type="text" id="apiKeyName" placeholder="X-API-Key" value="X-API-Key" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;font-family:inherit;font-size:13px;"></div>
+                <div class="form-row"><label>APIキー：</label><input type="text" id="apiKeyVal" placeholder="your-api-key" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:13px;"></div>`;
+        }
+    }
+
+    // Body
+    function updateBodyType() {
+        const type = document.getElementById('bodyType').value;
+        const area = document.getElementById('bodyArea');
+        area.innerHTML = '';
+        if (type === 'json') {
+            area.innerHTML = `<textarea class="body-ta" id="bodyJSON" placeholder='{"key": "value"}'>${JSON.stringify({"name":"John","email":"john@example.com"},null,2)}</textarea>`;
+        } else if (type === 'form') {
+            area.innerHTML = `<div id="formFields" class="kv-table"></div><button class="add-row-btn" id="addFormBtn">+ フィールドを追加</button>`;
+            document.getElementById('addFormBtn').addEventListener('click', () => addFormRow());
+            addFormRow('key', 'value');
+        } else if (type === 'raw') {
+            area.innerHTML = `<textarea class="body-ta" id="bodyRaw" placeholder="任意のテキストデータ"></textarea>`;
+        }
+    }
+
+    let formRows = [];
+    function addFormRow(key = '', value = '') {
+        const row = { id: Date.now() + Math.random(), key, value };
+        formRows.push(row);
+        renderFormRows();
+    }
+    function renderFormRows() {
+        const container = document.getElementById('formFields');
+        if (!container) return;
+        container.innerHTML = '';
+        formRows.forEach(row => {
+            const div = document.createElement('div');
+            div.className = 'kv-row';
+            const kInput = document.createElement('input');
+            kInput.type = 'text'; kInput.placeholder = 'フィールド名';
+            kInput.value = row.key;
+            kInput.addEventListener('input', e => { row.key = e.target.value; });
+            const vInput = document.createElement('input');
+            vInput.type = 'text'; vInput.placeholder = '値';
+            vInput.value = row.value;
+            vInput.addEventListener('input', e => { row.value = e.target.value; });
+            const del = document.createElement('button');
+            del.className = 'del-btn'; del.textContent = '×';
+            del.addEventListener('click', () => { formRows = formRows.filter(r => r.id !== row.id); renderFormRows(); });
+            div.append(kInput, vInput, del);
+            container.appendChild(div);
+        });
+    }
+
+    // Build cURL
+    function buildCurl() {
+        const method = document.getElementById('method').value;
+        const url = document.getElementById('url').value.trim();
+        if (!url) { showToast('URLを入力してください'); return null; }
+
+        const parts = ['curl'];
+
+        // Method
+        if (method !== 'GET') parts.push(`-X ${method}`);
+
+        // Options
+        if (document.getElementById('optVerbose').checked) parts.push('-v');
+        if (document.getElementById('optInsecure').checked) parts.push('-k');
+        if (document.getElementById('optFollowRedirects').checked) parts.push('-L');
+        if (document.getElementById('optSilent').checked) parts.push('-s');
+        if (document.getElementById('optCompressed').checked) parts.push('--compressed');
+        if (document.getElementById('optInclude').checked) parts.push('-i');
+
+        // Headers
+        const extraHeaders = [];
+        headerRows.forEach(({ key, value }) => {
+            if (key.trim()) extraHeaders.push({ key: key.trim(), value: value.trim() });
+        });
+
+        // Auth
+        const authType = document.getElementById('authType').value;
+        if (authType === 'bearer') {
+            const token = document.getElementById('authToken')?.value || '';
+            if (token) extraHeaders.push({ key: 'Authorization', value: `Bearer ${token}` });
+        } else if (authType === 'basic') {
+            const user = document.getElementById('authUser')?.value || '';
+            const pass = document.getElementById('authPass')?.value || '';
+            if (user) parts.push(`-u "${user}:${pass}"`);
+        } else if (authType === 'apikey') {
+            const keyName = document.getElementById('apiKeyName')?.value || 'X-API-Key';
+            const keyVal = document.getElementById('apiKeyVal')?.value || '';
+            if (keyVal) extraHeaders.push({ key: keyName, value: keyVal });
+        }
+
+        extraHeaders.forEach(({ key, value }) => {
+            parts.push(`-H "${key}: ${value.replace(/"/g, '\\"')}"`);
+        });
+
+        // Body
+        const bodyType = document.getElementById('bodyType').value;
+        if (bodyType === 'json') {
+            const json = document.getElementById('bodyJSON')?.value || '';
+            if (json.trim()) {
+                const minified = json.trim().replace(/\s+/g, ' ');
+                parts.push(`-d '${minified.replace(/'/g, "\\'")}'`);
+            }
+        } else if (bodyType === 'form') {
+            formRows.forEach(({ key, value }) => {
+                if (key.trim()) parts.push(`--data-urlencode "${key}=${value}"`);
+            });
+        } else if (bodyType === 'raw') {
+            const raw = document.getElementById('bodyRaw')?.value || '';
+            if (raw.trim()) parts.push(`-d '${raw.replace(/'/g, "\\'")}'`);
+        }
+
+        // URL
+        parts.push(`"${url}"`);
+
+        return parts.join(' \\\n  ');
+    }
+
+    document.getElementById('buildBtn').addEventListener('click', () => {
+        const cmd = buildCurl();
+        if (cmd) {
+            document.getElementById('curlOutput').textContent = cmd;
+            showToast('cURLコマンドを生成しました');
+        }
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+        const text = document.getElementById('curlOutput').textContent;
+        if (text === 'ビルダーで設定して「生成」をクリック') { showToast('先にコマンドを生成してください'); return; }
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+    });
+
+    document.getElementById('curlOutput').addEventListener('click', () => {
+        const text = document.getElementById('curlOutput').textContent;
+        if (text !== 'ビルダーで設定して「生成」をクリック') {
+            navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+        }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('method').value = 'GET';
+        document.getElementById('url').value = '';
+        headerRows = [];
+        addHeaderRow('Content-Type', 'application/json');
+        addHeaderRow('Accept', 'application/json');
+        document.getElementById('authType').value = 'none';
+        updateAuth();
+        document.getElementById('bodyType').value = 'none';
+        updateBodyType();
+        document.getElementById('curlOutput').textContent = 'ビルダーで設定して「生成」をクリック';
+    });
+
+    // Import cURL
+    document.getElementById('importBtn').addEventListener('click', () => {
+        const input = document.getElementById('importInput').value.trim();
+        if (!input) { showToast('cURLコマンドを入力してください'); return; }
+        try {
+            parseCurl(input);
+            document.querySelectorAll('.tab-btn')[0].click();
+            showToast('インポートしました');
+        } catch(e) { showToast('解析エラー: ' + e.message); }
+    });
+
+    function parseCurl(cmd) {
+        // Normalize
+        let s = cmd.replace(/\\\n/g, ' ').replace(/\s+/g, ' ').trim();
+        if (s.startsWith('curl ')) s = s.slice(5);
+
+        const tokens = tokenizeCurl(s);
+        let i = 0;
+        let method = 'GET', url = '';
+        const headers = [];
+        let bodyData = '';
+        let authUser = '', authPass = '';
+
+        while (i < tokens.length) {
+            const t = tokens[i];
+            if (t === '-X' || t === '--request') { method = tokens[++i]; }
+            else if (t === '-H' || t === '--header') {
+                const hdr = tokens[++i];
+                const ci = hdr.indexOf(':');
+                if (ci !== -1) headers.push({ key: hdr.slice(0,ci).trim(), value: hdr.slice(ci+1).trim() });
+            }
+            else if (t === '-d' || t === '--data' || t === '--data-raw') {
+                bodyData = tokens[++i];
+                if (method === 'GET') method = 'POST';
+            }
+            else if (t === '-u' || t === '--user') {
+                const up = tokens[++i];
+                const ci = up.indexOf(':');
+                authUser = ci !== -1 ? up.slice(0,ci) : up;
+                authPass = ci !== -1 ? up.slice(ci+1) : '';
+            }
+            else if (t === '-v') document.getElementById('optVerbose').checked = true;
+            else if (t === '-k' || t === '--insecure') document.getElementById('optInsecure').checked = true;
+            else if (t === '-L' || t === '--location') document.getElementById('optFollowRedirects').checked = true;
+            else if (t === '-s' || t === '--silent') document.getElementById('optSilent').checked = true;
+            else if (t === '--compressed') document.getElementById('optCompressed').checked = true;
+            else if (t === '-i' || t === '--include') document.getElementById('optInclude').checked = true;
+            else if (!t.startsWith('-') && !url) url = t.replace(/^["']|["']$/g, '');
+            i++;
+        }
+
+        document.getElementById('method').value = method;
+        document.getElementById('url').value = url;
+        headerRows = [];
+        headers.forEach(h => {
+            if (h.key.toLowerCase() === 'authorization' && h.value.startsWith('Bearer ')) {
+                document.getElementById('authType').value = 'bearer';
+                updateAuth();
+                const tok = document.getElementById('authToken');
+                if (tok) tok.value = h.value.slice(7);
+            } else {
+                headerRows.push({ id: Date.now() + Math.random(), key: h.key, value: h.value });
+            }
+        });
+        renderHeaders();
+
+        if (authUser) {
+            document.getElementById('authType').value = 'basic';
+            updateAuth();
+            const u = document.getElementById('authUser'), p = document.getElementById('authPass');
+            if (u) u.value = authUser; if (p) p.value = authPass;
+        }
+
+        if (bodyData) {
+            try { JSON.parse(bodyData); document.getElementById('bodyType').value = 'json'; } catch { document.getElementById('bodyType').value = 'raw'; }
+            updateBodyType();
+            const el = document.getElementById('bodyJSON') || document.getElementById('bodyRaw');
+            if (el) el.value = bodyData;
+        }
+    }
+
+    function tokenizeCurl(s) {
+        const tokens = [];
+        let i = 0;
+        while (i < s.length) {
+            while (i < s.length && /\s/.test(s[i])) i++;
+            if (i >= s.length) break;
+            if (s[i] === '"' || s[i] === "'") {
+                const q = s[i++]; let tok = '';
+                while (i < s.length && s[i] !== q) {
+                    if (s[i] === '\\') { i++; tok += s[i] || ''; } else tok += s[i];
+                    i++;
+                }
+                i++; tokens.push(tok);
+            } else {
+                let tok = '';
+                while (i < s.length && !/\s/.test(s[i])) tok += s[i++];
+                tokens.push(tok);
+            }
+        }
+        return tokens;
+    }
+
+    // Auto-generate on load
+    setTimeout(() => {
+        const cmd = buildCurl();
+        if (cmd) document.getElementById('curlOutput').textContent = cmd;
+    }, 0);
+    </script>
+</body>
+</html>

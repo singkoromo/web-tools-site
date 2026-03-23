@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="README.mdファイルをGUIで生成します。プロジェクト情報を入力するだけで完成。">
+    <meta property="og:title" content="README.md生成ツール - ToolBox">
+    <meta property="og:description" content="README.mdを簡単生成。バッジ、目次自動生成、Markdownプレビュー対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/readme-generator.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/readme-generator.html">
+    <title>README.md生成ツール - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], textarea, select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        select {
+            cursor: pointer;
+        }
+        .form-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-item input {
+            cursor: pointer;
+        }
+        .badges-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .badge {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge button {
+            padding: 0;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .preview-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .preview-panel {
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .preview-panel h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .code-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        .markdown-preview {
+            background: white;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .markdown-preview h1 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+        .markdown-preview h2 {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        .markdown-preview p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .markdown-preview ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .markdown-preview li {
+            margin: 5px 0;
+        }
+        @media (max-width: 768px) {
+            .preview-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🛠️ ToolBox</h1>
+                <nav class="nav">
+                    <a href="/">ホーム</a>
+                    <a href="/#tools">ツール一覧</a>
+                    <a href="/about">について</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <div class="tool-page">
+        <div class="container">
+            <div class="tool-container">
+                <h1>README.md生成ツール</h1>
+                <p class="description">プロジェクト情報を入力するだけで、整形されたREADME.mdファイルが生成されます。</p>
+
+                <div class="form-section">
+                    <h3>プロジェクト基本情報</h3>
+                    <div class="form-group">
+                        <label for="projectName">プロジェクト名</label>
+                        <input type="text" id="projectName" placeholder="MyAwesomeProject" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="projectDesc">プロジェクト説明</label>
+                        <textarea id="projectDesc" placeholder="プロジェクトの概要を説明してください"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectUrl">プロジェクトURL</label>
+                        <input type="text" id="projectUrl" placeholder="https://github.com/user/project" value="">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>機能・セクション</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="includeFeatures" checked>
+                            <label for="includeFeatures">機能セクション</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="includeInstall" checked>
+                            <label for="includeInstall">インストール方法</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="includeUsage" checked>
+                            <label for="includeUsage">使い方</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="includeContribute">
+                            <label for="includeContribute">貢献方法</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="includeLicense" checked>
+                            <label for="includeLicense">ライセンス</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>インストール方法</h3>
+                    <div class="form-group">
+                        <label for="installSteps">インストール手順</label>
+                        <textarea id="installSteps" placeholder="```bash&#10;npm install&#10;npm start&#10;```"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>使い方</h3>
+                    <div class="form-group">
+                        <label for="usageContent">使い方の説明</label>
+                        <textarea id="usageContent" placeholder="基本的な使い方を説明してください"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>バッジ</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="badgeVersion" onchange="updateBadges()">
+                            <label for="badgeVersion">バージョン</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="badgeLicense" onchange="updateBadges()">
+                            <label for="badgeLicense">ライセンス</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="badgeCI" onchange="updateBadges()">
+                            <label for="badgeCI">CI/CD</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="badgeDownloads" onchange="updateBadges()">
+                            <label for="badgeDownloads">ダウンロード</label>
+                        </div>
+                    </div>
+                    <div class="badges-list" id="badgesList"></div>
+                </div>
+
+                <div class="form-section">
+                    <h3>その他</h3>
+                    <div class="form-group">
+                        <label for="authorName">著者名</label>
+                        <input type="text" id="authorName" placeholder="Your Name" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="licenseType">ライセンス</label>
+                        <select id="licenseType">
+                            <option value="MIT">MIT</option>
+                            <option value="Apache 2.0">Apache 2.0</option>
+                            <option value="GPL v3">GPL v3</option>
+                            <option value="BSD 2-Clause">BSD 2-Clause</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="generateReadme()">README.md生成</button>
+                </div>
+
+                <div class="preview-section" id="previewSection" style="display: none;">
+                    <div class="preview-panel">
+                        <h3>Markdownコード</h3>
+                        <div class="code-box" id="markdownOutput"></div>
+                        <div class="button-group">
+                            <button onclick="copyReadme()">コピー</button>
+                            <button onclick="downloadReadme()">ダウンロード</button>
+                        </div>
+                    </div>
+                    <div class="preview-panel">
+                        <h3>プレビュー</h3>
+                        <div class="markdown-preview" id="preview"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        function updateBadges() {
+            const badgesList = document.getElementById('badgesList');
+            badgesList.innerHTML = '';
+
+            const badges = [];
+            if (document.getElementById('badgeVersion').checked) {
+                badges.push({ label: 'Version', cmd: 'badge-version' });
+            }
+            if (document.getElementById('badgeLicense').checked) {
+                badges.push({ label: 'License: MIT', cmd: 'badge-license' });
+            }
+            if (document.getElementById('badgeCI').checked) {
+                badges.push({ label: 'Build: Passing', cmd: 'badge-ci' });
+            }
+            if (document.getElementById('badgeDownloads').checked) {
+                badges.push({ label: 'Downloads', cmd: 'badge-downloads' });
+            }
+
+            badges.forEach((badge, idx) => {
+                const div = document.createElement('div');
+                div.className = 'badge';
+                div.innerHTML = `${badge.label} <button onclick="removeBadge(${idx})">×</button>`;
+                badgesList.appendChild(div);
+            });
+        }
+
+        function removeBadge(idx) {
+            // Simplified for demo
+            updateBadges();
+        }
+
+        function generateReadme() {
+            const projectName = document.getElementById('projectName').value || 'MyProject';
+            const projectDesc = document.getElementById('projectDesc').value || '';
+            const authorName = document.getElementById('authorName').value || 'Author';
+            const licenseType = document.getElementById('licenseType').value;
+
+            let markdown = `# ${projectName}\n\n`;
+
+            // Description
+            if (projectDesc) {
+                markdown += `${projectDesc}\n\n`;
+            }
+
+            // Table of Contents
+            const sections = [];
+            if (document.getElementById('includeFeatures').checked) sections.push('機能');
+            if (document.getElementById('includeInstall').checked) sections.push('インストール');
+            if (document.getElementById('includeUsage').checked) sections.push('使い方');
+            if (document.getElementById('includeContribute').checked) sections.push('貢献');
+            if (document.getElementById('includeLicense').checked) sections.push('ライセンス');
+
+            if (sections.length > 0) {
+                markdown += `## 目次\n\n`;
+                sections.forEach(section => {
+                    markdown += `- [${section}](#${section.toLowerCase()})\n`;
+                });
+                markdown += '\n';
+            }
+
+            // Features
+            if (document.getElementById('includeFeatures').checked) {
+                markdown += `## 機能\n\n`;
+                markdown += `- 機能1\n`;
+                markdown += `- 機能2\n`;
+                markdown += `- 機能3\n\n`;
+            }
+
+            // Installation
+            if (document.getElementById('includeInstall').checked) {
+                markdown += `## インストール\n\n`;
+                const installSteps = document.getElementById('installSteps').value;
+                markdown += installSteps || `\`\`\`bash\nnpm install\n\`\`\`\n\n`;
+            }
+
+            // Usage
+            if (document.getElementById('includeUsage').checked) {
+                markdown += `## 使い方\n\n`;
+                const usageContent = document.getElementById('usageContent').value;
+                markdown += usageContent || `基本的な使い方を説明してください\n\n`;
+            }
+
+            // Contribution
+            if (document.getElementById('includeContribute').checked) {
+                markdown += `## 貢献\n\n`;
+                markdown += `プルリクエストを歓迎します。大きな変更の場合は、まずissueを開いて変更内容を説明してください。\n\n`;
+            }
+
+            // License
+            if (document.getElementById('includeLicense').checked) {
+                markdown += `## ライセンス\n\n`;
+                markdown += `このプロジェクトは${licenseType}ライセンスの下で公開されています。\n\n`;
+            }
+
+            // Author
+            markdown += `---\n\n`;
+            markdown += `作成: ${authorName}\n`;
+
+            document.getElementById('markdownOutput').textContent = markdown;
+            renderPreview(markdown);
+            document.getElementById('previewSection').style.display = 'grid';
+            showToast('README.mdを生成しました', 'success');
+        }
+
+        function renderPreview(markdown) {
+            const preview = document.getElementById('preview');
+            // Simple markdown to HTML conversion
+            let html = markdown
+                .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+                .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+                .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+                .replace(/^- (.*?)$/gm, '<li>$1</li>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/<li>/g, '<ul><li>')
+                .replace(/<\/li>/g, '</li></ul>')
+                .replace(/```[\s\S]*?```/g, '<pre>$&</pre>');
+
+            preview.innerHTML = html;
+        }
+
+        function copyReadme() {
+            const text = document.getElementById('markdownOutput').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました', 'success');
+            });
+        }
+
+        function downloadReadme() {
+            const text = document.getElementById('markdownOutput').textContent;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/markdown;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', 'README.md');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            showToast('ダウンロード開始', 'success');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

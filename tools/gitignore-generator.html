@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content=".gitignoreファイルをGUIで生成します。言語やIDE、OSに対応した自動生成。">
+    <meta property="og:title" content=".gitignore生成ツール - ToolBox">
+    <meta property="og:description" content=".gitignoreを簡単生成。言語、IDE、OS対応。カスタムルール追加可能。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/gitignore-generator.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/gitignore-generator.html">
+    <title>.gitignore生成ツール - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .selector-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .selector-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-item input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        .checkbox-item label {
+            cursor: pointer;
+            margin: 0;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .selected-items {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .selected-tag {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #2563eb;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .selected-tag button {
+            background: none;
+            border: none;
+            color: #2563eb;
+            cursor: pointer;
+            padding: 0;
+            font-size: 16px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            display: none;
+        }
+        .output-section.active {
+            display: block;
+        }
+        .output-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .code-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 768px) {
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🛠️ ToolBox</h1>
+                <nav class="nav">
+                    <a href="/">ホーム</a>
+                    <a href="/#tools">ツール一覧</a>
+                    <a href="/about">について</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <div class="tool-page">
+        <div class="container">
+            <div class="tool-container">
+                <h1>.gitignore生成ツール</h1>
+                <p class="description">使用している言語、IDE、OSを選択して、.gitignoreファイルを自動生成します。</p>
+
+                <div class="selector-section">
+                    <h3>プログラミング言語</h3>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-node" onchange="updateSelection()" value="Node.js">
+                            <label for="lang-node">Node.js</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-python" onchange="updateSelection()" value="Python">
+                            <label for="lang-python">Python</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-java" onchange="updateSelection()" value="Java">
+                            <label for="lang-java">Java</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-go" onchange="updateSelection()" value="Go">
+                            <label for="lang-go">Go</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-rust" onchange="updateSelection()" value="Rust">
+                            <label for="lang-rust">Rust</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-ruby" onchange="updateSelection()" value="Ruby">
+                            <label for="lang-ruby">Ruby</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-php" onchange="updateSelection()" value="PHP">
+                            <label for="lang-php">PHP</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="lang-swift" onchange="updateSelection()" value="Swift">
+                            <label for="lang-swift">Swift</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selector-section">
+                    <h3>IDE・エディタ</h3>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ide-vscode" onchange="updateSelection()" value="VS Code">
+                            <label for="ide-vscode">VS Code</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ide-intellij" onchange="updateSelection()" value="IntelliJ">
+                            <label for="ide-intellij">IntelliJ</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ide-vim" onchange="updateSelection()" value="Vim">
+                            <label for="ide-vim">Vim</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ide-sublime" onchange="updateSelection()" value="Sublime Text">
+                            <label for="ide-sublime">Sublime Text</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ide-xcode" onchange="updateSelection()" value="Xcode">
+                            <label for="ide-xcode">Xcode</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ide-eclipse" onchange="updateSelection()" value="Eclipse">
+                            <label for="ide-eclipse">Eclipse</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selector-section">
+                    <h3>OS</h3>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="os-macos" onchange="updateSelection()" value="macOS">
+                            <label for="os-macos">macOS</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="os-windows" onchange="updateSelection()" value="Windows">
+                            <label for="os-windows">Windows</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="os-linux" onchange="updateSelection()" value="Linux">
+                            <label for="os-linux">Linux</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selector-section">
+                    <h3>カスタムルール</h3>
+                    <div class="form-group">
+                        <label for="customRules">追加したいGitignoreルール（1行ずつ）</label>
+                        <textarea id="customRules" placeholder="*.log&#10;.env&#10nbuild/"></textarea>
+                    </div>
+                </div>
+
+                <div>
+                    <h3>選択中:</h3>
+                    <div class="selected-items" id="selectedItems"></div>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="generateGitignore()">.gitignore生成</button>
+                </div>
+
+                <div class="output-section" id="outputSection">
+                    <div class="output-label">.gitignore</div>
+                    <div class="code-box" id="output"></div>
+                    <div class="button-group">
+                        <button onclick="copyGitignore()">コピー</button>
+                        <button onclick="downloadGitignore()">ダウンロード</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const templates = {
+            'Node.js': 'node_modules/\nnpm-debug.log\n.env\n.env.local\nbuild/\ndist/\n',
+            'Python': '__pycache__/\n*.py[cod]\n*$py.class\n.venv/\nvenv/\nenv/\n.env\n',
+            'Java': 'target/\nbuild/\n.gradle/\n*.class\n*.jar\n',
+            'Go': '/bin/\n/dist/\n*.out\n.env\n',
+            'Rust': '/target/\nCargo.lock\n.env\n',
+            'Ruby': '*.gem\n.bundle/\nGemfile.lock\n.env\n',
+            'PHP': 'vendor/\ncomposer.lock\n.env\n',
+            'Swift': 'build/\n.build/\n*.xcodeproj/\n.env\n',
+            'VS Code': '.vscode/\n*.code-workspace\n',
+            'IntelliJ': '.idea/\n*.iml\n*.iws\n.DS_Store\n',
+            'Vim': '*.swp\n*.swo\n*~\n.vim/\n',
+            'Sublime Text': '*.sublime-project\n*.sublime-workspace\n',
+            'Xcode': '.xcodeproj/\nbuild/\n*.xcworkspace/\n',
+            'Eclipse': '.project\n.classpath\n.settings/\n',
+            'macOS': '.DS_Store\n.AppleDouble\n.LSOverride\n',
+            'Windows': 'Thumbs.db\n*.lnk\nDesktop.ini\n',
+            'Linux': '*.swp\n.*\n',
+        };
+
+        function updateSelection() {
+            const selected = document.getElementById('selectedItems');
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+            selected.innerHTML = '';
+
+            checked.forEach(input => {
+                const value = input.value;
+                const tag = document.createElement('div');
+                tag.className = 'selected-tag';
+                tag.innerHTML = `${value} <button onclick="document.getElementById('${input.id}').checked = false; updateSelection();">×</button>`;
+                selected.appendChild(tag);
+            });
+        }
+
+        function generateGitignore() {
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+            if (checked.length === 0 && !document.getElementById('customRules').value.trim()) {
+                showToast('少なくとも1つの項目を選択してください', 'error');
+                return;
+            }
+
+            let content = '# Generated by ToolBox .gitignore Generator\n\n';
+
+            const addedPatterns = new Set();
+
+            checked.forEach(input => {
+                const key = input.value;
+                if (templates[key]) {
+                    const patterns = templates[key].split('\n').filter(p => p.trim());
+                    patterns.forEach(pattern => {
+                        if (!addedPatterns.has(pattern)) {
+                            addedPatterns.add(pattern);
+                            content += pattern + '\n';
+                        }
+                    });
+                }
+            });
+
+            const customRules = document.getElementById('customRules').value.trim();
+            if (customRules) {
+                content += '\n# Custom rules\n';
+                customRules.split('\n').forEach(rule => {
+                    if (rule.trim()) {
+                        content += rule + '\n';
+                    }
+                });
+            }
+
+            document.getElementById('output').textContent = content.trim();
+            document.getElementById('outputSection').classList.add('active');
+            showToast('.gitignoreを生成しました', 'success');
+        }
+
+        function copyGitignore() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                showToast('コピーしました', 'success');
+            });
+        }
+
+        function downloadGitignore() {
+            const output = document.getElementById('output').textContent;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(output));
+            element.setAttribute('download', '.gitignore');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            showToast('ダウンロード開始', 'success');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

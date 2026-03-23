@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTPステータスコード一覧 - ToolBox</title>
+    <meta name="description" content="すべてのHTTPステータスコードのリファレンス。コードの意味と利用シーンを確認できます。">
+    <meta name="keywords" content="HTTPステータス, ステータスコード, 404, 500">
+    <meta property="og:title" content="HTTPステータスコード一覧 - ToolBox">
+    <meta property="og:description" content="すべてのHTTPステータスコードのリファレンス。コードの意味と利用シーンを確認できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/http-status.html">
+    <meta property="og:site_name" content="ToolBox">
+    <link rel="canonical" href="https://web-tool-site.com/tools/http-status.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-light: #eff6ff;
+            --primary-dark: #1e40af;
+            --info: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #e5e7eb;
+            --bg: #f9fafb;
+            --text: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .ad-top {
+            background: #f0f0f0;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .tool-section {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .tool-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
+        }
+
+        .search-box {
+            margin-bottom: 2rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .status-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .status-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-header {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 80px 1fr 24px;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .status-card.expanded .status-header {
+            background: var(--primary-light);
+            border-bottom-color: var(--primary);
+        }
+
+        .status-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            text-align: center;
+            color: white;
+        }
+
+        .status-code.cat-1xx {
+            background: var(--info);
+        }
+
+        .status-code.cat-2xx {
+            background: var(--success);
+        }
+
+        .status-code.cat-3xx {
+            background: var(--warning);
+        }
+
+        .status-code.cat-4xx {
+            background: var(--danger);
+        }
+
+        .status-code.cat-5xx {
+            background: #8b5cf6;
+        }
+
+        .status-name {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .status-name-en {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .status-name-ja {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .status-toggle {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .status-body {
+            padding: 1.5rem;
+            background: var(--primary-light);
+            display: none;
+        }
+
+        .status-card.expanded .status-body {
+            display: block;
+        }
+
+        .status-description {
+            margin-bottom: 1rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .status-usage {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .status-usage strong {
+            display: block;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer {
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-inner {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav {
+                gap: 1rem;
+            }
+
+            .status-header {
+                grid-template-columns: 60px 1fr 24px;
+            }
+
+            .status-code {
+                font-size: 1.2rem;
+            }
+
+            .filter-buttons {
+                gap: 0.25rem;
+            }
+
+            .filter-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="ad-top">
+            📢 広告スペース
+        </div>
+
+        <div class="tool-section">
+            <h2>HTTPステータスコード一覧</h2>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="コード番号またはキーワードで検索...">
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">すべて</button>
+                <button class="filter-btn" data-category="1">1xx (情報)</button>
+                <button class="filter-btn" data-category="2">2xx (成功)</button>
+                <button class="filter-btn" data-category="3">3xx (リダイレクト)</button>
+                <button class="filter-btn" data-category="4">4xx (クライアント)</button>
+                <button class="filter-btn" data-category="5">5xx (サーバー)</button>
+            </div>
+
+            <div id="statusContainer"></div>
+        </div>
+
+        <div class="ad-top">
+            📢 広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        © 2026 ToolBox. All rights reserved.
+    </footer>
+
+    <script>
+        const statusCodes = [
+            // 1xx
+            { code: 100, en: 'Continue', ja: 'リクエスト続行', category: '1xx', desc: 'リクエストが受け取られたことを示し、クライアントは続行すべきです。', usage: 'ヘッダーだけが送信された場合に使用' },
+            { code: 101, en: 'Switching Protocols', ja: 'プロトコル切り替え', category: '1xx', desc: 'サーバーがプロトコルの変更に同意し、WebSocketへのアップグレードなどを示します。', usage: 'WebSocketやHTTP/2へのアップグレード' },
+
+            // 2xx
+            { code: 200, en: 'OK', ja: '成功', category: '2xx', desc: 'リクエストが成功し、レスポンスボディに要求されたデータが含まれています。', usage: 'すべてのGETリクエスト成功時、データ取得成功時' },
+            { code: 201, en: 'Created', ja: '作成済み', category: '2xx', desc: 'リクエストが成功し、新しいリソースが作成されました。', usage: 'POSTでリソース作成成功時、Location ヘッダーを含める' },
+            { code: 204, en: 'No Content', ja: 'コンテンツなし', category: '2xx', desc: 'リクエストは成功しましたが、返すコンテンツはありません。', usage: 'DELETE成功時、又はPATCH/PUT成功時レスポンス本体不要な場合' },
+
+            // 3xx
+            { code: 301, en: 'Moved Permanently', ja: '永久移動', category: '3xx', desc: 'リソースが永久に移動しました。Location ヘッダーに新しいURLが含まれます。', usage: 'URLの恒久的な変更、SEO目的でのリダイレクト' },
+            { code: 302, en: 'Found', ja: '見つかりました', category: '3xx', desc: 'リソースが一時的に別の場所にあります。Location ヘッダーに一時的なURLが含まれます。', usage: '一時的なリダイレクト、フォーム送信後のリダイレクト' },
+            { code: 304, en: 'Not Modified', ja: '変更されていない', category: '3xx', desc: 'キャッシュされたリソースが変更されていません。', usage: 'If-None-Match または If-Modified-Since の条件付きリクエスト' },
+            { code: 307, en: 'Temporary Redirect', ja: '一時的なリダイレクト', category: '3xx', desc: '301と同様だが、HTTP メソッドが変更されません。', usage: 'メソッドを保持する必要があるリダイレクト' },
+            { code: 308, en: 'Permanent Redirect', ja: '永久リダイレクト', category: '3xx', desc: '302と同様だが、永久的です。HTTP メソッドが変更されません。', usage: 'メソッド保持の永久リダイレクト' },
+
+            // 4xx
+            { code: 400, en: 'Bad Request', ja: '不正なリクエスト', category: '4xx', desc: 'リクエストの構文が不正です。サーバーが理解できません。', usage: 'リクエストボディが無効、パラメータが間違っている' },
+            { code: 401, en: 'Unauthorized', ja: '認証が必要', category: '4xx', desc: '認証が必要です。有効な認証情報が提供されていません。', usage: 'API キーなし、ログイン失敗、JWT トークン無効' },
+            { code: 403, en: 'Forbidden', ja: 'アクセス禁止', category: '4xx', desc: '認証されていますがアクセス権がありません。', usage: 'ユーザーが特定のリソースにアクセスできない、権限不足' },
+            { code: 404, en: 'Not Found', ja: '見つかりません', category: '4xx', desc: 'リクエストされたリソースが見つかりません。', usage: '存在しないページ、削除されたAPI エンドポイント' },
+            { code: 405, en: 'Method Not Allowed', ja: 'メソッドは許可されていない', category: '4xx', desc: 'リクエストで使用されたHTTP メソッドが許可されていません。', usage: 'GETのみサポートのエンドポイントにPOSTを送信' },
+            { code: 408, en: 'Request Timeout', ja: 'リクエストタイムアウト', category: '4xx', desc: 'クライアントがリクエストを完了するまでの時間を超えました。', usage: '長時間接続せず、サーバーがコネクション切断' },
+            { code: 409, en: 'Conflict', ja: 'コンフリクト', category: '4xx', desc: 'リクエストがリソースの現在の状態と衝突しています。', usage: '同じリソースの同時更新、バージョンの競合' },
+            { code: 413, en: 'Payload Too Large', ja: 'ペイロード大きすぎ', category: '4xx', desc: 'リクエストボディがサーバーが処理できる最大サイズを超えています。', usage: 'ファイルアップロードサイズ制限超過' },
+            { code: 415, en: 'Unsupported Media Type', ja: 'サポートされていないメディアタイプ', category: '4xx', desc: 'リクエストボディのメディアタイプがサポートされていません。', usage: 'Content-Type が xml なのに JSON を期待される場合' },
+            { code: 429, en: 'Too Many Requests', ja: 'リクエストが多すぎます', category: '4xx', desc: 'クライアントが短時間に多くのリクエストを送信してレート制限に達しました。', usage: 'API レート制限、DDoS 検出' },
+
+            // 5xx
+            { code: 500, en: 'Internal Server Error', ja: 'サーバー内部エラー', category: '5xx', desc: 'サーバーで予期しないエラーが発生しました。', usage: 'コード例外、データベース接続エラー、サーバーバグ' },
+            { code: 501, en: 'Not Implemented', ja: '実装されていない', category: '5xx', desc: 'サーバーがリクエストメソッドをサポートしていません。', usage: 'エンドポイントがまだ実装されていない' },
+            { code: 502, en: 'Bad Gateway', ja: 'ゲートウェイエラー', category: '5xx', desc: 'ゲートウェイまたはプロキシが無効なレスポンスを受け取りました。', usage: 'リバースプロキシから無効な応答、アップストリームサーバー障害' },
+            { code: 503, en: 'Service Unavailable', ja: 'サービス利用不可', category: '5xx', desc: 'サーバーが一時的に利用できません。メンテナンスまたはオーバーロード中。', usage: 'サーバーメンテナンス、サーバー過負荷' },
+            { code: 504, en: 'Gateway Timeout', ja: 'ゲートウェイタイムアウト', category: '5xx', desc: 'ゲートウェイがアップストリームサーバーからレスポンスを受け取れませんでした。', usage: 'バックエンドサーバーが応答しない、接続タイムアウト' }
+        ];
+
+        let currentFilter = 'all';
+
+        function getCategoryClass(code) {
+            const firstDigit = Math.floor(code / 100);
+            return `cat-${firstDigit}xx`;
+        }
+
+        function renderStatus(code) {
+            return `
+                <div class="status-card" data-code="${code.code}" data-category="${code.category.charAt(0)}">
+                    <div class="status-header" onclick="toggleCard(this.parentElement)">
+                        <div class="status-code ${getCategoryClass(code.code)}">${code.code}</div>
+                        <div class="status-name">
+                            <div class="status-name-en">${code.en}</div>
+                            <div class="status-name-ja">${code.ja}</div>
+                        </div>
+                        <div class="status-toggle">▼</div>
+                    </div>
+                    <div class="status-body">
+                        <div class="status-description">${code.desc}</div>
+                        <div class="status-usage">
+                            <strong>一般的な使用シーン:</strong>
+                            ${code.usage}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleCard(card) {
+            card.classList.toggle('expanded');
+        }
+
+        function filterAndRender() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const container = document.getElementById('statusContainer');
+
+            let filtered = statusCodes.filter(code => {
+                const matchesCategory = currentFilter === 'all' || code.category.startsWith(currentFilter);
+                const matchesSearch =
+                    code.code.toString().includes(searchValue) ||
+                    code.en.toLowerCase().includes(searchValue) ||
+                    code.ja.toLowerCase().includes(searchValue) ||
+                    code.desc.toLowerCase().includes(searchValue);
+
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="no-results">検索結果がありません</div>';
+            } else {
+                container.innerHTML = filtered.map(renderStatus).join('');
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterAndRender);
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.category;
+                filterAndRender();
+            });
+        });
+
+        window.addEventListener('load', filterAndRender);
+    </script>
+</body>
+</html>

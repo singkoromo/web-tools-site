@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画圧縮 - ToolBox</title>
+    <meta name="description" content="動画ファイルのサイズを圧縮します。品質設定と解像度を選択してカスタマイズできます。">
+    <meta name="keywords" content="動画、圧縮、サイズ削減、ツール、無料">
+    <meta property="og:title" content="動画圧縮 - ToolBox">
+    <meta property="og:description" content="動画ファイルを圧縮するオンラインツール">
+    <meta property="og:url" content="https://web-tool-site.com/tools/video-compress.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/video-compress.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .compress-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+        .compress-control { display: flex; flex-direction: column; gap: 0.5rem; }
+        .compress-control label { font-weight: 500; color: #333; font-size: 0.95rem; }
+        .compress-control select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.375rem; font-family: Inter, sans-serif; }
+        .preset-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+        .preset-btn { padding: 1rem; border: 2px solid #ddd; border-radius: 0.375rem; background: white; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .preset-btn:hover { border-color: #3b82f6; background: #f0f9ff; }
+        .preset-btn.active { border-color: #3b82f6; background: #3b82f6; color: white; }
+        .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin: 1rem 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #1d4ed8); width: 0%; transition: width 0.3s; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+        .info-card { background: #f3f4f6; padding: 1rem; border-radius: 0.375rem; }
+        .info-card .label { font-size: 0.85rem; color: #666; margin-bottom: 0.25rem; }
+        .info-card .value { font-size: 1.25rem; font-weight: 600; color: #333; font-family: 'JetBrains Mono', monospace; }
+        .info-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; font-size: 0.9rem; color: #1e40af; }
+        .size-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0; }
+        .size-bar { background: #e5e7eb; height: 40px; border-radius: 0.375rem; display: flex; align-items: center; overflow: hidden; }
+        .size-bar-fill { height: 100%; background: linear-gradient(90deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; color: white; font-weight: 500; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <div class="ad-banner">スポンサー</div>
+
+            <h1>動画圧縮</h1>
+            <p class="subtitle">動画ファイルのサイズを圧縮します。品質と解像度をカスタマイズできます。</p>
+
+            <div class="drop-zone" id="dropZone">
+                <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <p>動画ファイルをドラッグ&ドロップするか、クリックして選択</p>
+                <small>対応形式: MP4, WebM, MOV (最大 500MB)</small>
+                <input type="file" id="videoFile" accept="video/*" style="display: none;">
+            </div>
+
+            <div id="videoInfo" style="display: none;">
+                <h3>ファイル情報</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="label">ファイル名</div>
+                        <div class="value" id="fileName" style="font-size: 1rem; word-break: break-all;">-</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">ファイルサイズ</div>
+                        <div class="value" id="originalFileSize">-</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">動画長</div>
+                        <div class="value" id="videoDuration">-</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">解像度</div>
+                        <div class="value" id="videoResolution">-</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem;">品質プリセット</h3>
+                <div class="preset-buttons">
+                    <button class="preset-btn active" onclick="selectPreset('high')">
+                        <div>高品質</div>
+                        <small>ファイルサイズ：大</small>
+                    </button>
+                    <button class="preset-btn" onclick="selectPreset('medium')">
+                        <div>中品質</div>
+                        <small>バランス型</small>
+                    </button>
+                    <button class="preset-btn" onclick="selectPreset('low')">
+                        <div>低品質</div>
+                        <small>ファイルサイズ：小</small>
+                    </button>
+                </div>
+
+                <div class="compress-controls">
+                    <div class="compress-control">
+                        <label>出力解像度</label>
+                        <select id="resolution">
+                            <option value="original">オリジナル</option>
+                            <option value="1080">1080p (1920x1080)</option>
+                            <option value="720" selected>720p (1280x720)</option>
+                            <option value="480">480p (854x480)</option>
+                            <option value="360">360p (640x360)</option>
+                        </select>
+                    </div>
+                    <div class="compress-control">
+                        <label>ビットレート（設定済）</label>
+                        <input type="text" id="bitrate" disabled style="background: #f3f4f6;">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-primary" onclick="startCompression()">圧縮を開始</button>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>注意:</strong> 圧縮処理はお客様のブラウザで実行されます。ファイルサイズによっては数分かかる場合があります。
+                </div>
+
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div id="progressText" style="text-align: center; color: #666; margin: 1rem 0; display: none; font-weight: 500;"></div>
+
+                <div id="resultSection" style="display: none; margin-top: 2rem;">
+                    <h3>圧縮完了</h3>
+
+                    <div class="size-comparison">
+                        <div>
+                            <div style="margin-bottom: 0.5rem; font-weight: 500;">圧縮前</div>
+                            <div class="size-bar" style="border: 2px solid #e5e7eb;">
+                                <div class="size-bar-fill" id="beforeBar" style="width: 100%; background: #ef4444;"></div>
+                            </div>
+                            <div style="margin-top: 0.5rem; text-align: center; font-weight: 500;" id="beforeSize">-</div>
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 0.5rem; font-weight: 500;">圧縮後</div>
+                            <div class="size-bar" style="border: 2px solid #e5e7eb;">
+                                <div class="size-bar-fill" id="afterBar" style="width: 50%; background: #10b981;"></div>
+                            </div>
+                            <div style="margin-top: 0.5rem; text-align: center; font-weight: 500;" id="afterSize">-</div>
+                        </div>
+                    </div>
+
+                    <div class="info-card" style="background: #dcfce7; border-left: 4px solid #10b981; padding: 1rem; margin: 1rem 0;">
+                        <div style="color: #166534; font-weight: 500;">削減率: <span id="reduction">-</span></div>
+                    </div>
+
+                    <video id="resultVideo" style="max-width: 100%; border-radius: 0.5rem; margin: 1rem 0; display: none;" controls></video>
+
+                    <button class="btn btn-primary" onclick="downloadCompressedVideo()">WebMをダウンロード</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-banner" style="margin-top: 2rem;">スポンサー</div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let video = document.getElementById('videoElement');
+        let dropZone = document.getElementById('dropZone');
+        let originalFileSize = 0;
+        let compressedBlob = null;
+        let currentPreset = 'high';
+        let videoFile = null;
+
+        const presets = {
+            high: { bitrate: 2500000, label: '高品質' },
+            medium: { bitrate: 1500000, label: '中品質' },
+            low: { bitrate: 500000, label: '低品質' }
+        };
+
+        video = document.createElement('video');
+
+        dropZone.addEventListener('click', () => document.getElementById('videoFile').click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.background = '#f3f4f6'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.background = ''; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) loadVideo(files[0]);
+        });
+
+        document.getElementById('videoFile').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) loadVideo(e.target.files[0]);
+        });
+
+        function loadVideo(file) {
+            videoFile = file;
+            const url = URL.createObjectURL(file);
+            video.src = url;
+            originalFileSize = file.size;
+            video.onloadedmetadata = () => {
+                document.getElementById('videoInfo').style.display = 'block';
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('originalFileSize').textContent = formatFileSize(originalFileSize);
+                document.getElementById('videoDuration').textContent = formatTime(video.duration);
+                document.getElementById('videoResolution').textContent = `${video.videoWidth}x${video.videoHeight}`;
+                dropZone.style.display = 'none';
+                updateBitrateDisplay();
+                showToast('動画が読み込まれました');
+            };
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = Math.floor(seconds % 60);
+            return `${h > 0 ? h + ':' : ''}${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function selectPreset(preset) {
+            currentPreset = preset;
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.preset-btn').classList.add('active');
+            updateBitrateDisplay();
+        }
+
+        function updateBitrateDisplay() {
+            const bitrate = presets[currentPreset].bitrate;
+            document.getElementById('bitrate').value = (bitrate / 1000000).toFixed(1) + ' Mbps';
+        }
+
+        function startCompression() {
+            const resolution = document.getElementById('resolution').value;
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('progressText').style.display = 'block';
+
+            compressVideo(resolution);
+        }
+
+        function compressVideo(resolution) {
+            const canvas = document.createElement('canvas');
+            let targetWidth = video.videoWidth;
+            let targetHeight = video.videoHeight;
+
+            if (resolution !== 'original') {
+                const height = parseInt(resolution);
+                const ratio = video.videoWidth / video.videoHeight;
+                targetHeight = height;
+                targetWidth = Math.round(height * ratio);
+            }
+
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            const stream = canvas.captureStream(30);
+            const bitrate = presets[currentPreset].bitrate;
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm',
+                videoBitsPerSecond: bitrate
+            });
+
+            const chunks = [];
+            mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+
+            mediaRecorder.onstop = () => {
+                compressedBlob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(compressedBlob);
+                document.getElementById('resultVideo').src = url;
+                document.getElementById('resultVideo').style.display = 'block';
+
+                const beforeSize = originalFileSize;
+                const afterSize = compressedBlob.size;
+                const reduction = ((1 - afterSize / beforeSize) * 100).toFixed(1);
+
+                document.getElementById('beforeSize').textContent = formatFileSize(beforeSize);
+                document.getElementById('afterSize').textContent = formatFileSize(afterSize);
+                document.getElementById('reduction').textContent = reduction + '%';
+
+                const maxSize = Math.max(beforeSize, afterSize);
+                document.getElementById('beforeBar').style.width = (beforeSize / maxSize * 100) + '%';
+                document.getElementById('afterBar').style.width = (afterSize / maxSize * 100) + '%';
+
+                document.getElementById('resultSection').style.display = 'block';
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('progressText').style.display = 'none';
+                showToast('圧縮完了');
+            };
+
+            mediaRecorder.start();
+
+            const ctx = canvas.getContext('2d');
+            const startTime = 0;
+            const endTime = video.duration;
+            const frameInterval = 1000 / 30;
+            let currentTime = startTime;
+
+            function drawFrame() {
+                video.currentTime = currentTime;
+                video.onseeked = () => {
+                    ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+                    const progress = ((currentTime - startTime) / (endTime - startTime)) * 100;
+                    document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+                    document.getElementById('progressText').textContent = `進捗: ${Math.min(Math.floor(progress), 100)}%`;
+
+                    currentTime += frameInterval / 1000;
+                    if (currentTime < endTime) {
+                        requestAnimationFrame(drawFrame);
+                    } else {
+                        mediaRecorder.stop();
+                    }
+                };
+            }
+
+            drawFrame();
+        }
+
+        function downloadCompressedVideo() {
+            if (!compressedBlob) return;
+            const url = URL.createObjectURL(compressedBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'compressed-video.webm';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('ダウンロードを開始しました');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + (type === 'error' ? 'error' : 'success');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+</body>
+</html>

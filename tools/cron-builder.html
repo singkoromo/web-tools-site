@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cron式をビジュアルに作成・解析するツール。次回実行時刻の一覧表示付き。">
+    <meta property="og:title" content="Cron式ビルダー - ToolBox">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/cron-builder.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/cron-builder.html">
+    <title>Cron式ビルダー - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .cron-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px; font-weight: 700; letter-spacing: 4px;
+            text-align: center; padding: 20px;
+            background: linear-gradient(135deg, #667eea22, #764ba222);
+            border-radius: 12px; margin-bottom: 24px;
+            border: 2px solid #667eea44; color: #333;
+            cursor: pointer; user-select: all;
+        }
+        .cron-input-bar {
+            display: flex; gap: 10px; margin-bottom: 24px; align-items: center;
+        }
+        .cron-input-bar input {
+            flex: 1; padding: 10px 14px; border: 1px solid #ddd;
+            border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+        }
+        .fields-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+        @media (max-width: 700px) { .fields-grid { grid-template-columns: 1fr 1fr; } }
+        .field-card {
+            border: 1px solid #ddd; border-radius: 8px; padding: 14px;
+            background: #fff;
+        }
+        .field-title { font-weight: 700; font-size: 13px; color: #666; text-transform: uppercase; margin-bottom: 6px; }
+        .field-val { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .field-card select, .field-card input[type=number] {
+            width: 100%; padding: 6px 8px; border: 1px solid #ddd;
+            border-radius: 4px; font-family: inherit; font-size: 13px;
+            margin-bottom: 6px; box-sizing: border-box;
+        }
+        .field-card .range-row {
+            display: flex; gap: 4px; align-items: center; font-size: 12px;
+        }
+        .field-card .range-row input { width: 50px; }
+        .description-box {
+            background: #e7f3ff; border-left: 4px solid #007bff;
+            padding: 14px; border-radius: 6px; margin-bottom: 20px;
+            font-size: 15px; color: #004085; font-weight: 500;
+        }
+        .next-runs h3 { font-size: 15px; margin-bottom: 10px; }
+        .next-runs ul { list-style: none; padding: 0; margin: 0; }
+        .next-runs li {
+            padding: 8px 12px; border-bottom: 1px solid #eee;
+            font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #333;
+        }
+        .next-runs li:last-child { border-bottom: none; }
+        .presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .preset-btn {
+            padding: 6px 14px; background: #f8f9fa; border: 1px solid #ddd;
+            border-radius: 20px; cursor: pointer; font-size: 12px; font-family: inherit;
+            transition: all 0.2s;
+        }
+        .preset-btn:hover { background: #007bff; color: #fff; border-color: #007bff; }
+        .btn-primary { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: inherit; font-size: 14px; }
+        .btn-primary:hover { background: #0056b3; }
+        .copy-hint { font-size: 12px; color: #888; text-align: center; margin-top: -16px; margin-bottom: 20px; }
+        .field-mode { font-size: 11px; margin-bottom: 6px; }
+        .field-mode select { padding: 3px 6px; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+        <div class="tool-container">
+            <h1>Cron式ビルダー</h1>
+
+            <div class="presets" id="presets"></div>
+
+            <div class="cron-display" id="cronDisplay" title="クリックしてコピー">* * * * *</div>
+            <p class="copy-hint">クリックでコピー</p>
+
+            <div class="cron-input-bar">
+                <input type="text" id="cronInput" value="* * * * *" placeholder="cron式を直接入力...">
+                <button class="btn-primary" id="parseBtn">解析</button>
+            </div>
+
+            <div class="description-box" id="descBox">毎分実行</div>
+
+            <div class="fields-grid">
+                <div class="field-card" data-field="min">
+                    <div class="field-title">分 (0-59)</div>
+                    <div class="field-val" id="minVal">*</div>
+                    <div class="field-mode">
+                        <select id="minMode" onchange="onModeChange('min')">
+                            <option value="any">毎分</option>
+                            <option value="specific">指定</option>
+                            <option value="range">範囲</option>
+                            <option value="step">ステップ</option>
+                        </select>
+                    </div>
+                    <div id="minOptions"></div>
+                </div>
+                <div class="field-card" data-field="hour">
+                    <div class="field-title">時 (0-23)</div>
+                    <div class="field-val" id="hourVal">*</div>
+                    <div class="field-mode">
+                        <select id="hourMode" onchange="onModeChange('hour')">
+                            <option value="any">毎時</option>
+                            <option value="specific">指定</option>
+                            <option value="range">範囲</option>
+                            <option value="step">ステップ</option>
+                        </select>
+                    </div>
+                    <div id="hourOptions"></div>
+                </div>
+                <div class="field-card" data-field="dom">
+                    <div class="field-title">日 (1-31)</div>
+                    <div class="field-val" id="domVal">*</div>
+                    <div class="field-mode">
+                        <select id="domMode" onchange="onModeChange('dom')">
+                            <option value="any">毎日</option>
+                            <option value="specific">指定</option>
+                            <option value="range">範囲</option>
+                            <option value="step">ステップ</option>
+                        </select>
+                    </div>
+                    <div id="domOptions"></div>
+                </div>
+                <div class="field-card" data-field="month">
+                    <div class="field-title">月 (1-12)</div>
+                    <div class="field-val" id="monthVal">*</div>
+                    <div class="field-mode">
+                        <select id="monthMode" onchange="onModeChange('month')">
+                            <option value="any">毎月</option>
+                            <option value="specific">指定</option>
+                            <option value="range">範囲</option>
+                        </select>
+                    </div>
+                    <div id="monthOptions"></div>
+                </div>
+                <div class="field-card" data-field="dow">
+                    <div class="field-title">曜日 (0=日〜6=土)</div>
+                    <div class="field-val" id="dowVal">*</div>
+                    <div class="field-mode">
+                        <select id="dowMode" onchange="onModeChange('dow')">
+                            <option value="any">毎日</option>
+                            <option value="specific">指定</option>
+                        </select>
+                    </div>
+                    <div id="dowOptions"></div>
+                </div>
+            </div>
+
+            <div class="next-runs">
+                <h3>⏰ 次回実行時刻（上位10件）</h3>
+                <ul id="nextRunsList"></ul>
+            </div>
+        </div>
+        <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+
+    <script>
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    const FIELD_CONFIG = {
+        min:   { min: 0, max: 59, label: '分' },
+        hour:  { min: 0, max: 23, label: '時' },
+        dom:   { min: 1, max: 31, label: '日' },
+        month: { min: 1, max: 12, label: '月' },
+        dow:   { min: 0, max: 6,  label: '曜日', names: ['日','月','火','水','木','金','土'] },
+    };
+    const FIELD_ORDER = ['min','hour','dom','month','dow'];
+
+    const PRESETS = [
+        { label: '毎分',     cron: '* * * * *' },
+        { label: '毎時',     cron: '0 * * * *' },
+        { label: '毎日0時',  cron: '0 0 * * *' },
+        { label: '毎日9時',  cron: '0 9 * * *' },
+        { label: '毎週月曜', cron: '0 9 * * 1' },
+        { label: '毎月1日',  cron: '0 0 1 * *' },
+        { label: '5分ごと',  cron: '*/5 * * * *' },
+        { label: '30分ごと', cron: '*/30 * * * *' },
+        { label: '平日9時',  cron: '0 9 * * 1-5' },
+        { label: '月末',     cron: '0 0 28-31 * *' },
+    ];
+
+    // Build preset buttons
+    const presetContainer = document.getElementById('presets');
+    PRESETS.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'preset-btn';
+        btn.textContent = p.label;
+        btn.addEventListener('click', () => { setCron(p.cron); });
+        presetContainer.appendChild(btn);
+    });
+
+    // Field options rendering
+    function renderOptions(field) {
+        const cfg = FIELD_CONFIG[field];
+        const mode = document.getElementById(field + 'Mode').value;
+        const container = document.getElementById(field + 'Options');
+        container.innerHTML = '';
+
+        if (mode === 'specific') {
+            if (cfg.names) {
+                // Checkboxes for days of week
+                const wrap = document.createElement('div');
+                wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;';
+                cfg.names.forEach((name, i) => {
+                    const label = document.createElement('label');
+                    label.style.cssText = 'display:flex;align-items:center;gap:3px;font-size:12px;cursor:pointer;';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox'; cb.value = i;
+                    cb.addEventListener('change', updateFromFields);
+                    label.appendChild(cb);
+                    label.appendChild(document.createTextNode(name));
+                    wrap.appendChild(label);
+                });
+                container.appendChild(wrap);
+            } else {
+                const input = document.createElement('input');
+                input.type = 'number'; input.min = cfg.min; input.max = cfg.max;
+                input.placeholder = `${cfg.min}〜${cfg.max}`;
+                input.addEventListener('input', updateFromFields);
+                container.appendChild(input);
+            }
+        } else if (mode === 'range') {
+            const row = document.createElement('div');
+            row.className = 'range-row';
+            const from = document.createElement('input');
+            from.type = 'number'; from.min = cfg.min; from.max = cfg.max; from.placeholder = '開始';
+            const to = document.createElement('input');
+            to.type = 'number'; to.min = cfg.min; to.max = cfg.max; to.placeholder = '終了';
+            from.addEventListener('input', updateFromFields);
+            to.addEventListener('input', updateFromFields);
+            row.append(from, document.createTextNode('〜'), to);
+            container.appendChild(row);
+        } else if (mode === 'step') {
+            const row = document.createElement('div');
+            row.className = 'range-row';
+            const step = document.createElement('input');
+            step.type = 'number'; step.min = 1; step.max = cfg.max; step.placeholder = 'n';
+            step.addEventListener('input', updateFromFields);
+            row.append(document.createTextNode('*/'), step);
+            container.appendChild(row);
+        }
+    }
+
+    function onModeChange(field) {
+        renderOptions(field);
+        updateFromFields();
+    }
+
+    function getFieldValue(field) {
+        const mode = document.getElementById(field + 'Mode').value;
+        const container = document.getElementById(field + 'Options');
+        const cfg = FIELD_CONFIG[field];
+        if (mode === 'any') return '*';
+        if (mode === 'specific') {
+            if (cfg.names) {
+                const checked = [...container.querySelectorAll('input:checked')].map(cb => cb.value);
+                return checked.length === 0 ? '*' : checked.join(',');
+            } else {
+                const val = container.querySelector('input')?.value;
+                return val !== '' && val !== undefined ? val : '*';
+            }
+        }
+        if (mode === 'range') {
+            const inputs = container.querySelectorAll('input');
+            const from = inputs[0]?.value; const to = inputs[1]?.value;
+            return (from && to) ? `${from}-${to}` : '*';
+        }
+        if (mode === 'step') {
+            const val = container.querySelector('input')?.value;
+            return val ? `*/${val}` : '*';
+        }
+        return '*';
+    }
+
+    function updateFromFields() {
+        const parts = FIELD_ORDER.map(f => getFieldValue(f));
+        const cron = parts.join(' ');
+        updateDisplay(cron);
+    }
+
+    function updateDisplay(cron) {
+        document.getElementById('cronDisplay').textContent = cron;
+        document.getElementById('cronInput').value = cron;
+        document.getElementById('descBox').textContent = describeCron(cron);
+        updateNextRuns(cron);
+        FIELD_ORDER.forEach((f, i) => {
+            document.getElementById(f + 'Val').textContent = cron.split(' ')[i] || '*';
+        });
+    }
+
+    // Initialize field options
+    FIELD_ORDER.forEach(f => renderOptions(f));
+
+    // Cron description
+    function describeCron(cron) {
+        const parts = cron.trim().split(/\s+/);
+        if (parts.length !== 5) return '無効なcron式です';
+        const [min, hour, dom, month, dow] = parts;
+        const DOW_NAMES = ['日曜','月曜','火曜','水曜','木曜','金曜','土曜'];
+        const MONTH_NAMES = ['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+        function descField(val, unit, names) {
+            if (val === '*') return null;
+            if (val.startsWith('*/')) return `${val.slice(2)}${unit}ごと`;
+            if (val.includes('-')) {
+                const [a,b] = val.split('-');
+                return names ? `${names[a]}〜${names[b]}` : `${a}〜${b}${unit}`;
+            }
+            if (val.includes(',')) {
+                const vals = val.split(',');
+                return (names ? vals.map(v => names[v]) : vals).join('・') + unit;
+            }
+            return names ? names[val] : `${val}${unit}`;
+        }
+
+        const parts2 = [];
+        const mDesc = descField(month, '月', MONTH_NAMES);
+        if (mDesc) parts2.push(mDesc);
+        const dDesc = descField(dom, '日');
+        if (dDesc) parts2.push(dDesc);
+        const wDesc = descField(dow, '曜日', DOW_NAMES);
+        if (wDesc) parts2.push(wDesc);
+
+        let timeDesc = '';
+        if (hour === '*' && min === '*') timeDesc = '毎分';
+        else if (hour === '*') timeDesc = `毎時${min}分`;
+        else if (min === '*') timeDesc = `${hour}時の毎分`;
+        else if (min.startsWith('*/')) timeDesc = `${hour}時から${min.slice(2)}分ごと`;
+        else timeDesc = `${hour}時${min === '0' ? '' : min + '分'}`;
+
+        return (parts2.length ? parts2.join(' ') + ' の' : '') + timeDesc + ' 実行';
+    }
+
+    // Next run calculation
+    function matchesCronField(val, n) {
+        if (val === '*') return true;
+        if (val.startsWith('*/')) return n % parseInt(val.slice(2)) === 0;
+        if (val.includes('-')) { const [a,b] = val.split('-').map(Number); return n >= a && n <= b; }
+        if (val.includes(',')) return val.split(',').map(Number).includes(n);
+        return parseInt(val) === n;
+    }
+
+    function updateNextRuns(cron) {
+        const list = document.getElementById('nextRunsList');
+        list.innerHTML = '';
+        const parts = cron.trim().split(/\s+/);
+        if (parts.length !== 5) { list.innerHTML = '<li>無効なcron式</li>'; return; }
+        const [min, hour, dom, month, dow] = parts;
+
+        const runs = [];
+        const now = new Date();
+        let d = new Date(now);
+        d.setSeconds(0); d.setMilliseconds(0);
+        d.setMinutes(d.getMinutes() + 1);
+
+        let count = 0, tries = 0;
+        while (runs.length < 10 && tries < 100000) {
+            tries++;
+            const m = d.getMonth() + 1, day = d.getDate(),
+                  h = d.getHours(), mn = d.getMinutes(), wd = d.getDay();
+            if (matchesCronField(month, m) && matchesCronField(dom, day) &&
+                matchesCronField(dow, wd) && matchesCronField(hour, h) &&
+                matchesCronField(min, mn)) {
+                runs.push(new Date(d));
+            }
+            d.setMinutes(d.getMinutes() + 1);
+        }
+
+        if (!runs.length) { list.innerHTML = '<li>次回実行時刻を計算できませんでした（範囲が広すぎる可能性があります）</li>'; return; }
+
+        const fmt = new Intl.DateTimeFormat('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', weekday:'short' });
+        runs.forEach(r => {
+            const li = document.createElement('li');
+            li.textContent = fmt.format(r);
+            list.appendChild(li);
+        });
+    }
+
+    // Parse cron input
+    document.getElementById('parseBtn').addEventListener('click', parseCronInput);
+    document.getElementById('cronInput').addEventListener('keydown', e => { if (e.key === 'Enter') parseCronInput(); });
+
+    function parseCronInput() {
+        const val = document.getElementById('cronInput').value.trim();
+        setCron(val);
+    }
+
+    function setCron(cron) {
+        document.getElementById('cronInput').value = cron;
+        updateDisplay(cron);
+        // Try to reflect back to fields (simple cases)
+        const parts = cron.trim().split(/\s+/);
+        if (parts.length !== 5) return;
+        FIELD_ORDER.forEach((f, i) => {
+            const val = parts[i];
+            const modeEl = document.getElementById(f + 'Mode');
+            if (val === '*') { modeEl.value = 'any'; }
+            else if (val.startsWith('*/')) { modeEl.value = 'step'; }
+            else if (val.includes('-')) { modeEl.value = 'range'; }
+            else { modeEl.value = 'specific'; }
+            renderOptions(f);
+            // Set input values
+            const container = document.getElementById(f + 'Options');
+            if (val.startsWith('*/')) {
+                const inp = container.querySelector('input');
+                if (inp) inp.value = val.slice(2);
+            } else if (val.includes('-')) {
+                const inputs = container.querySelectorAll('input');
+                const [a,b] = val.split('-');
+                if (inputs[0]) inputs[0].value = a;
+                if (inputs[1]) inputs[1].value = b;
+            } else if (val !== '*') {
+                const cfg = FIELD_CONFIG[f];
+                if (cfg.names) {
+                    const checks = val.split(',');
+                    container.querySelectorAll('input').forEach(cb => {
+                        cb.checked = checks.includes(cb.value);
+                    });
+                } else {
+                    const inp = container.querySelector('input');
+                    if (inp) inp.value = val;
+                }
+            }
+        });
+    }
+
+    // Copy on click
+    document.getElementById('cronDisplay').addEventListener('click', () => {
+        const text = document.getElementById('cronDisplay').textContent;
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+    });
+
+    // Initial render
+    updateDisplay('* * * * *');
+    </script>
+</body>
+</html>

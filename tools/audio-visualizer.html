@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声波形ビジュアライザー - ToolBox</title>
+    <meta name="description" content="音声ファイルやマイク入力を複数のビジュアライザーで表示できるツール。波形・周波数スペクトラム・サーキュラー表示対応。">
+    <meta name="keywords" content="ビジュアライザー, 波形表示, 周波数スペクトラム, 音声可視化, 音声ツール">
+    <meta property="og:title" content="音声波形ビジュアライザー - ToolBox">
+    <meta property="og:description" content="複数のビジュアルスタイルで音声を可視化できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/audio-visualizer.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/audio-visualizer.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page { padding: 2rem 1rem; }
+        .tool-container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .controls-top {
+            padding: 1.5rem; background: #f9f9f9;
+            border-radius: 8px; margin-bottom: 2rem;
+        }
+        .controls-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem; margin-bottom: 1rem;
+        }
+        .control-group {
+            display: flex; flex-direction: column;
+        }
+        .control-group label {
+            font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;
+        }
+        select, input[type="file"] {
+            padding: 0.75rem; border: 1px solid #ddd;
+            border-radius: 4px; font-size: 1rem;
+        }
+        button {
+            padding: 0.75rem 1.5rem; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #ccc; }
+        .button-group {
+            display: flex; gap: 1rem; flex-wrap: wrap;
+        }
+        .drop-zone {
+            border: 2px dashed #ccc; border-radius: 8px; padding: 2rem;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: white;
+        }
+        .drop-zone.dragover { border-color: #0066cc; background: #f0f7ff; }
+        .visualizer-container {
+            position: relative; width: 100%;
+            background: #000; border-radius: 8px;
+            overflow: hidden; margin: 2rem 0;
+            aspect-ratio: 16 / 9;
+        }
+        #visualizer {
+            width: 100%; height: 100%; display: block;
+        }
+        .playback-controls {
+            display: flex; gap: 1rem; align-items: center;
+            margin: 1.5rem 0; flex-wrap: wrap;
+        }
+        .progress-container {
+            flex: 1; min-width: 200px;
+        }
+        .progress-bar {
+            width: 100%; height: 4px; background: #ddd;
+            border-radius: 2px; overflow: hidden; cursor: pointer;
+        }
+        .progress-fill {
+            height: 100%; background: #0066cc; width: 0%;
+            transition: width 0.1s;
+        }
+        .time-display {
+            display: flex; justify-content: space-between;
+            font-size: 0.85rem; color: #666; margin-top: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .file-status {
+            font-size: 0.9rem; color: #666;
+            padding: 0.5rem; background: #f5f5f5;
+            border-radius: 4px; margin: 1rem 0;
+            display: none;
+        }
+        .file-status.show { display: block; }
+        .settings-panel {
+            padding: 1.5rem; background: #f9f9f9;
+            border-radius: 8px; margin-top: 2rem;
+        }
+        .settings-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 1rem 1.5rem; background: #333; color: white;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .fullscreen-mode {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; z-index: 999; border-radius: 0;
+        }
+        .fullscreen-close {
+            position: absolute; top: 20px; right: 20px;
+            background: white; color: #000; border: none;
+            border-radius: 50%; width: 50px; height: 50px;
+            cursor: pointer; font-size: 1.5rem; z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg> ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<div class="tool-page">
+    <div class="tool-container">
+        <h1>音声波形ビジュアライザー</h1>
+        <p class="subtitle">複数の表示方式で音声を可視化。波形・周波数スペクトラム・サーキュラー表示</p>
+
+        <div class="controls-top">
+            <div class="controls-row">
+                <div class="control-group">
+                    <label for="inputMode">入力ソース</label>
+                    <select id="inputMode">
+                        <option value="file">オーディオファイル</option>
+                        <option value="microphone">マイク入力</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="visualizationMode">表示方式</label>
+                    <select id="visualizationMode">
+                        <option value="waveform">波形（オシロスコープ）</option>
+                        <option value="spectrum">周波数スペクトラム</option>
+                        <option value="circular">サーキュラー表示</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="colorTheme">カラーテーマ</label>
+                    <select id="colorTheme">
+                        <option value="blue">ブルー</option>
+                        <option value="rainbow">レインボー</option>
+                        <option value="green">グリーン</option>
+                        <option value="custom">カスタム</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="controls-row">
+                <div class="control-group">
+                    <label for="backgroundColor">背景</label>
+                    <select id="backgroundColor">
+                        <option value="dark" selected>ダーク</option>
+                        <option value="light">ライト</option>
+                    </select>
+                </div>
+
+                <div id="customColorGroup" class="control-group" style="display: none;">
+                    <label for="customColor">カスタムカラー</label>
+                    <input type="color" id="customColor" value="#0066cc">
+                </div>
+            </div>
+
+            <div class="drop-zone" id="dropZone" style="display: none;">
+                <p>オーディオファイルをドラッグ&ドロップするか、クリックして選択</p>
+                <input type="file" id="audioInput" accept="audio/*" style="display: none;">
+            </div>
+
+            <div class="file-status" id="fileStatus"></div>
+
+            <div class="playback-controls">
+                <button class="btn-secondary" id="playBtn" style="display: none;">再生</button>
+                <button class="btn-secondary" id="pauseBtn" style="display: none;">一時停止</button>
+                <button class="btn-secondary" id="stopBtn" style="display: none;">停止</button>
+                <button class="btn-secondary" id="startMicBtn" style="display: none;">マイク開始</button>
+                <button class="btn-secondary" id="stopMicBtn" style="display: none;">マイク停止</button>
+
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalTime">0:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-secondary" id="screenshotBtn">スクリーンショット</button>
+                <button class="btn-secondary" id="fullscreenBtn">フルスクリーン</button>
+            </div>
+        </div>
+
+        <div class="visualizer-container" id="visualizerContainer">
+            <canvas id="visualizer"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+class AudioVisualizer {
+    constructor() {
+        this.audioContext = null;
+        this.analyser = null;
+        this.dataArray = null;
+        this.source = null;
+        this.audioBuffer = null;
+        this.isPlaying = false;
+        this.inputMode = 'file';
+        this.visualizationMode = 'waveform';
+        this.colorTheme = 'blue';
+        this.backgroundColor = 'dark';
+        this.customColor = '#0066cc';
+        this.mediaStream = null;
+        this.mediaStreamSource = null;
+        this.playbackStartTime = 0;
+
+        this.initElements();
+        this.attachEventListeners();
+        this.setupCanvas();
+    }
+
+    initElements() {
+        this.inputModeSelect = document.getElementById('inputMode');
+        this.visualizationModeSelect = document.getElementById('visualizationMode');
+        this.colorThemeSelect = document.getElementById('colorTheme');
+        this.bgColorSelect = document.getElementById('backgroundColor');
+        this.customColorInput = document.getElementById('customColor');
+        this.customColorGroup = document.getElementById('customColorGroup');
+        this.dropZone = document.getElementById('dropZone');
+        this.audioInput = document.getElementById('audioInput');
+        this.canvas = document.getElementById('visualizer');
+        this.ctx = this.canvas.getContext('2d');
+        this.fileStatus = document.getElementById('fileStatus');
+        this.playBtn = document.getElementById('playBtn');
+        this.pauseBtn = document.getElementById('pauseBtn');
+        this.stopBtn = document.getElementById('stopBtn');
+        this.startMicBtn = document.getElementById('startMicBtn');
+        this.stopMicBtn = document.getElementById('stopMicBtn');
+        this.progressContainer = document.getElementById('progressContainer');
+        this.progressFill = document.getElementById('progressFill');
+        this.screenshotBtn = document.getElementById('screenshotBtn');
+        this.fullscreenBtn = document.getElementById('fullscreenBtn');
+        this.visualizerContainer = document.getElementById('visualizerContainer');
+    }
+
+    attachEventListeners() {
+        this.inputModeSelect.addEventListener('change', (e) => this.setInputMode(e.target.value));
+        this.visualizationModeSelect.addEventListener('change', (e) => this.visualizationMode = e.target.value);
+        this.colorThemeSelect.addEventListener('change', (e) => {
+            this.colorTheme = e.target.value;
+            this.customColorGroup.style.display = this.colorTheme === 'custom' ? 'flex' : 'none';
+        });
+        this.bgColorSelect.addEventListener('change', (e) => this.backgroundColor = e.target.value);
+        this.customColorInput.addEventListener('change', (e) => this.customColor = e.target.value);
+
+        this.dropZone.addEventListener('click', () => this.audioInput.click());
+        this.dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.add('dragover');
+        });
+        this.dropZone.addEventListener('dragleave', () => this.dropZone.classList.remove('dragover'));
+        this.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) this.handleFile(e.dataTransfer.files[0]);
+        });
+
+        this.audioInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) this.handleFile(e.target.files[0]);
+        });
+
+        this.playBtn.addEventListener('click', () => this.play());
+        this.pauseBtn.addEventListener('click', () => this.pause());
+        this.stopBtn.addEventListener('click', () => this.stop());
+        this.startMicBtn.addEventListener('click', () => this.startMicrophone());
+        this.stopMicBtn.addEventListener('click', () => this.stopMicrophone());
+        this.screenshotBtn.addEventListener('click', () => this.takeScreenshot());
+        this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+
+        this.setInputMode('file');
+    }
+
+    setupCanvas() {
+        const rect = this.visualizerContainer.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+
+        if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 2048;
+            this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+        }
+
+        this.animate();
+    }
+
+    setInputMode(mode) {
+        this.inputMode = mode;
+        if (mode === 'file') {
+            this.dropZone.style.display = 'block';
+            this.playBtn.style.display = 'inline-block';
+            this.pauseBtn.style.display = 'none';
+            this.stopBtn.style.display = 'inline-block';
+            this.startMicBtn.style.display = 'none';
+            this.stopMicBtn.style.display = 'none';
+            this.progressContainer.style.display = 'block';
+        } else {
+            this.dropZone.style.display = 'none';
+            this.playBtn.style.display = 'none';
+            this.pauseBtn.style.display = 'none';
+            this.stopBtn.style.display = 'none';
+            this.startMicBtn.style.display = 'inline-block';
+            this.stopMicBtn.style.display = 'none';
+            this.progressContainer.style.display = 'none';
+        }
+    }
+
+    async handleFile(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        try {
+            this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.fileStatus.textContent = `ファイル読込: ${file.name} (${this.formatTime(this.audioBuffer.duration)})`;
+            this.fileStatus.classList.add('show');
+            document.getElementById('totalTime').textContent = this.formatTime(this.audioBuffer.duration);
+        } catch (error) {
+            this.showToast('ファイルのデコードに失敗しました');
+        }
+    }
+
+    play() {
+        if (this.isPlaying || !this.audioBuffer) return;
+
+        this.isPlaying = true;
+        this.playBtn.style.display = 'none';
+        this.pauseBtn.style.display = 'inline-block';
+
+        this.source = this.audioContext.createBufferSource();
+        this.source.buffer = this.audioBuffer;
+        this.source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
+        this.playbackStartTime = this.audioContext.currentTime;
+        this.source.start(0);
+
+        this.animateProgress();
+    }
+
+    pause() {
+        if (!this.isPlaying || !this.source) return;
+        this.isPlaying = false;
+        this.source.stop();
+        this.playBtn.style.display = 'inline-block';
+        this.pauseBtn.style.display = 'none';
+    }
+
+    stop() {
+        if (this.source && this.isPlaying) {
+            this.source.stop();
+        }
+        this.isPlaying = false;
+        this.playBtn.style.display = 'inline-block';
+        this.pauseBtn.style.display = 'none';
+        this.progressFill.style.width = '0%';
+        document.getElementById('currentTime').textContent = '0:00';
+    }
+
+    async startMicrophone() {
+        try {
+            this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.mediaStreamSource = this.audioContext.createMediaStreamAudioSource(this.mediaStream);
+            this.mediaStreamSource.connect(this.analyser);
+            this.analyser.connect(this.audioContext.destination);
+            this.startMicBtn.style.display = 'none';
+            this.stopMicBtn.style.display = 'inline-block';
+            this.showToast('マイク入力開始');
+        } catch (error) {
+            this.showToast('マイクへのアクセスに失敗しました');
+        }
+    }
+
+    stopMicrophone() {
+        if (this.mediaStream) {
+            this.mediaStream.getTracks().forEach(track => track.stop());
+            this.startMicBtn.style.display = 'inline-block';
+            this.stopMicBtn.style.display = 'none';
+            this.showToast('マイク入力停止');
+        }
+    }
+
+    animateProgress() {
+        const totalDuration = this.audioBuffer.duration;
+        const updateProgress = () => {
+            if (!this.isPlaying) return;
+
+            const elapsed = this.audioContext.currentTime - this.playbackStartTime;
+            const percent = (elapsed / totalDuration) * 100;
+            this.progressFill.style.width = Math.min(percent, 100) + '%';
+            document.getElementById('currentTime').textContent = this.formatTime(elapsed);
+
+            if (elapsed < totalDuration) {
+                requestAnimationFrame(updateProgress);
+            } else {
+                this.stop();
+            }
+        };
+        updateProgress();
+    }
+
+    animate() {
+        this.analyser.getByteFrequencyData(this.dataArray);
+
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+
+        const bgColor = this.backgroundColor === 'dark' ? '#000000' : '#ffffff';
+        this.ctx.fillStyle = bgColor;
+        this.ctx.fillRect(0, 0, width, height);
+
+        if (this.visualizationMode === 'waveform') {
+            this.drawWaveform(width, height);
+        } else if (this.visualizationMode === 'spectrum') {
+            this.drawSpectrum(width, height);
+        } else if (this.visualizationMode === 'circular') {
+            this.drawCircular(width, height);
+        }
+
+        requestAnimationFrame(() => this.animate());
+    }
+
+    drawWaveform(width, height) {
+        const timingData = new Uint8Array(this.analyser.fftSize);
+        this.analyser.getByteTimeDomainData(timingData);
+
+        const color = this.getColor(0);
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+
+        const sliceWidth = width / timingData.length;
+        let x = 0;
+
+        for (let i = 0; i < timingData.length; i++) {
+            const v = timingData[i] / 128.0;
+            const y = (v * height) / 2;
+
+            if (i === 0) this.ctx.moveTo(x, y);
+            else this.ctx.lineTo(x, y);
+
+            x += sliceWidth;
+        }
+
+        this.ctx.lineTo(width, height / 2);
+        this.ctx.stroke();
+    }
+
+    drawSpectrum(width, height) {
+        const barWidth = width / this.dataArray.length * 2.5;
+        let x = 0;
+
+        for (let i = 0; i < this.dataArray.length; i++) {
+            const barHeight = (this.dataArray[i] / 255) * height;
+            const color = this.getColor(i / this.dataArray.length);
+            this.ctx.fillStyle = color;
+            this.ctx.fillRect(x, height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+        }
+    }
+
+    drawCircular(width, height) {
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(width, height) / 3;
+
+        for (let i = 0; i < this.dataArray.length; i++) {
+            const angle = (i / this.dataArray.length) * Math.PI * 2;
+            const value = this.dataArray[i] / 255;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            const size = value * 50;
+
+            const color = this.getColor(i / this.dataArray.length);
+            this.ctx.fillStyle = color;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, size, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+    }
+
+    getColor(index) {
+        if (this.colorTheme === 'blue') {
+            return `hsl(210, 100%, ${50 + index * 30}%)`;
+        } else if (this.colorTheme === 'rainbow') {
+            return `hsl(${index * 360}, 100%, 50%)`;
+        } else if (this.colorTheme === 'green') {
+            return `hsl(120, 100%, ${30 + index * 50}%)`;
+        } else {
+            const brightness = 30 + index * 60;
+            const hsl = this.hexToHsl(this.customColor);
+            return `hsl(${hsl.h}, ${hsl.s}%, ${Math.min(brightness, 95)}%)`;
+        }
+    }
+
+    hexToHsl(hex) {
+        let r = parseInt(hex.slice(1, 3), 16) / 255;
+        let g = parseInt(hex.slice(3, 5), 16) / 255;
+        let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h = 0, s = 0, l = (max + min) / 2;
+
+        if (max !== min) {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                case g: h = ((b - r) / d + 2) / 6; break;
+                case b: h = ((r - g) / d + 4) / 6; break;
+            }
+        }
+
+        return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+    }
+
+    takeScreenshot() {
+        const link = document.createElement('a');
+        link.href = this.canvas.toDataURL('image/png');
+        link.download = `visualizer_${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.showToast('スクリーンショットを保存しました');
+    }
+
+    toggleFullscreen() {
+        if (this.visualizerContainer.classList.contains('fullscreen-mode')) {
+            this.visualizerContainer.classList.remove('fullscreen-mode');
+            this.visualizerContainer.innerHTML = '<canvas id="visualizer"></canvas>';
+            this.canvas = document.getElementById('visualizer');
+            this.ctx = this.canvas.getContext('2d');
+            this.setupCanvas();
+        } else {
+            this.visualizerContainer.classList.add('fullscreen-mode');
+            this.visualizerContainer.innerHTML = '<button class="fullscreen-close" onclick="location.reload()">✕</button><canvas id="visualizer"></canvas>';
+            this.canvas = document.getElementById('visualizer');
+            this.ctx = this.canvas.getContext('2d');
+            this.setupCanvas();
+        }
+    }
+
+    formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes}:${String(secs).padStart(2, '0')}`;
+    }
+
+    showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new AudioVisualizer();
+});
+</script>
+</body>
+</html>

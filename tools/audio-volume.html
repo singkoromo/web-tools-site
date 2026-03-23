@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音量調整・正規化 - ToolBox</title>
+    <meta name="description" content="音声ファイルの音量を調整・正規化できるオンラインツール。ノーマライズやフェードイン・アウト対応。">
+    <meta name="keywords" content="音量調整, 正規化, ノーマライズ, 音声編集, 音声ツール">
+    <meta property="og:title" content="音量調整・正規化 - ToolBox">
+    <meta property="og:description" content="音声の音量を簡単に調整・正規化できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/audio-volume.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/audio-volume.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page { padding: 2rem 1rem; }
+        .tool-container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .drop-zone {
+            border: 2px dashed #ccc; border-radius: 8px; padding: 2rem;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: #f9f9f9;
+        }
+        .drop-zone.dragover { border-color: #0066cc; background: #f0f7ff; }
+        .file-info {
+            margin-top: 2rem; padding: 1rem; background: #f5f5f5;
+            border-radius: 8px; display: none;
+        }
+        .file-info.show { display: block; }
+        .info-row { display: flex; justify-content: space-between; margin: 0.5rem 0; }
+        .controls-panel {
+            margin-top: 2rem; display: none;
+        }
+        .controls-panel.show { display: block; }
+        .control-group {
+            margin-bottom: 1.5rem; padding: 1.5rem;
+            background: #f9f9f9; border-radius: 8px;
+        }
+        .control-label {
+            font-weight: 600; margin-bottom: 1rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .control-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem; color: #0066cc; font-weight: 700;
+        }
+        input[type="range"] {
+            width: 100%; height: 6px;
+            border-radius: 3px; background: #ddd;
+            outline: none; -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #0066cc; cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #0066cc; cursor: pointer; border: none;
+        }
+        .levels-display {
+            margin-top: 1rem; padding: 1rem;
+            background: white; border-radius: 8px;
+        }
+        .level-item {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .level-name { font-size: 0.9rem; }
+        .level-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600; color: #0066cc;
+        }
+        .level-meter-visual {
+            width: 100px; height: 20px; background: #e0e0e0;
+            border-radius: 10px; overflow: hidden;
+            flex-shrink: 0;
+        }
+        .level-meter-fill {
+            height: 100%; background: #0066cc; width: 0%;
+            transition: width 0.1s;
+        }
+        .playback-section {
+            margin-top: 2rem; padding: 1.5rem;
+            background: #f9f9f9; border-radius: 8px;
+            display: none;
+        }
+        .playback-section.show { display: block; }
+        .progress-bar {
+            width: 100%; height: 4px; background: #e0e0e0;
+            border-radius: 2px; margin: 1rem 0; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: #0066cc; width: 0%;
+            transition: width 0.1s;
+        }
+        .time-display {
+            display: flex; justify-content: space-between;
+            font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        button {
+            padding: 0.75rem 1.5rem; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #ccc; }
+        .btn-secondary:disabled { background: #ccc; cursor: not-allowed; }
+        .button-group {
+            display: flex; gap: 1rem; margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 1rem 1.5rem; background: #333; color: white;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg> ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<div class="tool-page">
+    <div class="tool-container">
+        <h1>音量調整・正規化</h1>
+        <p class="subtitle">音量調整、正規化、フェードイン/アウト機能</p>
+
+        <div class="drop-zone" id="dropZone">
+            <p>音声ファイルをドラッグ&ドロップするか、クリックして選択</p>
+            <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">対応形式: MP3, WAV, OGG, M4A, WebM など</p>
+            <input type="file" id="audioInput" accept="audio/*" style="display: none;">
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="info-row">
+                <span>ファイル名:</span>
+                <span id="infoFilename">-</span>
+            </div>
+            <div class="info-row">
+                <span>再生時間:</span>
+                <span id="infoDuration">-</span>
+            </div>
+        </div>
+
+        <div class="controls-panel" id="controlsPanel">
+            <div class="control-group">
+                <div class="control-label">
+                    <span>音量</span>
+                    <span class="control-value" id="volumeValue">100%</span>
+                </div>
+                <input type="range" id="volumeSlider" min="0" max="300" value="100" step="1">
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">0% ～ 300%</p>
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>フェードイン</span>
+                    <span class="control-value" id="fadeInValue">なし</span>
+                </div>
+                <select id="fadeInSelect">
+                    <option value="0" selected>なし</option>
+                    <option value="0.5">0.5秒</option>
+                    <option value="1">1秒</option>
+                    <option value="2">2秒</option>
+                    <option value="3">3秒</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>フェードアウト</span>
+                    <span class="control-value" id="fadeOutValue">なし</span>
+                </div>
+                <select id="fadeOutSelect">
+                    <option value="0" selected>なし</option>
+                    <option value="0.5">0.5秒</option>
+                    <option value="1">1秒</option>
+                    <option value="2">2秒</option>
+                    <option value="3">3秒</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <div class="levels-display">
+                    <div class="level-item">
+                        <div class="level-name">ピークレベル</div>
+                        <div class="level-value" id="peakLevel">-</div>
+                    </div>
+                    <div class="level-item">
+                        <div class="level-name">RMSレベル</div>
+                        <div class="level-value" id="rmsLevel">-</div>
+                    </div>
+                </div>
+                <button class="btn-secondary" id="normalizeBtn" style="margin-top: 1rem; width: 100%;">正規化（ノーマライズ）実行</button>
+            </div>
+
+            <div class="playback-section" id="playbackSection">
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" id="playBtn">再生</button>
+                    <button class="btn-secondary" id="pauseBtn" style="display: none;">一時停止</button>
+                    <button class="btn-secondary" id="stopBtn">停止</button>
+                </div>
+
+                <div class="button-group" style="margin-top: 1.5rem;">
+                    <button class="btn-primary" id="exportBtn">適用して保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+class AudioVolume {
+    constructor() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.audioBuffer = null;
+        this.source = null;
+        this.gainNode = null;
+        this.isPlaying = false;
+        this.playbackStartTime = 0;
+        this.playbackPausedTime = 0;
+        this.volume = 1;
+        this.fadeInDuration = 0;
+        this.fadeOutDuration = 0;
+
+        this.initElements();
+        this.attachEventListeners();
+    }
+
+    initElements() {
+        this.dropZone = document.getElementById('dropZone');
+        this.audioInput = document.getElementById('audioInput');
+        this.fileInfo = document.getElementById('fileInfo');
+        this.controlsPanel = document.getElementById('controlsPanel');
+        this.playbackSection = document.getElementById('playbackSection');
+        this.volumeSlider = document.getElementById('volumeSlider');
+        this.volumeValue = document.getElementById('volumeValue');
+        this.fadeInSelect = document.getElementById('fadeInSelect');
+        this.fadeInValue = document.getElementById('fadeInValue');
+        this.fadeOutSelect = document.getElementById('fadeOutSelect');
+        this.fadeOutValue = document.getElementById('fadeOutValue');
+        this.peakLevel = document.getElementById('peakLevel');
+        this.rmsLevel = document.getElementById('rmsLevel');
+        this.normalizeBtn = document.getElementById('normalizeBtn');
+        this.playBtn = document.getElementById('playBtn');
+        this.pauseBtn = document.getElementById('pauseBtn');
+        this.stopBtn = document.getElementById('stopBtn');
+        this.progressFill = document.getElementById('progressFill');
+        this.exportBtn = document.getElementById('exportBtn');
+        this.currentTimeDisplay = document.getElementById('currentTime');
+        this.totalTimeDisplay = document.getElementById('totalTime');
+    }
+
+    attachEventListeners() {
+        this.dropZone.addEventListener('click', () => this.audioInput.click());
+        this.dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.add('dragover');
+        });
+        this.dropZone.addEventListener('dragleave', () => {
+            this.dropZone.classList.remove('dragover');
+        });
+        this.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                this.handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        this.audioInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) this.handleFile(e.target.files[0]);
+        });
+
+        this.volumeSlider.addEventListener('input', (e) => {
+            this.volume = parseFloat(e.target.value) / 100;
+            this.volumeValue.textContent = e.target.value + '%';
+        });
+
+        this.fadeInSelect.addEventListener('change', (e) => {
+            this.fadeInDuration = parseFloat(e.target.value);
+            this.fadeInValue.textContent = this.fadeInDuration === 0 ? 'なし' : this.fadeInDuration + '秒';
+        });
+
+        this.fadeOutSelect.addEventListener('change', (e) => {
+            this.fadeOutDuration = parseFloat(e.target.value);
+            this.fadeOutValue.textContent = this.fadeOutDuration === 0 ? 'なし' : this.fadeOutDuration + '秒';
+        });
+
+        this.normalizeBtn.addEventListener('click', () => this.normalize());
+        this.playBtn.addEventListener('click', () => this.play());
+        this.pauseBtn.addEventListener('click', () => this.pause());
+        this.stopBtn.addEventListener('click', () => this.stop());
+        this.exportBtn.addEventListener('click', () => this.export());
+    }
+
+    async handleFile(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        try {
+            this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.displayFileInfo(file);
+            this.analyzeAudio();
+            this.fileInfo.classList.add('show');
+            this.controlsPanel.classList.add('show');
+            this.playbackSection.classList.add('show');
+            this.totalTimeDisplay.textContent = this.formatTime(this.audioBuffer.duration);
+        } catch (error) {
+            this.showToast('ファイルのデコードに失敗しました');
+        }
+    }
+
+    displayFileInfo(file) {
+        document.getElementById('infoFilename').textContent = file.name;
+        document.getElementById('infoDuration').textContent = this.formatTime(this.audioBuffer.duration);
+    }
+
+    analyzeAudio() {
+        const data = this.audioBuffer.getChannelData(0);
+        let peak = 0;
+        let rms = 0;
+
+        for (let i = 0; i < data.length; i++) {
+            const sample = Math.abs(data[i]);
+            if (sample > peak) peak = sample;
+            rms += sample * sample;
+        }
+
+        rms = Math.sqrt(rms / data.length);
+
+        const peakDB = peak > 0 ? (20 * Math.log10(peak)).toFixed(2) : '-∞';
+        const rmsDB = rms > 0 ? (20 * Math.log10(rms)).toFixed(2) : '-∞';
+
+        this.peakLevel.textContent = peakDB + ' dB';
+        this.rmsLevel.textContent = rmsDB + ' dB';
+    }
+
+    normalize() {
+        if (!this.audioBuffer) return;
+
+        const data = this.audioBuffer.getChannelData(0);
+        let peak = 0;
+
+        for (let i = 0; i < data.length; i++) {
+            const sample = Math.abs(data[i]);
+            if (sample > peak) peak = sample;
+        }
+
+        if (peak === 0) {
+            this.showToast('無音ファイルです');
+            return;
+        }
+
+        const scaleFactor = 0.99 / peak;
+        this.volume = scaleFactor;
+        this.volumeSlider.value = Math.min(300, Math.round(scaleFactor * 100));
+        this.volumeValue.textContent = this.volumeSlider.value + '%';
+        this.showToast('正規化しました');
+    }
+
+    play() {
+        if (this.isPlaying) return;
+
+        this.isPlaying = true;
+        this.playBtn.style.display = 'none';
+        this.pauseBtn.style.display = 'inline-block';
+
+        this.source = this.audioContext.createBufferSource();
+        this.source.buffer = this.audioBuffer;
+        this.gainNode = this.audioContext.createGain();
+
+        this.source.connect(this.gainNode);
+        this.gainNode.connect(this.audioContext.destination);
+
+        this.playbackStartTime = this.audioContext.currentTime - this.playbackPausedTime;
+        const offset = this.playbackPausedTime;
+
+        // Apply fade in
+        if (this.fadeInDuration > 0 && offset === 0) {
+            this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+            this.gainNode.gain.linearRampToValueAtTime(this.volume, this.audioContext.currentTime + this.fadeInDuration);
+        } else {
+            this.gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
+        }
+
+        // Apply fade out
+        if (this.fadeOutDuration > 0) {
+            const startFadeTime = this.audioContext.currentTime + (this.audioBuffer.duration - offset - this.fadeOutDuration);
+            this.gainNode.gain.setValueAtTime(this.volume, startFadeTime);
+            this.gainNode.gain.linearRampToValueAtTime(0, startFadeTime + this.fadeOutDuration);
+        }
+
+        this.source.start(0, offset);
+        this.animateProgress();
+    }
+
+    pause() {
+        if (!this.isPlaying) return;
+
+        this.playbackPausedTime = this.audioContext.currentTime - this.playbackStartTime;
+        this.source.stop();
+        this.isPlaying = false;
+        this.playBtn.style.display = 'inline-block';
+        this.pauseBtn.style.display = 'none';
+    }
+
+    stop() {
+        if (this.source && this.isPlaying) {
+            this.source.stop();
+        }
+        this.isPlaying = false;
+        this.playbackPausedTime = 0;
+        this.currentTimeDisplay.textContent = '0:00';
+        this.progressFill.style.width = '0%';
+        this.playBtn.style.display = 'inline-block';
+        this.pauseBtn.style.display = 'none';
+    }
+
+    animateProgress() {
+        const totalDuration = this.audioBuffer.duration;
+        const updateProgress = () => {
+            if (!this.isPlaying) return;
+
+            const elapsed = this.audioContext.currentTime - this.playbackStartTime;
+            const percent = (elapsed / totalDuration) * 100;
+            this.progressFill.style.width = Math.min(percent, 100) + '%';
+            this.currentTimeDisplay.textContent = this.formatTime(elapsed);
+
+            if (elapsed < totalDuration) {
+                requestAnimationFrame(updateProgress);
+            } else {
+                this.stop();
+            }
+        };
+        updateProgress();
+    }
+
+    async export() {
+        this.stop();
+        this.showToast('処理中...');
+
+        try {
+            const offlineContext = new OfflineAudioContext(
+                this.audioBuffer.numberOfChannels,
+                this.audioBuffer.length,
+                this.audioBuffer.sampleRate
+            );
+
+            const source = offlineContext.createBufferSource();
+            source.buffer = this.audioBuffer;
+            const gainNode = offlineContext.createGain();
+
+            source.connect(gainNode);
+            gainNode.connect(offlineContext.destination);
+
+            // Apply fade in
+            if (this.fadeInDuration > 0) {
+                gainNode.gain.setValueAtTime(0, 0);
+                gainNode.gain.linearRampToValueAtTime(this.volume, this.fadeInDuration);
+            } else {
+                gainNode.gain.setValueAtTime(this.volume, 0);
+            }
+
+            // Apply fade out
+            if (this.fadeOutDuration > 0) {
+                const startFadeTime = this.audioBuffer.duration - this.fadeOutDuration;
+                gainNode.gain.setValueAtTime(this.volume, startFadeTime);
+                gainNode.gain.linearRampToValueAtTime(0, this.audioBuffer.duration);
+            }
+
+            source.start(0);
+            const renderedBuffer = await offlineContext.startRendering();
+            const blob = this.encodeWAV(renderedBuffer);
+            this.downloadBlob(blob, 'volume_adjusted.wav');
+            this.showToast('ファイルをダウンロードしました');
+        } catch (error) {
+            this.showToast('エクスポートに失敗しました');
+        }
+    }
+
+    encodeWAV(audioBuffer) {
+        const numberOfChannels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const format = 1;
+        const bitDepth = 16;
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numberOfChannels * bytesPerSample;
+
+        const channelData = [];
+        for (let i = 0; i < numberOfChannels; i++) {
+            channelData.push(audioBuffer.getChannelData(i));
+        }
+
+        const length = audioBuffer.length * numberOfChannels * bytesPerSample;
+        const buffer = new ArrayBuffer(44 + length);
+        const view = new DataView(buffer);
+
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + length, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(36, 'data');
+        view.setUint32(40, length, true);
+
+        let offset = 44;
+        for (let i = 0; i < audioBuffer.length; i++) {
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                let sample = Math.max(-1, Math.min(1, channelData[channel][i]));
+                sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                view.setInt16(offset, sample, true);
+                offset += 2;
+            }
+        }
+
+        return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = (seconds % 60).toFixed(0);
+        return `${minutes}:${String(secs).padStart(2, '0')}`;
+    }
+
+    showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new AudioVolume();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToolBox - 無料オンラインツール集 | 90種類の便利ツール</title>
+  <meta name="description" content="JSON整形、画像圧縮・リサイズ、パスワード生成、正規表現テスター、CSSジェネレーター、音声・動画編集、PDF変換、cURLビルダーなど90種類の無料オンラインツール。すべてブラウザ上で動作し、データはサーバーに送信されません。">
+  <meta name="keywords" content="JSON整形,画像圧縮,パスワード生成,正規表現,CSS生成,単位変換,QRコード,音声変換,動画編集,PDF変換,SQL整形,cURL,オンラインツール,無料ツール">
+  <meta property="og:title" content="ToolBox - 無料オンラインツール集 | 90種類の便利ツール">
+  <meta property="og:description" content="開発者・クリエイター向け90種類の無料オンラインツール。ブラウザ完結でプライバシーも安全。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://web-tool-site.com/">
+  <link rel="canonical" href="https://web-tool-site.com/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        ToolBox
+      </a>
+      <nav class="nav">
+        <a href="index.html">ホーム</a>
+        <a href="#tools">ツール一覧</a>
+        <a href="#about">このサイトについて</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">🌙</button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="メニュー">☰</button>
+      </nav>
+    </div>
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="index.html">ホーム</a>
+      <a href="#tools">ツール一覧</a>
+      <a href="#about">このサイトについて</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-mesh"></div>
+    <div class="hero-badge"><span class="badge-dot"></span>すべて無料・ブラウザ完結</div>
+    <h1>無料で使える<br><span class="gradient-text">便利ツール</span>集</h1>
+    <p>開発者・クリエイターの日常作業を効率化する90種類のオンラインツール。データは一切サーバーに送信されません。</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="number">90</div><div class="label">ツール数</div></div>
+      <div class="hero-stat"><div class="number">12</div><div class="label">カテゴリ</div></div>
+      <div class="hero-stat"><div class="number">0円</div><div class="label">完全無料</div></div>
+    </div>
+  </section>
+
+  <!-- Search -->
+  <div class="search-section">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="toolSearch" placeholder="ツールを検索... 例: JSON, 画像, パスワード">
+    </div>
+    <div class="search-count" id="searchCount"></div>
+  </div>
+
+  <!-- Category Nav -->
+  <div class="category-nav" id="categoryNav">
+    <button class="category-chip active" data-category="all"><span class="chip-icon">🏠</span>すべて<span class="chip-count">90</span></button>
+    <button class="category-chip" data-category="image"><span class="chip-icon">🖼️</span>画像・メディア<span class="chip-count">9</span></button>
+    <button class="category-chip" data-category="dev"><span class="chip-icon">💻</span>開発者向け<span class="chip-count">8</span></button>
+    <button class="category-chip" data-category="css"><span class="chip-icon">🎨</span>Web・CSS<span class="chip-count">8</span></button>
+    <button class="category-chip" data-category="text"><span class="chip-icon">📝</span>テキスト<span class="chip-count">8</span></button>
+    <button class="category-chip" data-category="convert"><span class="chip-icon">🔄</span>変換<span class="chip-count">8</span></button>
+    <button class="category-chip" data-category="calc"><span class="chip-icon">🧮</span>計算<span class="chip-count">6</span></button>
+    <button class="category-chip" data-category="security"><span class="chip-icon">🔒</span>セキュリティ<span class="chip-count">8</span></button>
+    <button class="category-chip" data-category="pdf"><span class="chip-icon">📄</span>PDF<span class="chip-count">9</span></button>
+    <button class="category-chip" data-category="audio"><span class="chip-icon">🎵</span>オーディオ<span class="chip-count">8</span></button>
+    <button class="category-chip" data-category="video"><span class="chip-icon">🎬</span>動画<span class="chip-count">9</span></button>
+    <button class="category-chip" data-category="generator"><span class="chip-icon">🎲</span>生成<span class="chip-count">2</span></button>
+    <button class="category-chip" data-category="it"><span class="chip-icon">🖥️</span>IT・インフラ<span class="chip-count">7</span></button>
+  </div>
+
+  <!-- No results -->
+  <div class="no-results" id="noResults">
+    <div class="nr-icon">🔍</div>
+    <h3>ツールが見つかりませんでした</h3>
+    <p>別のキーワードで検索してみてください</p>
+  </div>
+
+  <!-- Ad Banner -->
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== 画像・メディア ==================== -->
+  <section class="tools-section" id="tools" data-cat="image">
+    <div class="section-header">
+      <div class="section-icon img-icon">🖼️</div>
+      <h2>画像・メディア系ツール</h2>
+      <span class="section-count">9 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/image-compressor.html" class="tool-card" data-search="画像圧縮 image compress jpeg png ファイルサイズ">
+        <div class="tool-icon green">🗜️</div><h3>画像圧縮</h3>
+        <p>JPEG・PNG画像をブラウザ上で圧縮。画質を保ちながらサイズを大幅に削減。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/image-resizer.html" class="tool-card" data-search="画像リサイズ resize サイズ変更 アスペクト比">
+        <div class="tool-icon green">📐</div><h3>画像リサイズ</h3>
+        <p>画像のサイズを自由に変更。アスペクト比固定やプリセット倍率で簡単リサイズ。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/image-converter.html" class="tool-card" data-search="画像形式変換 convert png jpeg webp bmp 一括変換">
+        <div class="tool-icon green">🔄</div><h3>画像形式変換</h3>
+        <p>PNG・JPEG・WebP・BMP間で画像形式を変換。一括変換にも対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/color-picker.html" class="tool-card" data-search="カラーピッカー 色 HEX RGB HSL コントラスト WCAG">
+        <div class="tool-icon pink">🎨</div><h3>カラーピッカー</h3>
+        <p>HEX・RGB・HSLの相互変換、パレット生成、WCAGコントラストチェック。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/svg-to-png.html" class="tool-card" data-search="SVG PNG 変換 ベクター ラスター スケール">
+        <div class="tool-icon pink">🖼️</div><h3>SVG → PNG変換</h3>
+        <p>SVGコードやファイルを高解像度PNGに変換。1x〜4xスケール対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/qr-generator.html" class="tool-card" data-search="QRコード 生成 URL テキスト ダウンロード">
+        <div class="tool-icon pink">📱</div><h3>QRコード生成</h3>
+        <p>URL・テキストからQRコードを即座に生成。PNGダウンロード可能。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/favicon-generator.html" class="tool-card" data-search="favicon ファビコン アイコン 生成 apple-touch-icon">
+        <div class="tool-icon pink">⭐</div><h3>Favicon生成器</h3>
+        <p>テキストからFaviconを生成。各サイズのPNGとHTMLタグ出力。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/palette-generator.html" class="tool-card" data-search="配色 パレット 補色 類似色 カラースキーム">
+        <div class="tool-icon green">🌈</div><h3>配色パレット生成</h3>
+        <p>補色・類似色・三角配色など、調和のとれたカラーパレットを自動生成。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/image-exif.html" class="tool-card" data-search="EXIF 画像 メタデータ カメラ GPS 撮影日時 F値 ISO">
+        <div class="tool-icon teal">📷</div><h3>画像EXIF情報ビューア</h3>
+        <p>JPEG画像のEXIFデータ（撮影日時・カメラ機種・GPS座標・F値・ISO）を表示。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== 開発者向け ==================== -->
+  <section class="tools-section" data-cat="dev">
+    <div class="section-header">
+      <div class="section-icon dev-icon">💻</div>
+      <h2>開発者向けツール</h2>
+      <span class="section-count">8 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/json-formatter.html" class="tool-card" data-search="JSON 整形 フォーマット 検証 バリデーション 圧縮">
+        <div class="tool-icon blue">{ }</div><h3>JSON整形・検証</h3>
+        <p>JSONの整形・圧縮・構文チェックをワンクリック。エラー箇所も表示。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/regex-tester.html" class="tool-card" data-search="正規表現 regex テスター マッチング パターン 置換">
+        <div class="tool-icon blue">🔍</div><h3>正規表現テスター</h3>
+        <p>リアルタイムマッチング、グループ抽出、置換機能。パターン集付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/diff-checker.html" class="tool-card" data-search="テキスト比較 diff 差分 サイドバイサイド">
+        <div class="tool-icon blue">📝</div><h3>テキスト比較（Diff）</h3>
+        <p>2つのテキストの差分を色分け表示。サイドバイサイド対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/url-encoder.html" class="tool-card" data-search="URL エンコード デコード パーセント 特殊文字">
+        <div class="tool-icon orange">🔗</div><h3>URLエンコード/デコード</h3>
+        <p>URLの特殊文字をエンコード・デコード。コンポーネント/フルURL切替。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/hash-generator.html" class="tool-card" data-search="ハッシュ SHA SHA-256 SHA-512 チェックサム">
+        <div class="tool-icon orange">🛡️</div><h3>ハッシュ生成器</h3>
+        <p>SHA-1/256/384/512を同時生成。テキスト・ファイル両対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/html-escape.html" class="tool-card" data-search="HTML エスケープ アンエスケープ エンティティ 特殊文字">
+        <div class="tool-icon orange">🏷️</div><h3>HTMLエスケープ</h3>
+        <p>HTML特殊文字をエスケープ/アンエスケープ。プレビュー表示付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/unix-timestamp.html" class="tool-card" data-search="Unix タイムスタンプ 日時 変換 エポック">
+        <div class="tool-icon purple">⏱️</div><h3>Unixタイムスタンプ変換</h3>
+        <p>タイムスタンプと日時の相互変換。リアルタイム現在時刻表示付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/base64.html" class="tool-card" data-search="Base64 エンコード デコード データURI ファイル">
+        <div class="tool-icon purple">🔄</div><h3>Base64エンコード/デコード</h3>
+        <p>テキストやファイルをBase64に変換・復元。データURI生成対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== Web開発・CSS ==================== -->
+  <section class="tools-section" data-cat="css">
+    <div class="section-header">
+      <div class="section-icon css-icon">🎨</div>
+      <h2>Web開発・CSSツール</h2>
+      <span class="section-count">8 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/css-minifier.html" class="tool-card" data-search="CSS 整形 圧縮 ミニファイ ビューティファイ">
+        <div class="tool-icon blue">🎨</div><h3>CSS整形・圧縮</h3>
+        <p>CSSコードの整形（ビューティファイ）と圧縮（ミニファイ）。サイズ比較表示。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/js-minifier.html" class="tool-card" data-search="JavaScript JS 整形 圧縮 ミニファイ">
+        <div class="tool-icon blue">⚡</div><h3>JavaScript整形・圧縮</h3>
+        <p>JavaScriptの整形と圧縮。コメント除去、ホワイトスペース最適化。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/html-minifier.html" class="tool-card" data-search="HTML 整形 圧縮 インデント コメント除去">
+        <div class="tool-icon blue">📄</div><h3>HTML整形・圧縮</h3>
+        <p>HTMLのインデント整形と不要な空白・コメントの圧縮。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/meta-generator.html" class="tool-card" data-search="メタタグ SEO OGP Twitter カード 生成">
+        <div class="tool-icon orange">🏷️</div><h3>メタタグ生成器</h3>
+        <p>SEOメタタグ、OGP、Twitterカードのコードを一括生成。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/gradient-generator.html" class="tool-card" data-search="グラデーション CSS linear radial conic 背景">
+        <div class="tool-icon pink">🌈</div><h3>CSSグラデーション生成</h3>
+        <p>ビジュアルにCSS linear/radial/conicグラデーションを作成。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/box-shadow.html" class="tool-card" data-search="ボックスシャドウ box-shadow 影 CSS レイヤー">
+        <div class="tool-icon pink">🔲</div><h3>Box Shadow生成器</h3>
+        <p>スライダーで直感的にボックスシャドウを調整。複数レイヤー対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/flexbox-playground.html" class="tool-card" data-search="Flexbox フレックスボックス レイアウト CSS プレイグラウンド">
+        <div class="tool-icon purple">📐</div><h3>Flexboxプレイグラウンド</h3>
+        <p>Flexboxレイアウトをビジュアルに操作。全プロパティをリアルタイムで確認。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/border-radius.html" class="tool-card" data-search="border-radius 角丸 CSS ジェネレーター">
+        <div class="tool-icon purple">⬜</div><h3>Border Radius生成器</h3>
+        <p>角丸をビジュアルに調整。各コーナー個別制御とプリセット付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== テキスト ==================== -->
+  <section class="tools-section" data-cat="text">
+    <div class="section-header">
+      <div class="section-icon txt-icon">📝</div>
+      <h2>テキスト・文章系ツール</h2>
+      <span class="section-count">8 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/char-counter.html" class="tool-card" data-search="文字数 カウンター 単語数 行数 Twitter SNS">
+        <div class="tool-icon teal">📝</div><h3>文字数カウンター</h3>
+        <p>文字数・単語数・行数をリアルタイムカウント。SNS文字数制限チェック対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/markdown-preview.html" class="tool-card" data-search="Markdown プレビュー マークダウン 見出し 表">
+        <div class="tool-icon teal">📖</div><h3>Markdownプレビュー</h3>
+        <p>Markdownをリアルタイムでプレビュー。見出し・表・コードブロック対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/text-transform.html" class="tool-card" data-search="テキスト変換 大文字 小文字 全角 半角 カタカナ ひらがな">
+        <div class="tool-icon teal">🔤</div><h3>テキスト変換</h3>
+        <p>大文字⇔小文字、全角⇔半角、カタカナ⇔ひらがな、ケース変換。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/find-replace.html" class="tool-card" data-search="検索 置換 テキスト 正規表現 一括">
+        <div class="tool-icon teal">🔍</div><h3>検索・置換</h3>
+        <p>テキスト内の文字列検索と一括置換。正規表現モード対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/remove-duplicates.html" class="tool-card" data-search="重複 削除 ユニーク 行 テキスト">
+        <div class="tool-icon green">🗑️</div><h3>重複行削除</h3>
+        <p>テキストの重複行を検出・削除。大文字小文字区別、ソート機能付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/text-sort.html" class="tool-card" data-search="テキスト ソート 並び替え 昇順 降順 シャッフル">
+        <div class="tool-icon green">📊</div><h3>テキストソート</h3>
+        <p>行の並び替え（昇順/降順/数値順）、シャッフル、空行削除。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/word-frequency.html" class="tool-card" data-search="単語 頻度 カウント 出現回数 分析">
+        <div class="tool-icon green">📈</div><h3>単語頻度カウンター</h3>
+        <p>テキスト内の単語出現頻度を分析。棒グラフ表示、日本語対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/lorem-generator.html" class="tool-card" data-search="ダミーテキスト Lorem Ipsum 生成 日本語">
+        <div class="tool-icon green">📜</div><h3>ダミーテキスト生成</h3>
+        <p>Lorem Ipsumを日本語・英語で生成。段落数・文数を自由に設定。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== 変換 ==================== -->
+  <section class="tools-section" data-cat="convert">
+    <div class="section-header">
+      <div class="section-icon conv-icon">🔄</div>
+      <h2>変換ツール</h2>
+      <span class="section-count">8 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/unit-converter.html" class="tool-card" data-search="単位 変換 長さ 重さ 温度 面積 体積">
+        <div class="tool-icon orange">📏</div><h3>単位変換</h3>
+        <p>長さ・重さ・温度・面積・体積・速度・データ容量の7カテゴリ対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/number-converter.html" class="tool-card" data-search="進数 2進 8進 10進 16進 バイナリ ヘキサ">
+        <div class="tool-icon orange">🔢</div><h3>進数変換</h3>
+        <p>2進・8進・10進・16進を同時表示。ビット可視化付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/csv-json.html" class="tool-card" data-search="CSV JSON 変換 データ テーブル">
+        <div class="tool-icon blue">📊</div><h3>CSV↔JSON変換</h3>
+        <p>CSVとJSONの双方向変換。区切り文字変更、ファイルアップロード対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/yaml-json.html" class="tool-card" data-search="YAML JSON 変換 設定ファイル コンフィグ">
+        <div class="tool-icon blue">📋</div><h3>YAML↔JSON変換</h3>
+        <p>YAMLとJSONを相互変換。ネスト構造・配列・型対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/markdown-html.html" class="tool-card" data-search="Markdown HTML 変換 マークダウン">
+        <div class="tool-icon purple">📝</div><h3>Markdown↔HTML変換</h3>
+        <p>MarkdownとHTMLを双方向変換。プレビュー表示付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/encoding-converter.html" class="tool-card" data-search="文字コード UTF-8 Unicode エンコーディング バイト">
+        <div class="tool-icon purple">🔤</div><h3>文字コード変換</h3>
+        <p>UTF-8バイト表示、Unicodeコードポイント、バイト数解析。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/hex-calculator.html" class="tool-card" data-search="プログラマー 電卓 HEX DEC OCT BIN ビット演算">
+        <div class="tool-icon orange">🖩</div><h3>プログラマー電卓</h3>
+        <p>DEC/HEX/OCT/BIN対応電卓。ビット演算、ビット幅選択。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/byte-converter.html" class="tool-card" data-search="バイト 単位 変換 KB MB GB TB データ容量">
+        <div class="tool-icon orange">💾</div><h3>バイト単位変換</h3>
+        <p>Bit〜EBまで全単位変換。バイナリ/SI切替、転送時間推定。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== 計算 ==================== -->
+  <section class="tools-section" data-cat="calc">
+    <div class="section-header">
+      <div class="section-icon calc-icon">🧮</div>
+      <h2>計算・数学ツール</h2>
+      <span class="section-count">6 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/percentage-calc.html" class="tool-card" data-search="パーセント 計算 割合 増減 百分率">
+        <div class="tool-icon teal">％</div><h3>パーセント計算機</h3>
+        <p>「AのB%は？」「AはBの何%？」「増減計算」の3モード対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/bmi-calculator.html" class="tool-card" data-search="BMI 体重 身長 肥満度 健康">
+        <div class="tool-icon teal">⚖️</div><h3>BMI計算機</h3>
+        <p>BMI値・肥満度判定・適正体重を計算。日本肥満学会基準対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/loan-calculator.html" class="tool-card" data-search="ローン 返済 金利 住宅 元利均等 元金均等">
+        <div class="tool-icon green">🏦</div><h3>ローン計算機</h3>
+        <p>元利均等・元金均等の返済額計算。返済スケジュール表付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/date-calculator.html" class="tool-card" data-search="日付 計算 日数 曜日 うるう年 加算">
+        <div class="tool-icon green">📅</div><h3>日付計算</h3>
+        <p>日数差計算、日付加算/減算、曜日検索。うるう年判定付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/tax-calculator.html" class="tool-card" data-search="消費税 税抜 税込 計算 8% 10%">
+        <div class="tool-icon teal">🧾</div><h3>消費税計算機</h3>
+        <p>税抜⇔税込計算。10%/8%対応、複数商品の一括計算モード。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/split-bill.html" class="tool-card" data-search="割り勘 計算 均等 チップ 端数">
+        <div class="tool-icon teal">🍽️</div><h3>割り勘計算機</h3>
+        <p>均等割り・カスタム割り、チップ計算、端数処理対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== セキュリティ ==================== -->
+  <section class="tools-section" data-cat="security">
+    <div class="section-header">
+      <div class="section-icon sec-icon">🔒</div>
+      <h2>セキュリティ・ネットワーク系ツール</h2>
+      <span class="section-count">8 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/password-generator.html" class="tool-card" data-search="パスワード 生成 セキュア 強度 ランダム">
+        <div class="tool-icon purple">🔐</div><h3>パスワード生成器</h3>
+        <p>強力でセキュアなパスワードを即座に生成。文字種カスタマイズ対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/text-encrypt.html" class="tool-card" data-search="暗号化 復号 AES テキスト セキュリティ">
+        <div class="tool-icon purple">🔒</div><h3>テキスト暗号化</h3>
+        <p>AES-GCM暗号化でテキストを保護。パスワードベースの暗号化/復号。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/jwt-decoder.html" class="tool-card" data-search="JWT トークン デコード ヘッダー ペイロード 署名">
+        <div class="tool-icon blue">🎫</div><h3>JWTデコーダー</h3>
+        <p>JWTトークンのヘッダー・ペイロードを色分け表示。有効期限チェック。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/ip-info.html" class="tool-card" data-search="IP アドレス 情報 IPv4 サブネット 確認">
+        <div class="tool-icon orange">🌐</div><h3>IPアドレス情報</h3>
+        <p>自分のIPアドレス確認、IPv4解析、サブネット計算機能。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/cidr-calculator.html" class="tool-card" data-search="CIDR サブネット ネットワーク ホスト IPアドレス">
+        <div class="tool-icon orange">🔢</div><h3>CIDR計算機</h3>
+        <p>ネットワークアドレス、ホスト範囲、サブネットマスクを自動計算。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/useragent-parser.html" class="tool-card" data-search="User-Agent ブラウザ OS デバイス 解析">
+        <div class="tool-icon blue">🖥️</div><h3>User-Agent解析</h3>
+        <p>ブラウザ、OS、デバイスタイプ、エンジンを自動判別。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/http-status.html" class="tool-card" data-search="HTTP ステータスコード 200 404 500 リファレンス">
+        <div class="tool-icon purple">📡</div><h3>HTTPステータスコード一覧</h3>
+        <p>全HTTPステータスコードの検索可能なリファレンス。日本語解説付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/luhn-checker.html" class="tool-card" data-search="Luhn カード番号 チェック 検証 ブランド">
+        <div class="tool-icon purple">💳</div><h3>カード番号チェック</h3>
+        <p>Luhnアルゴリズムでカード番号の形式検証。ブランド自動判別。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== PDF ==================== -->
+  <section class="tools-section" data-cat="pdf">
+    <div class="section-header">
+      <div class="section-icon conv-icon">📄</div>
+      <h2>PDFツール</h2>
+      <span class="section-count">9 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/pdf-merge.html" class="tool-card" data-search="PDF 結合 マージ 合体 複数">
+        <div class="tool-icon orange">📑</div><h3>PDF結合</h3>
+        <p>複数のPDFファイルを1つに結合。ドラッグ&ドロップで順番変更も簡単。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/pdf-split.html" class="tool-card" data-search="PDF 分割 ページ 抽出 範囲">
+        <div class="tool-icon orange">✂️</div><h3>PDF分割</h3>
+        <p>PDFをページごと・範囲指定・均等に分割。必要なページだけ取り出せます。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/pdf-compress.html" class="tool-card" data-search="PDF 圧縮 サイズ 軽量化 最適化">
+        <div class="tool-icon orange">🗜️</div><h3>PDF圧縮</h3>
+        <p>PDFのファイルサイズを削減。メタデータ除去やフォーム平坦化にも対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/pdf-rotate.html" class="tool-card" data-search="PDF 回転 ページ 90度 180度 270度">
+        <div class="tool-icon blue">🔄</div><h3>PDFページ回転</h3>
+        <p>PDFの各ページを90°/180°/270°回転。全ページ一括回転にも対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/pdf-delete-pages.html" class="tool-card" data-search="PDF ページ削除 不要 除去">
+        <div class="tool-icon blue">🗑️</div><h3>PDFページ削除</h3>
+        <p>不要なページを選択して削除。チェックボックスで直感的に操作できます。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/pdf-extract-text.html" class="tool-card" data-search="PDF テキスト抽出 文字 コピー テキスト化">
+        <div class="tool-icon blue">📝</div><h3>PDFテキスト抽出</h3>
+        <p>PDFから全テキストを抽出。ページ別表示、コピー・ダウンロード対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/pdf-watermark.html" class="tool-card" data-search="PDF 透かし ウォーターマーク 社外秘 CONFIDENTIAL">
+        <div class="tool-icon purple">💧</div><h3>PDF透かし追加</h3>
+        <p>テキストの透かしを全ページに追加。フォントサイズ・色・角度をカスタマイズ。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/pdf-images.html" class="tool-card" data-search="画像 PDF 変換 JPEG PNG 写真">
+        <div class="tool-icon purple">🖼️</div><h3>画像→PDF変換</h3>
+        <p>複数のJPEG/PNG画像をPDFに変換。A4/Letter、余白設定、並べ替え対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/pdf-to-image.html" class="tool-card" data-search="PDF 画像変換 PNG JPEG スクリーンショット ページ エクスポート">
+        <div class="tool-icon blue">🖼️</div><h3>PDF→画像変換</h3>
+        <p>PDFの各ページをPNG/JPEG画像に変換。解像度スケール設定・一括ダウンロード対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== オーディオ ==================== -->
+  <section class="tools-section" data-cat="audio">
+    <div class="section-header">
+      <div class="section-icon gen-icon">🎵</div>
+      <h2>オーディオ系ツール</h2>
+      <span class="section-count">8 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/audio-trimmer.html" class="tool-card" data-search="音声 トリミング カット 切り取り mp3 wav 編集">
+        <div class="tool-icon green">✂️</div><h3>音声トリミング</h3>
+        <p>音声ファイルの不要部分をカット。波形表示で直感的に範囲を選択。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/audio-converter.html" class="tool-card" data-search="音声変換 フォーマット wav webm ogg opus mp3 変換">
+        <div class="tool-icon green">🔄</div><h3>音声形式変換</h3>
+        <p>WAV・WebM・OGG間で音声形式を変換。ビットレート・サンプルレート設定可能。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/audio-merger.html" class="tool-card" data-search="音声 結合 マージ 合体 つなげる 連結">
+        <div class="tool-icon green">🔗</div><h3>音声結合</h3>
+        <p>複数の音声ファイルを1つに結合。順序の入れ替えも簡単。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/audio-recorder.html" class="tool-card" data-search="録音 マイク ボイスレコーダー 音声録音 ブラウザ">
+        <div class="tool-icon pink">🎙️</div><h3>ブラウザ録音</h3>
+        <p>ブラウザだけで音声を録音。マイク入力をWAV/WebMで保存。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/audio-speed.html" class="tool-card" data-search="再生速度 スピード ピッチ 倍速 スロー 音声">
+        <div class="tool-icon pink">⏩</div><h3>再生速度変更</h3>
+        <p>音声の再生速度を0.25x〜4xで変更。ピッチ補正にも対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/audio-volume.html" class="tool-card" data-search="音量 ボリューム 調整 ノーマライズ ゲイン">
+        <div class="tool-icon pink">🔊</div><h3>音量調整</h3>
+        <p>音声の音量を自由に調整。ノーマライズ・フェードイン/アウトにも対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/audio-visualizer.html" class="tool-card" data-search="音声 ビジュアライザー 波形 スペクトル 可視化">
+        <div class="tool-icon orange">📊</div><h3>音声ビジュアライザー</h3>
+        <p>音声ファイルの波形・スペクトルをリアルタイムで可視化。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/audio-info.html" class="tool-card" data-search="音声 情報 メタデータ ビットレート サンプルレート 長さ">
+        <div class="tool-icon orange">ℹ️</div><h3>音声ファイル情報</h3>
+        <p>音声ファイルの詳細情報を表示。長さ・ビットレート・サンプルレートなど。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== 動画 ==================== -->
+  <section class="tools-section" data-cat="video">
+    <div class="section-header">
+      <div class="section-icon gen-icon">🎬</div>
+      <h2>動画・メディア系ツール</h2>
+      <span class="section-count">9 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/video-to-gif.html" class="tool-card" data-search="動画 GIF 変換 アニメーション mp4 gif化">
+        <div class="tool-icon blue">🎞️</div><h3>動画→GIF変換</h3>
+        <p>動画ファイルをアニメーションGIFに変換。フレームレート・サイズ調整可能。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/video-thumbnail.html" class="tool-card" data-search="動画 サムネイル フレーム 切り出し スクリーンショット">
+        <div class="tool-icon blue">🖼️</div><h3>動画サムネイル抽出</h3>
+        <p>動画の任意のフレームをサムネイル画像として切り出し・保存。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/video-trimmer.html" class="tool-card" data-search="動画 トリミング カット 切り取り 編集 mp4">
+        <div class="tool-icon blue">✂️</div><h3>動画トリミング</h3>
+        <p>動画の不要部分をカット。プレビュー付きで範囲を確認しながら編集。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/video-compress.html" class="tool-card" data-search="動画 圧縮 サイズ削減 軽量化 mp4 圧縮">
+        <div class="tool-icon purple">🗜️</div><h3>動画圧縮</h3>
+        <p>動画ファイルのサイズを削減。解像度・品質を調整して圧縮。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/screen-recorder.html" class="tool-card" data-search="画面録画 スクリーンレコーダー キャプチャ 収録">
+        <div class="tool-icon purple">🖥️</div><h3>画面録画</h3>
+        <p>ブラウザから画面を録画。タブ・ウィンドウ・全画面の選択が可能。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/video-info.html" class="tool-card" data-search="動画 情報 メタデータ コーデック 解像度 fps">
+        <div class="tool-icon purple">ℹ️</div><h3>動画ファイル情報</h3>
+        <p>動画ファイルの詳細情報を表示。解像度・長さ・コーデック・FPSなど。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/video-rotate.html" class="tool-card" data-search="動画 回転 反転 90度 180度 ミラー">
+        <div class="tool-icon orange">🔄</div><h3>動画回転・反転</h3>
+        <p>動画を90°/180°/270°回転、左右・上下反転。プレビュー付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/webcam-capture.html" class="tool-card" data-search="Webカメラ 撮影 写真 カメラ キャプチャ">
+        <div class="tool-icon orange">📷</div><h3>Webカメラ撮影</h3>
+        <p>ブラウザからWebカメラで写真撮影。フィルターやタイマー機能付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/subtitle-converter.html" class="tool-card" data-search="字幕 SRT VTT ASS 変換 フォーマット 動画 subtitle">
+        <div class="tool-icon blue">💬</div><h3>字幕フォーマット変換</h3>
+        <p>SRT・WebVTT・ASS字幕ファイルを相互変換。テキスト抽出・ダウンロード対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== 生成 ==================== -->
+  <section class="tools-section" data-cat="generator">
+    <div class="section-header">
+      <div class="section-icon gen-icon">🎲</div>
+      <h2>生成・ランダム系ツール</h2>
+      <span class="section-count">2 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/uuid-generator.html" class="tool-card" data-search="UUID 生成 v4 ユニークID 一括">
+        <div class="tool-icon orange">🆔</div><h3>UUID生成器</h3>
+        <p>UUID v4をワンクリック生成。一括生成、大文字/ハイフンの切替対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/dummy-data.html" class="tool-card" data-search="ダミーデータ テスト 名前 住所 電話番号 JSON CSV">
+        <div class="tool-icon orange">👤</div><h3>ダミーデータ生成</h3>
+        <p>日本語の名前・住所・電話番号などのテストデータをJSON/CSVで生成。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- ==================== IT・インフラ ==================== -->
+  <section class="tools-section" data-cat="it">
+    <div class="section-header">
+      <div class="section-icon dev-icon">🖥️</div>
+      <h2>IT・インフラ系ツール</h2>
+      <span class="section-count">7 ツール</span>
+    </div>
+    <div class="tool-grid">
+      <a href="tools/cron-builder.html" class="tool-card" data-search="cron クーロン スケジューラ 定期実行 Linux タスク">
+        <div class="tool-icon blue">⏰</div><h3>Cron式ビルダー</h3>
+        <p>cron式をビジュアルで作成・解析。次回実行時刻の一覧表示、プリセット付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/sql-formatter.html" class="tool-card" data-search="SQL 整形 フォーマット 圧縮 クエリ データベース">
+        <div class="tool-icon orange">🗄️</div><h3>SQL整形ツール</h3>
+        <p>SQLクエリを整形・圧縮。キーワード大文字化・インデント調整。SELECT/JOIN対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/xml-formatter.html" class="tool-card" data-search="XML 整形 検証 圧縮 フォーマット バリデーション">
+        <div class="tool-icon green">📋</div><h3>XML整形・検証</h3>
+        <p>XMLの整形・圧縮・構文検証をブラウザ上で実行。DOMParser使用の精密な解析。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/env-parser.html" class="tool-card" data-search=".env 環境変数 設定ファイル JSON YAML Shell Docker">
+        <div class="tool-icon teal">⚙️</div><h3>.envファイルパーサー</h3>
+        <p>.envファイルをJSON/YAML/Shell/Docker形式に変換。逆変換・変数一覧表示対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/ascii-art.html" class="tool-card" data-search="ASCIIアート テキスト アスキー アート 文字 ピクセル">
+        <div class="tool-icon purple">🎨</div><h3>ASCIIアート生成</h3>
+        <p>テキストをASCIIアートに変換。ピクセルマップ・ブロック・シャドウ・画像変換対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/jwt-generator.html" class="tool-card" data-search="JWT JSON Web Token 生成 デコード 認証 署名 HS256">
+        <div class="tool-icon blue">🔑</div><h3>JWT生成・デコード</h3>
+        <p>JWTトークンをGUIで生成（HS256署名）。デコード・ペイロード確認・有効期限設定。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/curl-builder.html" class="tool-card" data-search="cURL コマンド HTTP リクエスト API ヘッダー 認証 Bearer">
+        <div class="tool-icon orange">🌐</div><h3>cURLコマンドビルダー</h3>
+        <p>GUIでcURLコマンドを作成。ヘッダー・認証・ボディ設定、既存cURLのインポートも可能。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Ad Banner -->
+  <div class="ad-banner"><div class="ad-placeholder">広告スペース（Google AdSense）</div></div>
+
+  <!-- About -->
+  <section class="tools-section" id="about">
+    <div class="section-header">
+      <div class="section-icon dev-icon">ℹ️</div>
+      <h2>このサイトについて</h2>
+    </div>
+    <p class="about-content">
+      ToolBoxは、開発者やクリエイターが日常的に使う便利ツールを無料で提供するサイトです。
+      すべてのツールはブラウザ上のJavaScriptで動作するため、入力データがサーバーに送信されることはありません。
+      プライバシーを守りながら、安心してご利用いただけます。
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="index.html">ホーム</a>
+        <a href="#tools">ツール一覧</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+      </div>
+      <p>&copy; 2026 ToolBox. All rights reserved.</p>
+      <p class="footer-note">すべてのツールはブラウザ上で動作します。データはサーバーに送信されません。</p>
+    </div>
+  </footer>
+
+  <!-- Scroll to top -->
+  <button class="scroll-top" id="scrollTop" aria-label="トップへ戻る">↑</button>
+
+  <!-- JavaScript -->
+  <script>
+  (function() {
+    // --- Dark Mode ---
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved) {
+      html.setAttribute('data-theme', saved);
+      toggle.textContent = saved === 'dark' ? '☀️' : '🌙';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      html.setAttribute('data-theme', 'dark');
+      toggle.textContent = '☀️';
+    }
+    toggle.addEventListener('click', () => {
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      toggle.textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    });
+
+    // --- Mobile Menu ---
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const mobileNav = document.getElementById('mobileNav');
+    menuBtn.addEventListener('click', () => {
+      mobileNav.classList.toggle('open');
+      menuBtn.textContent = mobileNav.classList.contains('open') ? '✕' : '☰';
+    });
+    mobileNav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => { mobileNav.classList.remove('open'); menuBtn.textContent = '☰'; });
+    });
+
+    // --- Header scroll effect ---
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      header.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    // --- Scroll to top ---
+    const scrollBtn = document.getElementById('scrollTop');
+    window.addEventListener('scroll', () => {
+      scrollBtn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // --- Search ---
+    const searchInput = document.getElementById('toolSearch');
+    const searchCount = document.getElementById('searchCount');
+    const noResults = document.getElementById('noResults');
+    const allCards = document.querySelectorAll('.tool-card');
+    const allSections = document.querySelectorAll('.tools-section[data-cat]');
+    const adBanners = document.querySelectorAll('.ad-banner');
+
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.toLowerCase().trim();
+      let visible = 0;
+      // Reset category chips
+      document.querySelectorAll('.category-chip').forEach(c => {
+        if (c.dataset.category === 'all') c.classList.add('active');
+        else c.classList.remove('active');
+      });
+
+      allCards.forEach(card => {
+        const text = (card.dataset.search || '') + ' ' + card.textContent;
+        const show = !q || text.toLowerCase().includes(q);
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+
+      allSections.forEach(sec => {
+        const hasVisible = sec.querySelectorAll('.tool-card[style=""], .tool-card:not([style])').length > 0
+          || [...sec.querySelectorAll('.tool-card')].some(c => c.style.display !== 'none');
+        sec.style.display = hasVisible ? '' : 'none';
+      });
+
+      if (q) {
+        searchCount.textContent = `${visible} 件のツールが見つかりました`;
+        searchCount.style.opacity = '1';
+      } else {
+        searchCount.textContent = '';
+      }
+      noResults.style.display = (q && visible === 0) ? 'block' : 'none';
+    });
+
+    // --- Category filter ---
+    document.querySelectorAll('.category-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const cat = chip.dataset.category;
+        searchInput.value = '';
+        searchCount.textContent = '';
+        noResults.style.display = 'none';
+
+        if (cat === 'all') {
+          allSections.forEach(s => s.style.display = '');
+          allCards.forEach(c => { c.style.display = ''; c.classList.add('visible'); });
+          adBanners.forEach(b => b.style.display = '');
+        } else {
+          allSections.forEach(s => {
+            s.style.display = s.dataset.cat === cat ? '' : 'none';
+          });
+          adBanners.forEach(b => b.style.display = 'none');
+          allCards.forEach(c => { c.style.display = ''; c.classList.add('visible'); });
+        }
+      });
+    });
+
+    // --- Scroll Reveal (IntersectionObserver) ---
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    allCards.forEach(card => observer.observe(card));
+
+  })();
+  </script>
+
+</body>
+</html>

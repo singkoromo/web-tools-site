@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声トリミング - ToolBox</title>
+    <meta name="description" content="オンライン音声トリミングツール。MP3、WAV、OGGなどの音声ファイルを自由にカット・トリミングできます。波形表示で直感的に操作可能。">
+    <meta name="keywords" content="音声トリミング, MP3カット, WAV編集, 音声ファイル, オンラインツール">
+    <meta property="og:title" content="音声トリミング - ToolBox">
+    <meta property="og:description" content="オンライン音声トリミングツール。波形表示で簡単に音声ファイルをカット・編集できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/audio-trimmer.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/audio-trimmer.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page { padding: 2rem 1rem; }
+        .tool-container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .drop-zone {
+            border: 2px dashed #ccc; border-radius: 8px; padding: 2rem;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: #f9f9f9;
+        }
+        .drop-zone.dragover { border-color: #0066cc; background: #f0f7ff; }
+        .file-info {
+            margin-top: 2rem; padding: 1rem; background: #f5f5f5;
+            border-radius: 8px; display: none;
+        }
+        .file-info.show { display: block; }
+        .info-row { display: flex; justify-content: space-between; margin: 0.5rem 0; }
+        .waveform-container {
+            margin-top: 2rem; padding: 1rem; background: #1a1a1a;
+            border-radius: 8px; display: none;
+        }
+        .waveform-container.show { display: block; }
+        #waveform {
+            width: 100%; height: 200px; display: block;
+            background: #0a0a0a; border-radius: 4px;
+        }
+        .controls { margin-top: 2rem; }
+        .control-group {
+            margin-bottom: 1.5rem; padding: 1rem;
+            background: #f9f9f9; border-radius: 8px;
+        }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        input[type="range"] { width: 100%; }
+        input[type="time"], input[type="number"] {
+            padding: 0.5rem; border: 1px solid #ddd;
+            border-radius: 4px; width: 100%; max-width: 150px;
+        }
+        .time-inputs { display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem; }
+        .button-group {
+            display: flex; gap: 1rem; margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 0.75rem 1.5rem; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #ccc; }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 1rem 1.5rem; background: #333; color: white;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .preview-controls { display: flex; gap: 1rem; align-items: center; margin-top: 1rem; }
+        .progress-bar {
+            width: 100%; height: 4px; background: #e0e0e0;
+            border-radius: 2px; margin-top: 0.5rem; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: #0066cc; width: 0%;
+            transition: width 0.1s;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg> ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<div class="tool-page">
+    <div class="tool-container">
+        <h1>音声トリミング</h1>
+        <p class="subtitle">MP3、WAV、OGGなどの音声ファイルをカット・編集して保存</p>
+
+        <div class="drop-zone" id="dropZone">
+            <p>音声ファイルをドラッグ&ドロップするか、クリックして選択</p>
+            <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">対応形式: MP3, WAV, OGG, M4A, WebM など</p>
+            <input type="file" id="audioInput" accept="audio/*" style="display: none;">
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="info-row">
+                <span>ファイル名:</span>
+                <span id="infoFilename">-</span>
+            </div>
+            <div class="info-row">
+                <span>ファイルサイズ:</span>
+                <span id="infoFileSize">-</span>
+            </div>
+            <div class="info-row">
+                <span>総再生時間:</span>
+                <span id="infoDuration">-</span>
+            </div>
+            <div class="info-row">
+                <span>サンプリングレート:</span>
+                <span id="infoSampleRate">-</span>
+            </div>
+            <div class="info-row">
+                <span>チャンネル数:</span>
+                <span id="infoChannels">-</span>
+            </div>
+        </div>
+
+        <div class="waveform-container" id="waveformContainer">
+            <canvas id="waveform"></canvas>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">ドラッグで選択範囲を指定できます</p>
+        </div>
+
+        <div class="controls" id="controls" style="display: none;">
+            <div class="control-group">
+                <label>カット範囲を設定</label>
+                <div class="time-inputs">
+                    <div>
+                        <label style="font-size: 0.9rem; margin-bottom: 0.25rem;">開始時刻（秒）</label>
+                        <input type="number" id="startTime" min="0" step="0.1" value="0">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.9rem; margin-bottom: 0.25rem;">終了時刻（秒）</label>
+                        <input type="number" id="endTime" min="0" step="0.1" value="0">
+                    </div>
+                </div>
+                <input type="range" id="startSlider" min="0" max="100" value="0" style="margin-top: 0.5rem;">
+                <input type="range" id="endSlider" min="0" max="100" value="100" style="margin-top: 0.5rem;">
+            </div>
+
+            <div class="control-group">
+                <label>プレビュー</label>
+                <div class="button-group">
+                    <button class="btn-secondary" id="playButton">再生</button>
+                    <button class="btn-secondary" id="pauseButton">一時停止</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>トリミングの実行</label>
+                <div class="button-group">
+                    <button class="btn-primary" id="trimButton">トリミング実行</button>
+                </div>
+                <div id="processingStatus" style="margin-top: 0.5rem; color: #0066cc; display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+class AudioTrimmer {
+    constructor() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.audioBuffer = null;
+        this.source = null;
+        this.currentTime = 0;
+        this.isPlaying = false;
+        this.startTime = 0;
+        this.endTime = 0;
+        this.fileName = '';
+        this.fileSize = 0;
+
+        this.initElements();
+        this.attachEventListeners();
+    }
+
+    initElements() {
+        this.dropZone = document.getElementById('dropZone');
+        this.audioInput = document.getElementById('audioInput');
+        this.fileInfo = document.getElementById('fileInfo');
+        this.waveformContainer = document.getElementById('waveformContainer');
+        this.canvas = document.getElementById('waveform');
+        this.ctx = this.canvas.getContext('2d');
+        this.controls = document.getElementById('controls');
+        this.startTimeInput = document.getElementById('startTime');
+        this.endTimeInput = document.getElementById('endTime');
+        this.startSlider = document.getElementById('startSlider');
+        this.endSlider = document.getElementById('endSlider');
+        this.playButton = document.getElementById('playButton');
+        this.pauseButton = document.getElementById('pauseButton');
+        this.trimButton = document.getElementById('trimButton');
+        this.progressFill = document.getElementById('progressFill');
+        this.processingStatus = document.getElementById('processingStatus');
+    }
+
+    attachEventListeners() {
+        this.dropZone.addEventListener('click', () => this.audioInput.click());
+        this.dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.add('dragover');
+        });
+        this.dropZone.addEventListener('dragleave', () => {
+            this.dropZone.classList.remove('dragover');
+        });
+        this.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) this.handleFile(files[0]);
+        });
+
+        this.audioInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) this.handleFile(e.target.files[0]);
+        });
+
+        this.startTimeInput.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (val >= 0 && val <= this.audioBuffer.duration) {
+                this.startTime = val;
+                this.startSlider.value = (val / this.audioBuffer.duration) * 100;
+                this.drawWaveform();
+            }
+        });
+
+        this.endTimeInput.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            if (val >= 0 && val <= this.audioBuffer.duration) {
+                this.endTime = val;
+                this.endSlider.value = (val / this.audioBuffer.duration) * 100;
+                this.drawWaveform();
+            }
+        });
+
+        this.startSlider.addEventListener('input', (e) => {
+            const val = (parseFloat(e.target.value) / 100) * this.audioBuffer.duration;
+            this.startTime = Math.min(val, this.endTime);
+            this.startTimeInput.value = this.startTime.toFixed(2);
+            this.drawWaveform();
+        });
+
+        this.endSlider.addEventListener('input', (e) => {
+            const val = (parseFloat(e.target.value) / 100) * this.audioBuffer.duration;
+            this.endTime = Math.max(val, this.startTime);
+            this.endTimeInput.value = this.endTime.toFixed(2);
+            this.drawWaveform();
+        });
+
+        this.canvas.addEventListener('click', (e) => {
+            if (!this.audioBuffer) return;
+            const rect = this.canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percent = x / this.canvas.width;
+            const time = percent * this.audioBuffer.duration;
+            if (e.shiftKey) {
+                this.endTime = Math.max(time, this.startTime);
+                this.endTimeInput.value = this.endTime.toFixed(2);
+                this.endSlider.value = (this.endTime / this.audioBuffer.duration) * 100;
+            } else {
+                this.startTime = Math.min(time, this.endTime);
+                this.startTimeInput.value = this.startTime.toFixed(2);
+                this.startSlider.value = (this.startTime / this.audioBuffer.duration) * 100;
+            }
+            this.drawWaveform();
+        });
+
+        this.playButton.addEventListener('click', () => this.preview());
+        this.pauseButton.addEventListener('click', () => this.stopPreview());
+        this.trimButton.addEventListener('click', () => this.trim());
+    }
+
+    async handleFile(file) {
+        this.fileName = file.name;
+        this.fileSize = file.size;
+        const arrayBuffer = await file.arrayBuffer();
+
+        try {
+            this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.displayFileInfo();
+            this.waveformContainer.classList.add('show');
+            this.controls.style.display = 'block';
+            this.fileInfo.classList.add('show');
+            this.endTime = this.audioBuffer.duration;
+            this.endTimeInput.value = this.endTime.toFixed(2);
+            this.endSlider.value = 100;
+            this.startSlider.max = 100;
+            this.endSlider.max = 100;
+            this.drawWaveform();
+        } catch (error) {
+            this.showToast('音声ファイルのデコードに失敗しました');
+        }
+    }
+
+    displayFileInfo() {
+        document.getElementById('infoFilename').textContent = this.fileName;
+        document.getElementById('infoFileSize').textContent = `${(this.fileSize / 1024 / 1024).toFixed(2)} MB`;
+        document.getElementById('infoDuration').textContent = this.formatTime(this.audioBuffer.duration);
+        document.getElementById('infoSampleRate').textContent = `${this.audioBuffer.sampleRate} Hz`;
+        document.getElementById('infoChannels').textContent = this.audioBuffer.numberOfChannels === 1 ? 'モノラル' : 'ステレオ';
+    }
+
+    drawWaveform() {
+        if (!this.audioBuffer) return;
+
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const data = this.audioBuffer.getChannelData(0);
+        const step = Math.ceil(data.length / width);
+        const amp = height / 2;
+
+        this.ctx.fillStyle = '#0a0a0a';
+        this.ctx.fillRect(0, 0, width, height);
+
+        // Draw selection
+        const startPixel = (this.startTime / this.audioBuffer.duration) * width;
+        const endPixel = (this.endTime / this.audioBuffer.duration) * width;
+        this.ctx.fillStyle = 'rgba(0, 102, 204, 0.2)';
+        this.ctx.fillRect(startPixel, 0, endPixel - startPixel, height);
+
+        // Draw waveform
+        this.ctx.strokeStyle = '#0066cc';
+        this.ctx.lineWidth = 1;
+        this.ctx.beginPath();
+        for (let i = 0; i < width; i++) {
+            let min = 1, max = -1;
+            for (let j = 0; j < step; j++) {
+                const idx = i * step + j;
+                if (idx < data.length) {
+                    const val = data[idx];
+                    if (val < min) min = val;
+                    if (val > max) max = val;
+                }
+            }
+            const y = amp - max * amp;
+            if (i === 0) this.ctx.moveTo(i, y);
+            else this.ctx.lineTo(i, y);
+        }
+        this.ctx.stroke();
+
+        // Draw center line
+        this.ctx.strokeStyle = '#333';
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, amp);
+        this.ctx.lineTo(width, amp);
+        this.ctx.stroke();
+    }
+
+    preview() {
+        if (this.isPlaying) return;
+        this.isPlaying = true;
+        this.currentTime = this.startTime;
+
+        this.source = this.audioContext.createBufferSource();
+        this.source.buffer = this.audioBuffer;
+        this.source.connect(this.audioContext.destination);
+        this.source.start(0, this.startTime, this.endTime - this.startTime);
+
+        const startTime = this.audioContext.currentTime;
+        const updateProgress = () => {
+            if (!this.isPlaying) return;
+            const elapsed = this.audioContext.currentTime - startTime;
+            const totalDuration = this.endTime - this.startTime;
+            const percent = (elapsed / totalDuration) * 100;
+            this.progressFill.style.width = Math.min(percent, 100) + '%';
+
+            if (elapsed < totalDuration) {
+                requestAnimationFrame(updateProgress);
+            } else {
+                this.stopPreview();
+            }
+        };
+        updateProgress();
+    }
+
+    stopPreview() {
+        if (this.source) {
+            this.source.stop();
+            this.source = null;
+        }
+        this.isPlaying = false;
+        this.progressFill.style.width = '0%';
+    }
+
+    async trim() {
+        this.processingStatus.style.display = 'block';
+        this.processingStatus.textContent = 'トリミング処理中...';
+
+        try {
+            const trimmedBuffer = this.audioContext.createBuffer(
+                this.audioBuffer.numberOfChannels,
+                Math.ceil((this.endTime - this.startTime) * this.audioBuffer.sampleRate),
+                this.audioBuffer.sampleRate
+            );
+
+            const startSample = Math.floor(this.startTime * this.audioBuffer.sampleRate);
+            const endSample = Math.floor(this.endTime * this.audioBuffer.sampleRate);
+
+            for (let channel = 0; channel < this.audioBuffer.numberOfChannels; channel++) {
+                const source = this.audioBuffer.getChannelData(channel);
+                const target = trimmedBuffer.getChannelData(channel);
+                target.set(source.slice(startSample, endSample));
+            }
+
+            const wavBlob = this.encodeWAV(trimmedBuffer);
+            this.downloadBlob(wavBlob, this.fileName.replace(/\.[^/.]+$/, '_trimmed.wav'));
+            this.showToast('トリミング完了！ファイルをダウンロードしました');
+        } catch (error) {
+            this.showToast('トリミングに失敗しました');
+        } finally {
+            this.processingStatus.style.display = 'none';
+        }
+    }
+
+    encodeWAV(audioBuffer) {
+        const numberOfChannels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const format = 1;
+        const bitDepth = 16;
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numberOfChannels * bytesPerSample;
+
+        const channelData = [];
+        for (let i = 0; i < numberOfChannels; i++) {
+            channelData.push(audioBuffer.getChannelData(i));
+        }
+
+        const length = audioBuffer.length * numberOfChannels * bytesPerSample;
+        const buffer = new ArrayBuffer(44 + length);
+        const view = new DataView(buffer);
+
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + length, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(36, 'data');
+        view.setUint32(40, length, true);
+
+        let offset = 44;
+        const volume = 1;
+        for (let i = 0; i < audioBuffer.length; i++) {
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                let sample = Math.max(-1, Math.min(1, channelData[channel][i])) * volume;
+                sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                view.setInt16(offset, sample, true);
+                offset += 2;
+            }
+        }
+
+        return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = (seconds % 60).toFixed(2);
+        return `${mins}:${secs.padStart(5, '0')}`;
+    }
+
+    showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new AudioTrimmer();
+});
+</script>
+</body>
+</html>

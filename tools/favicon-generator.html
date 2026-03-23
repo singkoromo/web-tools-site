@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favicon生成器 - ToolBox</title>
+    <meta name="description" content="テキストから高品質なFaviconを生成できるツール。複数のサイズでプレビュー、PNG/ICO形式でダウンロードでき、HTMLコードもコピーできます。">
+    <meta name="keywords" content="Favicon, 生成器, 無料, アイコン">
+    <meta property="og:title" content="Favicon生成器 - ToolBox">
+    <meta property="og:description" content="テキストから高品質なFaviconを生成できるツール。複数のサイズでプレビュー、PNG/ICO形式でダウンロードでき、HTMLコードもコピーできます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/favicon-generator.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/favicon-generator.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .tool-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+        }
+        .controls {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .control-group {
+            margin-bottom: 16px;
+        }
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+        .control-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .control-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .control-col {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Inter, sans-serif;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        .color-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        input[type="color"] {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .color-input-text {
+            flex: 1;
+        }
+        .shape-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        input[type="radio"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        .radio-item label {
+            cursor: pointer;
+            user-select: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: Inter, sans-serif;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background: #0066cc;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+        .btn-secondary {
+            background: #e8e8e8;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #d5d5d5;
+        }
+        .preview-section {
+            margin-bottom: 40px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .preview-item {
+            text-align: center;
+        }
+        .preview-canvas {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: block;
+            margin: 0 auto 8px;
+            background: #f9f9f9;
+        }
+        .preview-size {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+        .download-section {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .download-group {
+            margin-bottom: 16px;
+        }
+        .download-group:last-child {
+            margin-bottom: 0;
+        }
+        .download-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .download-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .html-code {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 12px;
+            word-break: break-all;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .copy-button {
+            padding: 8px 12px;
+            font-size: 12px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .copy-button:hover {
+            background: #0052a3;
+        }
+        .ad-banner {
+            background: #f0f0f0;
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            margin: 30px 0;
+            border-radius: 4px;
+            color: #666;
+            font-size: 13px;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        footer {
+            background: #f5f5f5;
+            padding: 30px 20px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1 class="tool-title">Favicon生成器</h1>
+
+        <div class="ad-banner">
+            広告スペース
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">テキスト (1～2文字)</label>
+                <input type="text" id="text" value="TB" maxlength="2">
+            </div>
+
+            <div class="control-row">
+                <div class="control-col">
+                    <label class="control-label">背景色</label>
+                    <div class="color-group">
+                        <input type="color" id="bgColor" value="#3498db">
+                        <input type="text" class="color-input-text" id="bgColorHex" value="#3498db" readonly>
+                    </div>
+                </div>
+
+                <div class="control-col">
+                    <label class="control-label">テキスト色</label>
+                    <div class="color-group">
+                        <input type="color" id="textColor" value="#ffffff">
+                        <input type="text" class="color-input-text" id="textColorHex" value="#ffffff" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-row">
+                <div class="control-col">
+                    <label class="control-label">フォントサイズ</label>
+                    <input type="number" id="fontSize" value="24" min="10" max="40">
+                </div>
+
+                <div class="control-col">
+                    <label class="control-label">シェイプ</label>
+                    <div class="shape-options">
+                        <div class="radio-item">
+                            <input type="radio" name="shape" id="shape-square" value="square" checked>
+                            <label for="shape-square">正方形</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="shape" id="shape-rounded" value="rounded">
+                            <label for="shape-rounded">角丸</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" name="shape" id="shape-circle" value="circle">
+                            <label for="shape-circle">円形</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="generateFavicon()">生成</button>
+                <button class="btn-secondary" onclick="resetToDefaults()">リセット</button>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <div class="section-title">プレビュー</div>
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <canvas id="preview16" class="preview-canvas" width="16" height="16"></canvas>
+                    <div class="preview-size">16x16</div>
+                </div>
+                <div class="preview-item">
+                    <canvas id="preview32" class="preview-canvas" width="32" height="32"></canvas>
+                    <div class="preview-size">32x32</div>
+                </div>
+                <div class="preview-item">
+                    <canvas id="preview48" class="preview-canvas" width="48" height="48"></canvas>
+                    <div class="preview-size">48x48</div>
+                </div>
+                <div class="preview-item">
+                    <canvas id="preview180" class="preview-canvas" width="180" height="180"></canvas>
+                    <div class="preview-size">180x180</div>
+                </div>
+                <div class="preview-item">
+                    <canvas id="preview512" class="preview-canvas" width="512" height="512"></canvas>
+                    <div class="preview-size">512x512</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <div class="section-title">ダウンロード</div>
+
+            <div class="download-group">
+                <div class="download-label">Favicon (16x16 & 32x32)</div>
+                <div class="download-buttons">
+                    <button class="btn-secondary" onclick="downloadFavicon(32)">favicon.png (32x32)</button>
+                    <button class="btn-secondary" onclick="downloadFavicon(16)">favicon.ico (16x16)</button>
+                </div>
+            </div>
+
+            <div class="download-group">
+                <div class="download-label">Apple Touch Icon</div>
+                <div class="download-buttons">
+                    <button class="btn-secondary" onclick="downloadAppleTouchIcon()">apple-touch-icon.png (180x180)</button>
+                </div>
+            </div>
+
+            <div class="download-group">
+                <div class="download-label">HTML コード</div>
+                <div class="html-code" id="htmlCode"></div>
+                <button class="copy-button" onclick="copyHtmlCode()">HTMLコードをコピー</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        広告スペース
+    </div>
+
+    <footer>
+        © 2026 ToolBox. All rights reserved.
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        function drawFavicon(canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+
+            const text = document.getElementById('text').value || 'T';
+            const bgColor = document.getElementById('bgColor').value;
+            const textColor = document.getElementById('textColor').value;
+            const fontSize = Math.floor(parseInt(document.getElementById('fontSize').value) * (size / 32));
+            const shape = document.querySelector('input[name="shape"]:checked').value;
+
+            ctx.clearRect(0, 0, size, size);
+
+            // Draw background
+            ctx.fillStyle = bgColor;
+            if (shape === 'circle') {
+                ctx.beginPath();
+                ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (shape === 'rounded') {
+                const radius = size / 8;
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(size - radius, 0);
+                ctx.quadraticCurveTo(size, 0, size, radius);
+                ctx.lineTo(size, size - radius);
+                ctx.quadraticCurveTo(size, size, size - radius, size);
+                ctx.lineTo(radius, size);
+                ctx.quadraticCurveTo(0, size, 0, size - radius);
+                ctx.lineTo(0, radius);
+                ctx.quadraticCurveTo(0, 0, radius, 0);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.fillRect(0, 0, size, size);
+            }
+
+            // Draw text
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text.toUpperCase(), size / 2, size / 2);
+        }
+
+        function generateFavicon() {
+            drawFavicon('preview16', 16);
+            drawFavicon('preview32', 32);
+            drawFavicon('preview48', 48);
+            drawFavicon('preview180', 180);
+            drawFavicon('preview512', 512);
+            updateHtmlCode();
+            showToast('Faviconを生成しました');
+        }
+
+        function updateHtmlCode() {
+            const htmlCode = `<!-- Favicon -->
+<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">`;
+            document.getElementById('htmlCode').textContent = htmlCode;
+        }
+
+        function downloadFavicon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            const text = document.getElementById('text').value || 'T';
+            const bgColor = document.getElementById('bgColor').value;
+            const textColor = document.getElementById('textColor').value;
+            const fontSize = Math.floor(parseInt(document.getElementById('fontSize').value) * (size / 32));
+            const shape = document.querySelector('input[name="shape"]:checked').value;
+
+            ctx.fillStyle = bgColor;
+            if (shape === 'circle') {
+                ctx.beginPath();
+                ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (shape === 'rounded') {
+                const radius = size / 8;
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(size - radius, 0);
+                ctx.quadraticCurveTo(size, 0, size, radius);
+                ctx.lineTo(size, size - radius);
+                ctx.quadraticCurveTo(size, size, size - radius, size);
+                ctx.lineTo(radius, size);
+                ctx.quadraticCurveTo(0, size, 0, size - radius);
+                ctx.lineTo(0, radius);
+                ctx.quadraticCurveTo(0, 0, radius, 0);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.fillRect(0, 0, size, size);
+            }
+
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text.toUpperCase(), size / 2, size / 2);
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `favicon-${size}x${size}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('ダウンロードしました');
+            });
+        }
+
+        function downloadAppleTouchIcon() {
+            downloadFavicon(180);
+        }
+
+        function copyHtmlCode() {
+            const htmlCode = document.getElementById('htmlCode').textContent;
+            navigator.clipboard.writeText(htmlCode).then(() => {
+                showToast('HTMLコードをコピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function resetToDefaults() {
+            document.getElementById('text').value = 'TB';
+            document.getElementById('bgColor').value = '#3498db';
+            document.getElementById('bgColorHex').value = '#3498db';
+            document.getElementById('textColor').value = '#ffffff';
+            document.getElementById('textColorHex').value = '#ffffff';
+            document.getElementById('fontSize').value = '24';
+            document.getElementById('shape-square').checked = true;
+            generateFavicon();
+            showToast('リセットしました');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Event listeners
+        document.getElementById('text').addEventListener('input', generateFavicon);
+        document.getElementById('bgColor').addEventListener('input', (e) => {
+            document.getElementById('bgColorHex').value = e.target.value;
+            generateFavicon();
+        });
+        document.getElementById('textColor').addEventListener('input', (e) => {
+            document.getElementById('textColorHex').value = e.target.value;
+            generateFavicon();
+        });
+        document.getElementById('fontSize').addEventListener('input', generateFavicon);
+        document.querySelectorAll('input[name="shape"]').forEach(radio => {
+            radio.addEventListener('change', generateFavicon);
+        });
+
+        // Initial generation
+        window.addEventListener('load', generateFavicon);
+    </script>
+</body>
+</html>

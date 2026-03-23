@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メタタグ生成器 - ToolBox</title>
+    <meta name="description" content="SEO対応のメタタグとOGP、Twitter Cardを生成するツール。">
+    <meta property="og:title" content="メタタグ生成器 - ToolBox">
+    <meta property="og:description" content="SEO対応のメタタグとOGP、Twitter Cardを生成するツール。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/meta-generator.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/meta-generator.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .form-section { display: flex; flex-direction: column; gap: 1.5rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group label { font-weight: 600; color: #333; }
+        .form-group input, .form-group select { padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-group textarea { padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: 'JetBrains Mono', monospace; min-height: 100px; resize: vertical; }
+        .checkbox-group { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .checkbox-item { display: flex; align-items: center; gap: 0.5rem; }
+        .checkbox-item input { cursor: pointer; }
+        .char-count { font-size: 12px; color: #666; margin-top: 0.25rem; }
+        .char-warning { color: #ff9800; font-weight: 500; }
+        .preview-section { display: flex; flex-direction: column; gap: 1rem; }
+        .preview-title { font-weight: 600; color: #333; font-size: 16px; }
+        .preview-code { background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6; max-height: 500px; overflow-y: auto; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; background: #2196F3; color: white; transition: all 0.2s; }
+        button:hover { background: #0b7dda; }
+        .section-divider { border-bottom: 2px solid #eee; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+        @media (max-width: 1024px) {
+            .tool-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <h1>メタタグ生成器</h1>
+            <p>SEO対応のメタタグ、OGP、Twitter Cardを生成します。</p>
+
+            <div class="tool-wrapper">
+                <div class="form-section">
+                    <h3>基本設定</h3>
+                    <div class="form-group">
+                        <label for="pageTitle">ページタイトル *</label>
+                        <input type="text" id="pageTitle" placeholder="ページのタイトルを入力" oninput="updatePreview(); updateCharCount('pageTitle', 60);">
+                        <div class="char-count"><span id="titleCount">0</span>/60 <span class="char-warning" id="titleWarning"></span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">説明文 (Description) *</label>
+                        <textarea id="description" placeholder="ページの説明を入力（160文字程度）" oninput="updatePreview(); updateCharCount('description', 160);"></textarea>
+                        <div class="char-count"><span id="descriptionCount">0</span>/160 <span class="char-warning" id="descriptionWarning"></span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keywords">キーワード（カンマ区切り）</label>
+                        <input type="text" id="keywords" placeholder="キーワード1, キーワード2, キーワード3" oninput="updatePreview();">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="author">著者</label>
+                        <input type="text" id="author" placeholder="著者名" oninput="updatePreview();">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ロボット指示</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="radio" id="index" name="indexOption" value="index" checked oninput="updatePreview();">
+                                <label for="index">Index</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="noindex" name="indexOption" value="noindex" oninput="updatePreview();">
+                                <label for="noindex">NoIndex</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="follow" name="followOption" value="follow" checked oninput="updatePreview();">
+                                <label for="follow">Follow</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="radio" id="nofollow" name="followOption" value="nofollow" oninput="updatePreview();">
+                                <label for="nofollow">NoFollow</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <h3>OGP (Open Graph Protocol)</h3>
+                    <div class="form-group">
+                        <label for="ogTitle">OG Title</label>
+                        <input type="text" id="ogTitle" placeholder="（未設定の場合はページタイトルを使用）" oninput="updatePreview();">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ogDescription">OG Description</label>
+                        <textarea id="ogDescription" placeholder="（未設定の場合は説明文を使用）" style="min-height: 80px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ogImage">OG Image URL</label>
+                        <input type="url" id="ogImage" placeholder="https://example.com/image.jpg" oninput="updatePreview();">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ogType">OG Type</label>
+                        <select id="ogType" oninput="updatePreview();">
+                            <option value="website">website</option>
+                            <option value="article">article</option>
+                            <option value="blog">blog</option>
+                            <option value="product">product</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ogUrl">OG URL</label>
+                        <input type="url" id="ogUrl" placeholder="https://example.com/page" oninput="updatePreview();">
+                    </div>
+
+                    <div class="section-divider"></div>
+
+                    <h3>Twitter Card</h3>
+                    <div class="form-group">
+                        <label for="twitterCard">Card Type</label>
+                        <select id="twitterCard" oninput="updatePreview();">
+                            <option value="summary">summary</option>
+                            <option value="summary_large_image">summary_large_image</option>
+                            <option value="app">app</option>
+                            <option value="player">player</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="twitterSite">Twitter Site (@accounts)</label>
+                        <input type="text" id="twitterSite" placeholder="@username" oninput="updatePreview();">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="twitterCreator">Twitter Creator (@accounts)</label>
+                        <input type="text" id="twitterCreator" placeholder="@username" oninput="updatePreview();">
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <div class="preview-title">生成されたコード</div>
+                    <div class="preview-code" id="preview"></div>
+                    <button onclick="copyPreview()">コピー</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <nav class="footer-nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシー</a>
+            </nav>
+            <p>&copy; 2026 ToolBox</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        function updateCharCount(fieldId, maxChars) {
+            const field = document.getElementById(fieldId);
+            const countId = fieldId === 'pageTitle' ? 'titleCount' : 'descriptionCount';
+            const warningId = fieldId === 'pageTitle' ? 'titleWarning' : 'descriptionWarning';
+            const count = field.value.length;
+
+            document.getElementById(countId).textContent = count;
+            const warning = document.getElementById(warningId);
+
+            if (count > maxChars) {
+                warning.textContent = '⚠ 超過しています';
+            } else if (count > maxChars * 0.8) {
+                warning.textContent = '注意';
+            } else {
+                warning.textContent = '';
+            }
+
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const pageTitle = document.getElementById('pageTitle').value || 'ページタイトル';
+            const description = document.getElementById('description').value || 'ページの説明';
+            const keywords = document.getElementById('keywords').value;
+            const author = document.getElementById('author').value;
+            const indexOption = document.querySelector('input[name="indexOption"]:checked').value;
+            const followOption = document.querySelector('input[name="followOption"]:checked').value;
+
+            const ogTitle = document.getElementById('ogTitle').value || pageTitle;
+            const ogDescription = document.getElementById('ogDescription').value || description;
+            const ogImage = document.getElementById('ogImage').value;
+            const ogType = document.getElementById('ogType').value;
+            const ogUrl = document.getElementById('ogUrl').value;
+
+            const twitterCard = document.getElementById('twitterCard').value;
+            const twitterSite = document.getElementById('twitterSite').value;
+            const twitterCreator = document.getElementById('twitterCreator').value;
+
+            let code = `&lt;!-- Basic Meta Tags --&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+&lt;title&gt;${escapeHtml(pageTitle)}&lt;/title&gt;
+&lt;meta name="description" content="${escapeHtml(description)}"&gt;`;
+
+            if (keywords) {
+                code += `\n&lt;meta name="keywords" content="${escapeHtml(keywords)}"&gt;`;
+            }
+
+            if (author) {
+                code += `\n&lt;meta name="author" content="${escapeHtml(author)}"&gt;`;
+            }
+
+            code += `\n&lt;meta name="robots" content="${indexOption}, ${followOption}"&gt;`;
+            code += `\n\n&lt;!-- Open Graph Protocol --&gt;
+&lt;meta property="og:title" content="${escapeHtml(ogTitle)}"&gt;
+&lt;meta property="og:description" content="${escapeHtml(ogDescription)}"&gt;
+&lt;meta property="og:type" content="${ogType}"&gt;`;
+
+            if (ogUrl) {
+                code += `\n&lt;meta property="og:url" content="${escapeHtml(ogUrl)}"&gt;`;
+            }
+
+            if (ogImage) {
+                code += `\n&lt;meta property="og:image" content="${escapeHtml(ogImage)}"&gt;`;
+            }
+
+            code += `\n\n&lt;!-- Twitter Card --&gt;
+&lt;meta name="twitter:card" content="${twitterCard}"&gt;`;
+
+            if (twitterSite) {
+                code += `\n&lt;meta name="twitter:site" content="${escapeHtml(twitterSite)}"&gt;`;
+            }
+
+            if (twitterCreator) {
+                code += `\n&lt;meta name="twitter:creator" content="${escapeHtml(twitterCreator)}"&gt;`;
+            }
+
+            document.getElementById('preview').innerHTML = code;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function copyPreview() {
+            const preview = document.getElementById('preview');
+            const text = preview.innerText;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Initialize preview
+        updatePreview();
+    </script>
+</body>
+</html>

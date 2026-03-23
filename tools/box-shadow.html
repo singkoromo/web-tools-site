@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Box Shadow生成器 - ToolBox</title>
+    <meta name="description" content="CSSボックスシャドウを簡単に生成するツール。複数のシャドウ設定とプリセットに対応。">
+    <meta property="og:title" content="Box Shadow生成器 - ToolBox">
+    <meta property="og:description" content="CSSボックスシャドウを簡単に生成するツール。複数のシャドウ設定とプリセットに対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/box-shadow.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/box-shadow.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .preview-box { width: 100%; height: 200px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 2rem; }
+        .preview-element { width: 150px; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; }
+        .presets { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .preset-btn { padding: 0.75rem; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; font-weight: 500; color: #333; }
+        .preset-btn:hover { border-color: #667eea; }
+        .preset-btn.active { border-color: #667eea; background: #f3f4ff; }
+        .shadows-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; max-height: 400px; overflow-y: auto; padding-right: 0.5rem; }
+        .shadow-item { padding: 1rem; background: #f9f9f9; border-radius: 6px; border-left: 4px solid #667eea; }
+        .shadow-item h4 { margin: 0 0 0.75rem 0; color: #333; }
+        .slider-group { display: grid; grid-template-columns: 1fr 80px; gap: 1rem; align-items: center; margin-bottom: 0.75rem; }
+        label { font-size: 13px; font-weight: 500; color: #666; }
+        input[type="range"] { width: 100%; }
+        input[type="number"] { padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; text-align: center; font-size: 13px; }
+        .color-picker-group { display: grid; grid-template-columns: auto 1fr auto; gap: 1rem; align-items: center; }
+        .color-input { width: 50px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; }
+        .opacity-slider { width: 100%; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin: 0.75rem 0; }
+        .checkbox-group input { cursor: pointer; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .btn-add { background: #4CAF50; color: white; }
+        .btn-add:hover { background: #45a049; }
+        .btn-remove { background: #ff6b6b; color: white; padding: 0.5rem 1rem; font-size: 12px; }
+        .btn-remove:hover { background: #ff5252; }
+        .btn-copy { background: #2196F3; color: white; width: 100%; }
+        .btn-copy:hover { background: #0b7dda; }
+        .code-output { background: #f5f5f5; padding: 1rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; word-break: break-all; margin-bottom: 1rem; max-height: 150px; overflow-y: auto; }
+        @media (max-width: 1024px) {
+            .tool-wrapper { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <h1>Box Shadow生成器</h1>
+            <p>CSSボックスシャドウを複数設定して生成します。</p>
+
+            <div class="tool-wrapper">
+                <div>
+                    <div class="preview-box" id="previewContainer">
+                        <div class="preview-element" id="previewElement"></div>
+                    </div>
+                    <div class="code-output" id="codeOutput">box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);</div>
+                    <button class="btn-copy" onclick="copyCode()">コピー</button>
+                </div>
+
+                <div>
+                    <h3>プリセット</h3>
+                    <div class="presets">
+                        <button class="preset-btn" onclick="loadPreset('subtle')">小</button>
+                        <button class="preset-btn" onclick="loadPreset('medium')">中</button>
+                        <button class="preset-btn" onclick="loadPreset('heavy')">大</button>
+                        <button class="preset-btn" onclick="loadPreset('floating')">浮遊</button>
+                        <button class="preset-btn" onclick="loadPreset('glow')">グロー</button>
+                        <button class="preset-btn" onclick="loadPreset('inset')">インセット</button>
+                    </div>
+
+                    <h3>シャドウ設定</h3>
+                    <div class="shadows-list" id="shadowsList"></div>
+                    <button class="btn-add" onclick="addShadow()" style="width: 100%; margin-bottom: 1rem;">シャドウを追加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <nav class="footer-nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシー</a>
+            </nav>
+            <p>&copy; 2026 ToolBox</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let shadows = [
+            { offsetX: 0, offsetY: 4, blur: 6, spread: 0, color: '#000000', opacity: 0.1, inset: false }
+        ];
+
+        const presets = {
+            subtle: [{ offsetX: 0, offsetY: 2, blur: 4, spread: 0, color: '#000000', opacity: 0.1, inset: false }],
+            medium: [{ offsetX: 0, offsetY: 4, blur: 8, spread: 0, color: '#000000', opacity: 0.15, inset: false }],
+            heavy: [{ offsetX: 0, offsetY: 10, blur: 20, spread: 0, color: '#000000', opacity: 0.3, inset: false }],
+            floating: [
+                { offsetX: 0, offsetY: 5, blur: 15, spread: 0, color: '#000000', opacity: 0.1, inset: false },
+                { offsetX: 0, offsetY: 10, blur: 30, spread: 0, color: '#000000', opacity: 0.05, inset: false }
+            ],
+            glow: [{ offsetX: 0, offsetY: 0, blur: 20, spread: 0, color: '#667eea', opacity: 0.6, inset: false }],
+            inset: [{ offsetX: 0, offsetY: 2, blur: 4, spread: 0, color: '#000000', opacity: 0.2, inset: true }]
+        };
+
+        function renderShadows() {
+            const container = document.getElementById('shadowsList');
+            container.innerHTML = '';
+
+            shadows.forEach((shadow, index) => {
+                const div = document.createElement('div');
+                div.className = 'shadow-item';
+                div.innerHTML = `
+                    <h4>シャドウ ${index + 1}</h4>
+                    <div class="slider-group">
+                        <label>X オフセット</label>
+                        <input type="range" min="-50" max="100" value="${shadow.offsetX}" onchange="updateShadow(${index}, 'offsetX', this.value)">
+                        <input type="number" min="-50" max="100" value="${shadow.offsetX}" onchange="updateShadow(${index}, 'offsetX', this.value)">
+                    </div>
+                    <div class="slider-group">
+                        <label>Y オフセット</label>
+                        <input type="range" min="-50" max="100" value="${shadow.offsetY}" onchange="updateShadow(${index}, 'offsetY', this.value)">
+                        <input type="number" min="-50" max="100" value="${shadow.offsetY}" onchange="updateShadow(${index}, 'offsetY', this.value)">
+                    </div>
+                    <div class="slider-group">
+                        <label>ブラー</label>
+                        <input type="range" min="0" max="100" value="${shadow.blur}" onchange="updateShadow(${index}, 'blur', this.value)">
+                        <input type="number" min="0" max="100" value="${shadow.blur}" onchange="updateShadow(${index}, 'blur', this.value)">
+                    </div>
+                    <div class="slider-group">
+                        <label>スプレッド</label>
+                        <input type="range" min="-50" max="100" value="${shadow.spread}" onchange="updateShadow(${index}, 'spread', this.value)">
+                        <input type="number" min="-50" max="100" value="${shadow.spread}" onchange="updateShadow(${index}, 'spread', this.value)">
+                    </div>
+                    <div class="color-picker-group">
+                        <input type="color" class="color-input" value="${shadow.color}" onchange="updateShadow(${index}, 'color', this.value)">
+                        <label>不透明度</label>
+                        <input type="range" class="opacity-slider" min="0" max="1" step="0.1" value="${shadow.opacity}" onchange="updateShadow(${index}, 'opacity', this.value)">
+                        <input type="number" min="0" max="1" step="0.1" value="${shadow.opacity}" onchange="updateShadow(${index}, 'opacity', this.value)" style="width: 60px;">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="inset-${index}" ${shadow.inset ? 'checked' : ''} onchange="updateShadow(${index}, 'inset', this.checked)">
+                        <label for="inset-${index}">インセット</label>
+                    </div>
+                    ${shadows.length > 1 ? `<button class="btn-remove" onclick="removeShadow(${index})">削除</button>` : ''}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateShadow(index, property, value) {
+            if (property === 'opacity') {
+                shadows[index][property] = parseFloat(value);
+            } else if (property === 'inset') {
+                shadows[index][property] = value;
+            } else {
+                shadows[index][property] = parseInt(value);
+            }
+            updatePreview();
+        }
+
+        function addShadow() {
+            shadows.push({ offsetX: 0, offsetY: 4, blur: 6, spread: 0, color: '#000000', opacity: 0.1, inset: false });
+            renderShadows();
+            updatePreview();
+        }
+
+        function removeShadow(index) {
+            if (shadows.length > 1) {
+                shadows.splice(index, 1);
+                renderShadows();
+                updatePreview();
+            }
+        }
+
+        function updatePreview() {
+            const shadowCSS = shadows.map(s => {
+                const rgb = hexToRgb(s.color);
+                const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${s.opacity})`;
+                return `${s.inset ? 'inset ' : ''}${s.offsetX}px ${s.offsetY}px ${s.blur}px ${s.spread}px ${rgba}`;
+            }).join(', ');
+
+            document.getElementById('previewElement').style.boxShadow = shadowCSS;
+            document.getElementById('codeOutput').textContent = `box-shadow: ${shadowCSS};`;
+        }
+
+        function loadPreset(name) {
+            shadows = presets[name].map(s => ({ ...s }));
+            renderShadows();
+            updatePreview();
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 0, b: 0 };
+        }
+
+        function copyCode() {
+            const code = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        renderShadows();
+        updatePreview();
+    </script>
+</body>
+</html>

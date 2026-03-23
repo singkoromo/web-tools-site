@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF透かし追加 - ToolBox</title>
+    <meta name="description" content="PDFに透かしを追加できます。文字、色、透明度、回転角度を自由に調整できます。">
+    <meta name="keywords" content="PDF, 透かし, ウォーターマーク, ツール, 無料">
+    <meta property="og:title" content="PDF透かし追加 - ToolBox">
+    <meta property="og:description" content="PDFに透かしを追加できます。文字、色、透明度、回転角度を自由に調整できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/pdf-watermark.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/pdf-watermark.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        .tool-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 40px 20px;
+        }
+        .tool-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        .ad-banner {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+        .drop-zone {
+            border: 2px dashed #007bff;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        .drop-zone:hover {
+            border-color: #0056b3;
+            background: #e8eeff;
+        }
+        .drop-zone.active {
+            border-color: #0056b3;
+            background: #e8eeff;
+        }
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .file-input-label:hover {
+            background: #0056b3;
+        }
+        .drop-zone-text {
+            margin-top: 15px;
+            color: #666;
+        }
+        .settings-container {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .settings-container.show {
+            display: block;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .setting-group.full {
+            grid-column: 1 / -1;
+        }
+        .setting-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .setting-value {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .setting-input {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .setting-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .preset-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+        .preset-btn:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+        .color-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .color-input {
+            width: 50px;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+        }
+        .slider-container input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: none;
+        }
+        .slider-value {
+            font-weight: 600;
+            color: #007bff;
+            min-width: 45px;
+            text-align: right;
+        }
+        .position-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .position-btn {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        .position-btn:hover {
+            border-color: #007bff;
+        }
+        .position-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .preview-container {
+            background: #f9f9f9;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .preview-text {
+            font-size: 3em;
+            font-weight: bold;
+            opacity: 0.3;
+            transform-origin: center;
+            letter-spacing: 2px;
+        }
+        .apply-button {
+            padding: 14px 32px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: background 0.3s;
+            display: block;
+            margin: 30px auto;
+        }
+        .apply-button:hover:not(:disabled) {
+            background: #0056b3;
+        }
+        .apply-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .download-button {
+            padding: 14px 32px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: background 0.3s;
+            display: none;
+            margin: 20px auto;
+        }
+        .download-button:hover:not(:disabled) {
+            background: #218838;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: #333;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            display: none;
+        }
+        .toast.show {
+            display: block;
+        }
+        .toast.success {
+            background: #28a745;
+        }
+        .toast.error {
+            background: #dc3545;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 700;
+            font-size: 1.5em;
+        }
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            color: #007bff;
+        }
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav a:hover {
+            color: #007bff;
+        }
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 60px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <h1>PDF透かし追加</h1>
+            <p class="subtitle">PDFのすべてのページに透かしを追加して、機密性を表示します</p>
+
+            <div class="ad-banner">
+                広告スペース
+            </div>
+
+            <div class="drop-zone" id="dropZone">
+                <label class="file-input-label">
+                    PDFを選択
+                    <input type="file" id="fileInput" accept=".pdf" />
+                </label>
+                <div class="drop-zone-text">
+                    またはここにPDFをドラッグ＆ドロップ
+                </div>
+            </div>
+
+            <div class="settings-container" id="settingsContainer">
+                <h2>透かしの設定</h2>
+
+                <div class="settings-grid">
+                    <div class="setting-group full">
+                        <label class="setting-label">テキスト</label>
+                        <input type="text" id="watermarkText" class="setting-input" value="CONFIDENTIAL" placeholder="透かしのテキストを入力">
+                        <div class="preset-buttons">
+                            <button class="preset-btn" data-text="CONFIDENTIAL">CONFIDENTIAL</button>
+                            <button class="preset-btn" data-text="社外秘">社外秘</button>
+                            <button class="preset-btn" data-text="DRAFT">DRAFT</button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            フォントサイズ
+                            <span class="setting-value"><span id="fontSizeValue">60</span>px</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="fontSize" min="20" max="120" value="60">
+                            <span class="slider-value" id="fontSizeSlider">60</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            透明度
+                            <span class="setting-value"><span id="opacityValue">50</span>%</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="opacity" min="0" max="100" value="50">
+                            <span class="slider-value" id="opacitySlider">50</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">色</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="watermarkColor" class="color-input" value="#000000">
+                            <span id="colorValue">#000000</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            回転角度
+                            <span class="setting-value"><span id="rotationValue">-45</span>°</span>
+                        </label>
+                        <div class="slider-container">
+                            <input type="range" id="rotation" min="-90" max="90" value="-45">
+                            <span class="slider-value" id="rotationSlider">-45</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">位置</label>
+                        <div class="position-buttons">
+                            <button class="position-btn" data-position="top">上</button>
+                            <button class="position-btn active" data-position="center">中央</button>
+                            <button class="position-btn" data-position="bottom">下</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-container">
+                    <div class="preview-text" id="previewText" style="">CONFIDENTIAL</div>
+                </div>
+
+                <button class="apply-button" id="applyButton">透かしを追加</button>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>処理中...</p>
+                </div>
+                <button class="download-button" id="downloadButton">PDFをダウンロード</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner" style="margin: 40px 20px;">
+        広告スペース
+    </div>
+
+    <footer>
+        © 2026 ToolBox. All rights reserved.
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const { PDFDocument, rgb, degrees } = PDFLib;
+
+        let currentPdf = null;
+        let processedPdf = null;
+        let currentPosition = 'center';
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const settingsContainer = document.getElementById('settingsContainer');
+        const watermarkText = document.getElementById('watermarkText');
+        const fontSize = document.getElementById('fontSize');
+        const opacity = document.getElementById('opacity');
+        const watermarkColor = document.getElementById('watermarkColor');
+        const rotation = document.getElementById('rotation');
+        const applyButton = document.getElementById('applyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const loading = document.getElementById('loading');
+        const previewText = document.getElementById('previewText');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function updatePreview() {
+            previewText.textContent = watermarkText.value || 'CONFIDENTIAL';
+            previewText.style.fontSize = fontSize.value + 'px';
+            previewText.style.color = watermarkColor.value;
+            previewText.style.opacity = (opacity.value / 100);
+            previewText.style.transform = `rotate(${rotation.value}deg)`;
+
+            document.getElementById('fontSizeValue').textContent = fontSize.value;
+            document.getElementById('fontSizeSlider').textContent = fontSize.value;
+            document.getElementById('opacityValue').textContent = opacity.value;
+            document.getElementById('opacitySlider').textContent = opacity.value;
+            document.getElementById('rotationValue').textContent = rotation.value;
+            document.getElementById('rotationSlider').textContent = rotation.value;
+            document.getElementById('colorValue').textContent = watermarkColor.value;
+
+            const previewContainer = document.querySelector('.preview-container');
+            if (currentPosition === 'top') {
+                previewContainer.style.alignItems = 'flex-start';
+                previewContainer.style.paddingTop = '30px';
+            } else if (currentPosition === 'bottom') {
+                previewContainer.style.alignItems = 'flex-end';
+                previewContainer.style.paddingBottom = '30px';
+            } else {
+                previewContainer.style.alignItems = 'center';
+                previewContainer.style.paddingTop = '40px';
+                previewContainer.style.paddingBottom = '40px';
+            }
+        }
+
+        watermarkText.addEventListener('input', updatePreview);
+        fontSize.addEventListener('input', updatePreview);
+        opacity.addEventListener('input', updatePreview);
+        watermarkColor.addEventListener('input', updatePreview);
+        rotation.addEventListener('input', updatePreview);
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                watermarkText.value = btn.dataset.text;
+                updatePreview();
+            });
+        });
+
+        document.querySelectorAll('.position-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPosition = btn.dataset.position;
+                updatePreview();
+            });
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('active');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('active');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('active');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        async function handleFileSelect(file) {
+            if (!file.type.includes('pdf')) {
+                showToast('PDFファイルを選択してください', 'error');
+                return;
+            }
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                currentPdf = await PDFDocument.load(arrayBuffer);
+                processedPdf = null;
+                downloadButton.style.display = 'none';
+                settingsContainer.classList.add('show');
+                showToast('PDFが読み込まれました');
+            } catch (error) {
+                showToast('PDFの読み込みに失敗しました: ' + error.message, 'error');
+            }
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16) / 255,
+                g: parseInt(result[2], 16) / 255,
+                b: parseInt(result[3], 16) / 255
+            } : { r: 0, g: 0, b: 0 };
+        }
+
+        applyButton.addEventListener('click', async () => {
+            if (!currentPdf) {
+                showToast('PDFを選択してください', 'error');
+                return;
+            }
+
+            try {
+                loading.classList.add('show');
+                applyButton.disabled = true;
+
+                const newPdf = await PDFDocument.create();
+                const pages = currentPdf.getPages();
+                const text = watermarkText.value || 'CONFIDENTIAL';
+                const size = parseInt(fontSize.value);
+                const opacityVal = parseInt(opacity.value) / 100;
+                const rotationVal = parseInt(rotation.value);
+                const colorHex = watermarkColor.value;
+                const colorRgb = hexToRgb(colorHex);
+
+                for (const page of pages) {
+                    const [copiedPage] = await newPdf.embedPage(page);
+                    const newPage = newPdf.addPage([copiedPage.width, copiedPage.height]);
+                    newPage.drawPage(copiedPage);
+
+                    const pageWidth = newPage.getWidth();
+                    const pageHeight = newPage.getHeight();
+
+                    let yPosition = pageHeight / 2;
+                    if (currentPosition === 'top') {
+                        yPosition = pageHeight - (size * 1.5);
+                    } else if (currentPosition === 'bottom') {
+                        yPosition = size;
+                    }
+
+                    newPage.drawText(text, {
+                        x: pageWidth / 2,
+                        y: yPosition,
+                        size: size,
+                        color: rgb(colorRgb.r, colorRgb.g, colorRgb.b),
+                        opacity: opacityVal,
+                        align: 'center',
+                        rotate: degrees(rotationVal)
+                    });
+                }
+
+                processedPdf = await newPdf.save();
+                downloadButton.style.display = 'block';
+                showToast('透かしが追加されました');
+            } catch (error) {
+                showToast('処理に失敗しました: ' + error.message, 'error');
+            } finally {
+                loading.classList.remove('show');
+                applyButton.disabled = false;
+            }
+        });
+
+        downloadButton.addEventListener('click', () => {
+            if (!processedPdf) return;
+
+            const blob = new Blob([processedPdf], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'watermarked.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('ダウンロードが開始しました');
+        });
+
+        updatePreview();
+    </script>
+</body>
+</html>

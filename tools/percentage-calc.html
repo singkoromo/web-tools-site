@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パーセント計算機 - ToolBox</title>
+    <meta name="description" content="簡単で便利なパーセント計算機。AのB%は？、AはBの何%？、増減計算など3つのモードで計算できます。">
+    <meta name="keywords" content="パーセント計算,パーセント,計算,ツール,無料">
+    <meta property="og:title" content="パーセント計算機 - ToolBox">
+    <meta property="og:description" content="簡単で便利なパーセント計算機。3つのパーセント計算モードに対応。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/percentage-calc.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/percentage-calc.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .mode-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .mode-tab {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .mode-tab.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+        .mode-tab:hover {
+            border-color: #3b82f6;
+        }
+        .mode-content {
+            display: none;
+        }
+        .mode-content.active {
+            display: block;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        input[type="number"] {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .unit {
+            color: #6b7280;
+            font-weight: 500;
+            min-width: 2rem;
+        }
+        .result-box {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .result-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #3b82f6;
+            font-family: 'JetBrains Mono', monospace;
+            word-break: break-all;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .btn-calculate {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .btn-calculate:hover {
+            background: #2563eb;
+        }
+        .btn-clear {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-clear:hover {
+            background: #d1d5db;
+        }
+        .ad-banner {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1>パーセント計算機</h1>
+        <p style="color: #6b7280; margin-bottom: 2rem;">3つのパーセント計算モードで様々な計算ができます。</p>
+
+        <div class="ad-banner">広告スペース</div>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode(0)">AのB%は？</button>
+            <button class="mode-tab" onclick="switchMode(1)">AはBの何%？</button>
+            <button class="mode-tab" onclick="switchMode(2)">増減計算</button>
+        </div>
+
+        <!-- Mode 1: A の B% は？ -->
+        <div class="mode-content active">
+            <div class="input-group">
+                <label class="input-label">値 (A)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode1-a" placeholder="例: 200" step="0.01">
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">パーセント (B)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode1-b" placeholder="例: 15" step="0.01">
+                    <span class="unit">%</span>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateMode1()">計算する</button>
+                <button class="btn-clear" onclick="clearMode1()">クリア</button>
+            </div>
+            <div class="result-box" id="mode1-result" style="display: none;">
+                <div class="result-label">計算結果</div>
+                <div class="result-value" id="mode1-value">0</div>
+            </div>
+        </div>
+
+        <!-- Mode 2: A は B の何%？ -->
+        <div class="mode-content">
+            <div class="input-group">
+                <label class="input-label">値 (A)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode2-a" placeholder="例: 30" step="0.01">
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">全体 (B)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode2-b" placeholder="例: 200" step="0.01">
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateMode2()">計算する</button>
+                <button class="btn-clear" onclick="clearMode2()">クリア</button>
+            </div>
+            <div class="result-box" id="mode2-result" style="display: none;">
+                <div class="result-label">計算結果</div>
+                <div class="result-value" id="mode2-value">0%</div>
+            </div>
+        </div>
+
+        <!-- Mode 3: A から B%増/減 -->
+        <div class="mode-content">
+            <div class="input-group">
+                <label class="input-label">値 (A)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode3-a" placeholder="例: 200" step="0.01">
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">増減 (B)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode3-b" placeholder="例: 15 (正数=増, 負数=減)" step="0.01">
+                    <span class="unit">%</span>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateMode3()">計算する</button>
+                <button class="btn-clear" onclick="clearMode3()">クリア</button>
+            </div>
+            <div class="result-box" id="mode3-result" style="display: none;">
+                <div class="result-label">計算結果</div>
+                <div class="result-value" id="mode3-value">0</div>
+            </div>
+        </div>
+
+        <div class="ad-banner">広告スペース</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <div id="toast"></div>
+
+    <script>
+        function switchMode(mode) {
+            const contents = document.querySelectorAll('.mode-content');
+            const tabs = document.querySelectorAll('.mode-tab');
+            contents.forEach(c => c.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active'));
+            contents[mode].classList.add('active');
+            tabs[mode].classList.add('active');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: #fff; padding: 1rem 1.5rem; border-radius: 6px; z-index: 1000;';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function calculateMode1() {
+            const a = parseFloat(document.getElementById('mode1-a').value);
+            const b = parseFloat(document.getElementById('mode1-b').value);
+            if (isNaN(a) || isNaN(b)) {
+                showToast('値を入力してください');
+                return;
+            }
+            const result = a * (b / 100);
+            document.getElementById('mode1-value').textContent = result.toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+            document.getElementById('mode1-result').style.display = 'block';
+        }
+
+        function clearMode1() {
+            document.getElementById('mode1-a').value = '';
+            document.getElementById('mode1-b').value = '';
+            document.getElementById('mode1-result').style.display = 'none';
+        }
+
+        function calculateMode2() {
+            const a = parseFloat(document.getElementById('mode2-a').value);
+            const b = parseFloat(document.getElementById('mode2-b').value);
+            if (isNaN(a) || isNaN(b) || b === 0) {
+                showToast('有効な値を入力してください');
+                return;
+            }
+            const result = (a / b) * 100;
+            document.getElementById('mode2-value').textContent = result.toLocaleString('ja-JP', { maximumFractionDigits: 2 }) + '%';
+            document.getElementById('mode2-result').style.display = 'block';
+        }
+
+        function clearMode2() {
+            document.getElementById('mode2-a').value = '';
+            document.getElementById('mode2-b').value = '';
+            document.getElementById('mode2-result').style.display = 'none';
+        }
+
+        function calculateMode3() {
+            const a = parseFloat(document.getElementById('mode3-a').value);
+            const b = parseFloat(document.getElementById('mode3-b').value);
+            if (isNaN(a) || isNaN(b)) {
+                showToast('値を入力してください');
+                return;
+            }
+            const result = a * (1 + b / 100);
+            document.getElementById('mode3-value').textContent = result.toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+            document.getElementById('mode3-result').style.display = 'block';
+        }
+
+        function clearMode3() {
+            document.getElementById('mode3-a').value = '';
+            document.getElementById('mode3-b').value = '';
+            document.getElementById('mode3-result').style.display = 'none';
+        }
+
+        // Real-time calculation
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('mode1-a').addEventListener('input', calculateMode1);
+            document.getElementById('mode1-b').addEventListener('input', calculateMode1);
+            document.getElementById('mode2-a').addEventListener('input', calculateMode2);
+            document.getElementById('mode2-b').addEventListener('input', calculateMode2);
+            document.getElementById('mode3-a').addEventListener('input', calculateMode3);
+            document.getElementById('mode3-b').addEventListener('input', calculateMode3);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="chmod 計算機。数値表記とシンボリック表記を相互変換でき、GUIでファイル権限を設定できます。">
+    <meta name="keywords" content="chmod, ファイル権限, Linux, パーミッション, IT・インフラ">
+    <meta name="author" content="ToolBox">
+    <meta name="theme-color" content="#007bff">
+    <title>chmod 計算機 - ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #007bff;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .ad-banner {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .ad-placeholder {
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-page h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #007bff;
+            background: white;
+            color: #007bff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .permission-group {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .permission-group h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .permission-row {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .permission-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #007bff;
+        }
+
+        .permission-item label {
+            cursor: pointer;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .permission-value {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #007bff;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .output-section {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .output-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .output-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .output-item label {
+            display: block;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .output-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            color: #007bff;
+            font-weight: 600;
+            user-select: all;
+        }
+
+        .command-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            word-break: break-all;
+            color: #333;
+            user-select: all;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-generate:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-copy {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        footer {
+            background: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav {
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .tool-page {
+                padding: 1.5rem;
+            }
+
+            .permission-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav>
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-page">
+            <h1>chmod 計算機</h1>
+
+            <div class="form-section">
+                <h2>よく使うパターン</h2>
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="loadPreset('644')">644 (ファイル標準)</button>
+                    <button class="preset-btn" onclick="loadPreset('755')">755 (ディレクトリ標準)</button>
+                    <button class="preset-btn" onclick="loadPreset('777')">777 (全権限)</button>
+                    <button class="preset-btn" onclick="loadPreset('600')">600 (所有者のみ)</button>
+                    <button class="preset-btn" onclick="loadPreset('700')">700 (所有者のみ実行可)</button>
+                    <button class="preset-btn" onclick="loadPreset('750')">750 (グループ読取)</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>数値表記入力</h2>
+                <div class="form-group">
+                    <label for="numericInput">数値 (例: 755):</label>
+                    <input type="text" id="numericInput" placeholder="755" maxlength="4" oninput="updateFromNumeric()">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>GUI権限設定</h2>
+
+                <div class="permission-group">
+                    <h3>所有者 (Owner)</h3>
+                    <div class="permission-row">
+                        <div class="permission-item">
+                            <input type="checkbox" id="ownerRead" onchange="updateFromGui()">
+                            <label for="ownerRead">読取 (r)</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="ownerWrite" onchange="updateFromGui()">
+                            <label for="ownerWrite">書込 (w)</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="ownerExecute" onchange="updateFromGui()">
+                            <label for="ownerExecute">実行 (x)</label>
+                        </div>
+                        <div class="permission-value" id="ownerValue">0</div>
+                    </div>
+                </div>
+
+                <div class="permission-group">
+                    <h3>グループ (Group)</h3>
+                    <div class="permission-row">
+                        <div class="permission-item">
+                            <input type="checkbox" id="groupRead" onchange="updateFromGui()">
+                            <label for="groupRead">読取 (r)</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="groupWrite" onchange="updateFromGui()">
+                            <label for="groupWrite">書込 (w)</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="groupExecute" onchange="updateFromGui()">
+                            <label for="groupExecute">実行 (x)</label>
+                        </div>
+                        <div class="permission-value" id="groupValue">0</div>
+                    </div>
+                </div>
+
+                <div class="permission-group">
+                    <h3>その他 (Other)</h3>
+                    <div class="permission-row">
+                        <div class="permission-item">
+                            <input type="checkbox" id="otherRead" onchange="updateFromGui()">
+                            <label for="otherRead">読取 (r)</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="otherWrite" onchange="updateFromGui()">
+                            <label for="otherWrite">書込 (w)</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="otherExecute" onchange="updateFromGui()">
+                            <label for="otherExecute">実行 (x)</label>
+                        </div>
+                        <div class="permission-value" id="otherValue">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h3>変換結果</h3>
+
+                <div class="output-item">
+                    <label>数値表記 (Numeric):</label>
+                    <div class="output-value" id="numericOutput">644</div>
+                </div>
+
+                <div class="output-item">
+                    <label>シンボリック表記 (Symbolic):</label>
+                    <div class="output-value" id="symbolicOutput">rw-r--r--</div>
+                </div>
+
+                <div class="output-item">
+                    <label>chmodコマンド:</label>
+                    <div class="command-output" id="chmodCommand">chmod 644 filename</div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-copy" onclick="copyCommand()">chmodコマンドをコピー</button>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 ToolBox
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const toast = document.getElementById('toast');
+
+        function calculatePermissionValue(read, write, execute) {
+            return (read ? 4 : 0) + (write ? 2 : 0) + (execute ? 1 : 0);
+        }
+
+        function updateFromGui() {
+            const ownerR = document.getElementById('ownerRead').checked;
+            const ownerW = document.getElementById('ownerWrite').checked;
+            const ownerX = document.getElementById('ownerExecute').checked;
+
+            const groupR = document.getElementById('groupRead').checked;
+            const groupW = document.getElementById('groupWrite').checked;
+            const groupX = document.getElementById('groupExecute').checked;
+
+            const otherR = document.getElementById('otherRead').checked;
+            const otherW = document.getElementById('otherWrite').checked;
+            const otherX = document.getElementById('otherExecute').checked;
+
+            const owner = calculatePermissionValue(ownerR, ownerW, ownerX);
+            const group = calculatePermissionValue(groupR, groupW, groupX);
+            const other = calculatePermissionValue(otherR, otherW, otherX);
+
+            const numeric = '' + owner + group + other;
+
+            document.getElementById('ownerValue').textContent = owner;
+            document.getElementById('groupValue').textContent = group;
+            document.getElementById('otherValue').textContent = other;
+            document.getElementById('numericInput').value = numeric;
+            document.getElementById('numericOutput').textContent = numeric;
+
+            const symbolic = (ownerR ? 'r' : '-') + (ownerW ? 'w' : '-') + (ownerX ? 'x' : '-') +
+                            (groupR ? 'r' : '-') + (groupW ? 'w' : '-') + (groupX ? 'x' : '-') +
+                            (otherR ? 'r' : '-') + (otherW ? 'w' : '-') + (otherX ? 'x' : '-');
+
+            document.getElementById('symbolicOutput').textContent = symbolic;
+            document.getElementById('chmodCommand').textContent = `chmod ${numeric} filename`;
+        }
+
+        function updateFromNumeric() {
+            const numeric = document.getElementById('numericInput').value.replace(/\D/g, '');
+            if (numeric.length !== 3) return;
+
+            const owner = parseInt(numeric[0]);
+            const group = parseInt(numeric[1]);
+            const other = parseInt(numeric[2]);
+
+            const ownerR = (owner & 4) !== 0;
+            const ownerW = (owner & 2) !== 0;
+            const ownerX = (owner & 1) !== 0;
+
+            const groupR = (group & 4) !== 0;
+            const groupW = (group & 2) !== 0;
+            const groupX = (group & 1) !== 0;
+
+            const otherR = (other & 4) !== 0;
+            const otherW = (other & 2) !== 0;
+            const otherX = (other & 1) !== 0;
+
+            document.getElementById('ownerRead').checked = ownerR;
+            document.getElementById('ownerWrite').checked = ownerW;
+            document.getElementById('ownerExecute').checked = ownerX;
+
+            document.getElementById('groupRead').checked = groupR;
+            document.getElementById('groupWrite').checked = groupW;
+            document.getElementById('groupExecute').checked = groupX;
+
+            document.getElementById('otherRead').checked = otherR;
+            document.getElementById('otherWrite').checked = otherW;
+            document.getElementById('otherExecute').checked = otherX;
+
+            document.getElementById('ownerValue').textContent = owner;
+            document.getElementById('groupValue').textContent = group;
+            document.getElementById('otherValue').textContent = other;
+
+            const symbolic = (ownerR ? 'r' : '-') + (ownerW ? 'w' : '-') + (ownerX ? 'x' : '-') +
+                            (groupR ? 'r' : '-') + (groupW ? 'w' : '-') + (groupX ? 'x' : '-') +
+                            (otherR ? 'r' : '-') + (otherW ? 'w' : '-') + (otherX ? 'x' : '-');
+
+            document.getElementById('symbolicOutput').textContent = symbolic;
+            document.getElementById('numericOutput').textContent = numeric;
+            document.getElementById('chmodCommand').textContent = `chmod ${numeric} filename`;
+        }
+
+        function loadPreset(preset) {
+            document.getElementById('numericInput').value = preset;
+            updateFromNumeric();
+        }
+
+        function copyCommand() {
+            const command = document.getElementById('chmodCommand').textContent;
+            navigator.clipboard.writeText(command).then(() => {
+                toast.textContent = 'chmodコマンドをコピーしました';
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2000);
+            });
+        }
+
+        // Initialize with 644
+        loadPreset('644');
+    </script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="QRコード生成ツール。テキストやURLから簡単にQRコードを作成できます。">
+    <meta name="keywords" content="QRコード,生成,作成,URL,テキスト">
+    <meta name="author" content="ToolBox">
+    <title>QRコード生成 | ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .tool-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tool-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .tool-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .input-info {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .size-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .size-selector label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #ddd;
+            background-color: white;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .size-btn:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+
+        .size-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .qr-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            border: 2px dashed #ddd;
+            border-radius: 0.5rem;
+            background-color: #f9f9f9;
+            padding: 2rem;
+        }
+
+        .qr-output {
+            display: none;
+        }
+
+        .qr-output.show {
+            display: block;
+        }
+
+        .qr-output canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .error-message {
+            padding: 1rem;
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            padding: 1rem;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .size-btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">ToolBox</div>
+            <nav class="nav">
+                <a href="../index.html" class="nav-link">ホーム</a>
+                <a href="../index.html#tools" class="nav-link">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Ad Banner (Before Tool) -->
+    <div class="ad-banner ad-before">
+        <p>広告スペース</p>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="tool-header">
+            <h1>QRコード生成</h1>
+            <p>テキストやURLからQRコードを生成します。生成したQRコードはPNG形式でダウンロードできます。</p>
+        </div>
+
+        <div class="tool-container">
+            <!-- Input Section -->
+            <div>
+                <div class="input-group">
+                    <label for="qrInput">テキスト / URL</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="qrInput"
+                            class="tool-input"
+                            placeholder="QRコードに変換するテキストやURLを入力してください..."
+                        >
+                        <span class="input-info" id="inputInfo">0 文字</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="settings-grid">
+                <div class="size-selector">
+                    <label>QRコードサイズ</label>
+                    <div class="size-options">
+                        <button class="size-btn" data-size="128">128px</button>
+                        <button class="size-btn active" data-size="256">256px</button>
+                        <button class="size-btn" data-size="512">512px</button>
+                    </div>
+                </div>
+                <div>
+                    <label>操作</label>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="generateQRCode()">生成</button>
+                        <button class="btn btn-secondary" onclick="clearQRCode()">クリア</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <!-- Output Section -->
+            <div class="output-section">
+                <div class="qr-display">
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>QRコードを生成中...</p>
+                    </div>
+                    <div class="qr-output" id="qrOutput"></div>
+                    <div id="emptyState" style="color: #999; text-align: center;">
+                        <p>QRコードがここに表示されます</p>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-success" id="downloadBtn" onclick="downloadQRCode()" style="display: none;">
+                        PNG としてダウンロード
+                    </button>
+                    <button class="btn btn-secondary" id="copyBtn" onclick="copyQRCodeData()" style="display: none;">
+                        データをコピー
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Ad Banner (After Tool) -->
+    <div class="ad-banner ad-after">
+        <p>広告スペース</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox</p>
+    </footer>
+
+    <script>
+        let currentQRData = null;
+        let currentSize = 256;
+        let debounceTimer = null;
+
+        const input = document.getElementById('qrInput');
+        const sizeButtons = document.querySelectorAll('.size-btn');
+
+        // Update character count
+        input.addEventListener('input', () => {
+            document.getElementById('inputInfo').textContent = input.value.length + ' 文字';
+            clearMessages();
+
+            // Debounced auto-generation
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (input.value.trim()) {
+                    generateQRCode();
+                }
+            }, 500);
+        });
+
+        // Size selector
+        sizeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                sizeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSize = parseInt(btn.dataset.size);
+                if (input.value.trim()) {
+                    generateQRCode();
+                }
+            });
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            showToast(message, 'error');
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.add('show');
+            showToast(message, 'success');
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function generateQRCode() {
+            clearMessages();
+            const text = input.value.trim();
+
+            if (!text) {
+                showError('QRコードに変換するテキストを入力してください。');
+                document.getElementById('downloadBtn').style.display = 'none';
+                document.getElementById('copyBtn').style.display = 'none';
+                return;
+            }
+
+            try {
+                document.getElementById('loading').classList.add('show');
+                document.getElementById('qrOutput').classList.remove('show');
+                document.getElementById('emptyState').style.display = 'none';
+
+                // Clear previous QR code
+                const qrOutput = document.getElementById('qrOutput');
+                qrOutput.innerHTML = '';
+
+                // Generate new QR code
+                const qr = new QRCode(qrOutput, {
+                    text: text,
+                    width: currentSize,
+                    height: currentSize,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Wait for QR code to be generated
+                setTimeout(() => {
+                    document.getElementById('loading').classList.remove('show');
+                    qrOutput.classList.add('show');
+
+                    // Store the canvas for download
+                    const canvas = qrOutput.querySelector('canvas');
+                    currentQRData = canvas;
+
+                    document.getElementById('downloadBtn').style.display = 'block';
+                    document.getElementById('copyBtn').style.display = 'block';
+                    showSuccess('QRコードを生成しました。');
+                }, 300);
+            } catch (error) {
+                document.getElementById('loading').classList.remove('show');
+                showError('QRコード生成中にエラーが発生しました: ' + error.message);
+                document.getElementById('downloadBtn').style.display = 'none';
+                document.getElementById('copyBtn').style.display = 'none';
+            }
+        }
+
+        function downloadQRCode() {
+            if (!currentQRData) {
+                showError('ダウンロードするQRコードがありません。');
+                return;
+            }
+
+            try {
+                const link = document.createElement('a');
+                link.href = currentQRData.toDataURL('image/png');
+                link.download = 'qrcode-' + Date.now() + '.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast('QRコードをダウンロードしました', 'success');
+            } catch (error) {
+                showError('ダウンロード中にエラーが発生しました。');
+            }
+        }
+
+        function copyQRCodeData() {
+            if (!currentQRData) {
+                showError('コピーするQRコードがありません。');
+                return;
+            }
+
+            try {
+                currentQRData.toBlob(blob => {
+                    navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]).then(() => {
+                        showToast('QRコードをクリップボードにコピーしました', 'success');
+                    }).catch(() => {
+                        showError('クリップボードへのコピーに失敗しました。');
+                    });
+                });
+            } catch (error) {
+                showError('コピー中にエラーが発生しました。');
+            }
+        }
+
+        function clearQRCode() {
+            input.value = '';
+            document.getElementById('inputInfo').textContent = '0 文字';
+            document.getElementById('qrOutput').innerHTML = '';
+            document.getElementById('qrOutput').classList.remove('show');
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('downloadBtn').style.display = 'none';
+            document.getElementById('copyBtn').style.display = 'none';
+            currentQRData = null;
+            clearMessages();
+            clearTimeout(debounceTimer);
+        }
+    </script>
+</body>
+</html>

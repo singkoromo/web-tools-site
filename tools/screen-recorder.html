@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スクリーン録画 - ToolBox</title>
+    <meta name="description" content="パソコンの画面とマイク音声を録画します。WebM形式で高品質に保存できます。">
+    <meta name="keywords" content="スクリーン、録画、キャプチャ、ツール、無料">
+    <meta property="og:title" content="スクリーン録画 - ToolBox">
+    <meta property="og:description" content="スクリーンを録画するオンラインツール">
+    <meta property="og:url" content="https://web-tool-site.com/tools/screen-recorder.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/screen-recorder.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .recorder-controls { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; justify-content: center; }
+        .recorder-btn { padding: 0.75rem 1.5rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.2s; }
+        .recorder-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .timer-display { text-align: center; font-size: 2rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ef4444; margin: 1rem 0; }
+        .toggle-btn { display: flex; align-items: center; gap: 0.5rem; }
+        .toggle-btn input { width: 1.25rem; height: 1.25rem; cursor: pointer; }
+        .settings-group { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+        .setting-item { display: flex; flex-direction: column; gap: 0.5rem; }
+        .setting-item label { font-weight: 500; color: #333; }
+        .setting-item select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.375rem; font-family: Inter, sans-serif; }
+        .preview-area { width: 100%; max-width: 100%; border-radius: 0.5rem; background: #000; margin: 1rem 0; position: relative; overflow: hidden; }
+        .preview-video { width: 100%; height: auto; display: block; }
+        .preview-placeholder { width: 100%; height: 300px; background: #1f2937; display: flex; align-items: center; justify-content: center; color: #9ca3af; }
+        .info-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; font-size: 0.9rem; color: #1e40af; }
+        .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; font-size: 0.9rem; color: #92400e; }
+        .success-box { background: #dcfce7; border-left: 4px solid #10b981; padding: 1rem; margin: 1rem 0; border-radius: 0.375rem; font-size: 0.9rem; color: #166534; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <div class="tool-container">
+            <div class="ad-banner">スポンサー</div>
+
+            <h1>スクリーン録画</h1>
+            <p class="subtitle">パソコンの画面をWebM形式で高品質に録画します。マイク音声も一緒に録音できます。</p>
+
+            <div class="warning-box">
+                <strong>ブラウザ対応:</strong> このツールはChrome、Firefox、Edge などのモダンブラウザで動作します。Safari では一部機能が制限される場合があります。
+            </div>
+
+            <div class="settings-group">
+                <div class="setting-item">
+                    <label class="toggle-btn">
+                        <input type="checkbox" id="includeAudio" checked>
+                        マイク音声を含める
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>品質設定</label>
+                    <select id="quality">
+                        <option value="high">高品質 (1080p, 高ビットレート)</option>
+                        <option value="medium" selected>中品質 (720p)</option>
+                        <option value="low">低品質 (480p)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="preview-area">
+                <div class="preview-placeholder" id="previewPlaceholder">
+                    <div style="text-align: center;">
+                        <p>録画中の画面がここに表示されます</p>
+                        <small style="color: #6b7280; margin-top: 0.5rem;">（実際には表示されないため、フレームレート低下を避けています）</small>
+                    </div>
+                </div>
+                <video id="previewVideo" class="preview-video" style="display: none;" controls></video>
+            </div>
+
+            <div class="timer-display" id="timerDisplay" style="display: none;">00:00:00</div>
+
+            <div class="recorder-controls">
+                <button class="recorder-btn btn btn-success" id="startBtn" onclick="startRecording()">
+                    <span>● 録画開始</span>
+                </button>
+                <button class="recorder-btn btn btn-warning" id="pauseBtn" onclick="pauseRecording()" disabled>
+                    <span>⏸ 一時停止</span>
+                </button>
+                <button class="recorder-btn btn btn-info" id="resumeBtn" onclick="resumeRecording()" disabled style="display: none;">
+                    <span>▶ 再開</span>
+                </button>
+                <button class="recorder-btn btn btn-danger" id="stopBtn" onclick="stopRecording()" disabled>
+                    <span>⏹ 停止</span>
+                </button>
+            </div>
+
+            <div id="resultSection" style="display: none;">
+                <div class="success-box">
+                    <strong>録画完了!</strong> ファイルをレビューしてダウンロードできます。
+                </div>
+
+                <h3>プレビュー</h3>
+                <video id="resultVideo" style="max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;" controls></video>
+
+                <button class="btn btn-primary" onclick="downloadRecording()">WebMをダウンロード</button>
+            </div>
+        </div>
+
+        <div class="ad-banner" style="margin-top: 2rem;">スポンサー</div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let mediaRecorder = null;
+        let chunks = [];
+        let recordingBlob = null;
+        let timerInterval = null;
+        let recordingTime = 0;
+        let isPaused = false;
+
+        async function startRecording() {
+            try {
+                const constraints = {
+                    video: {
+                        cursor: 'always',
+                        displaySurface: 'monitor'
+                    }
+                };
+
+                const screenStream = await navigator.mediaDevices.getDisplayMedia(constraints);
+
+                let audioStream = null;
+                if (document.getElementById('includeAudio').checked) {
+                    try {
+                        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    } catch (e) {
+                        showToast('マイクへのアクセスが拒否されました（オプション機能）', 'warning');
+                    }
+                }
+
+                const combinedStream = new MediaStream();
+                screenStream.getVideoTracks().forEach(track => combinedStream.addTrack(track));
+                if (audioStream) {
+                    audioStream.getAudioTracks().forEach(track => combinedStream.addTrack(track));
+                }
+
+                const quality = document.getElementById('quality').value;
+                let videoBitsPerSecond = 2500000;
+                if (quality === 'medium') videoBitsPerSecond = 1500000;
+                else if (quality === 'low') videoBitsPerSecond = 500000;
+
+                mediaRecorder = new MediaRecorder(combinedStream, {
+                    mimeType: 'video/webm',
+                    videoBitsPerSecond: videoBitsPerSecond
+                });
+
+                chunks = [];
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    recordingBlob = new Blob(chunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(recordingBlob);
+                    document.getElementById('resultVideo').src = url;
+                    document.getElementById('resultSection').style.display = 'block';
+                    document.getElementById('timerDisplay').style.display = 'none';
+                    clearInterval(timerInterval);
+                    showToast('録画が保存されました');
+                };
+
+                mediaRecorder.start();
+
+                screenStream.getVideoTracks()[0].onended = () => {
+                    stopRecording();
+                };
+
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('includeAudio').disabled = true;
+                document.getElementById('quality').disabled = true;
+
+                document.getElementById('timerDisplay').style.display = 'block';
+                recordingTime = 0;
+                timerInterval = setInterval(() => {
+                    if (!isPaused) recordingTime++;
+                    updateTimer();
+                }, 1000);
+
+                showToast('スクリーン録画を開始しました');
+            } catch (e) {
+                showToast('スクリーン録画を開始できません: ' + e.message, 'error');
+            }
+        }
+
+        function updateTimer() {
+            const hours = Math.floor(recordingTime / 3600);
+            const minutes = Math.floor((recordingTime % 3600) / 60);
+            const seconds = recordingTime % 60;
+            const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = timeStr;
+        }
+
+        function pauseRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.pause();
+                isPaused = true;
+                document.getElementById('pauseBtn').style.display = 'none';
+                document.getElementById('resumeBtn').style.display = 'inline-block';
+                showToast('一時停止しました');
+            }
+        }
+
+        function resumeRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'paused') {
+                mediaRecorder.resume();
+                isPaused = false;
+                document.getElementById('pauseBtn').style.display = 'inline-block';
+                document.getElementById('resumeBtn').style.display = 'none';
+                showToast('再開しました');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && (mediaRecorder.state === 'recording' || mediaRecorder.state === 'paused')) {
+                mediaRecorder.stop();
+
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('resumeBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = true;
+                document.getElementById('includeAudio').disabled = false;
+                document.getElementById('quality').disabled = false;
+                document.getElementById('pauseBtn').style.display = 'inline-block';
+                document.getElementById('resumeBtn').style.display = 'none';
+
+                clearInterval(timerInterval);
+                isPaused = false;
+
+                showToast('録画を停止しました');
+            }
+        }
+
+        function downloadRecording() {
+            if (!recordingBlob) return;
+            const url = URL.createObjectURL(recordingBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `screen-recording-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('ダウンロードを開始しました');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + (type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'success');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+</body>
+</html>

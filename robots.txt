@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://web-tool-site.com/sitemap.xml

@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="画像を簡単に圧縮できるオンラインツール。ドラッグ&ドロップで簡単アップロード、品質調整、高速ダウンロード。">
+    <meta name="keywords" content="画像圧縮, 画像最適化, JPEG, PNG, オンラインツール">
+    <meta name="author" content="ToolBox">
+    <meta property="og:title" content="画像圧縮ツール - ToolBox">
+    <meta property="og:description" content="無料で画像を圧縮できるオンラインツール">
+    <meta property="og:type" content="website">
+    <title>画像圧縮ツール - ToolBox</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        /* Ad Banner */
+        .ad-banner {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            margin: 1.5rem auto;
+            max-width: 1200px;
+            width: 90%;
+            border-radius: 0.5rem;
+        }
+
+        .ad-placeholder {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Tool Page */
+        .tool-page {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .tool-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .tool-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Tool Container */
+        .tool-container {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 0.75rem;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--bg-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background-color: #eff6ff;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--primary);
+            background-color: #eff6ff;
+        }
+
+        .drop-zone-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .drop-zone-text {
+            margin-bottom: 0.5rem;
+        }
+
+        .drop-zone-text h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .drop-zone-text p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .drop-zone-button {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .drop-zone-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .drop-zone-button:active {
+            transform: scale(0.98);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* Controls */
+        .controls {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .quality-control {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        #qualitySlider {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #ef4444 0%, #f59e0b 25%, #fbbf24 50%, #10b981 75%, #10b981 100%);
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        #qualitySlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease;
+        }
+
+        #qualitySlider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        #qualitySlider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease;
+        }
+
+        #qualitySlider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .quality-value {
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: var(--border);
+        }
+
+        .btn-secondary:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Preview Section */
+        .image-preview {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .image-preview.active {
+            display: block;
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-box {
+            text-align: center;
+        }
+
+        .preview-box h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .preview-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .file-size {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Compression Stats */
+        .compression-stats {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 0 1rem;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--success);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-value.negative {
+            color: var(--warning);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-primary);
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--text-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.success {
+            background-color: var(--success);
+        }
+
+        .toast.error {
+            background-color: var(--danger);
+        }
+
+        .toast.info {
+            background-color: var(--primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.removing {
+            animation: slideOut 0.3s ease;
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav>
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Ad Banner 1 -->
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <!-- Main Tool Page -->
+    <div class="tool-page">
+        <div class="tool-header">
+            <h1>画像圧縮ツール</h1>
+            <p>高品質を保ちながら画像ファイルサイズを削減します</p>
+        </div>
+
+        <div class="tool-container">
+            <!-- Drop Zone -->
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">📁</div>
+                <div class="drop-zone-text">
+                    <h2>画像をアップロード</h2>
+                    <p>またはクリックしてファイルを選択</p>
+                </div>
+                <button class="drop-zone-button" id="uploadButton">ファイルを選択</button>
+            </div>
+
+            <input type="file" id="fileInput" accept="image/jpeg,image/png" />
+
+            <!-- Controls -->
+            <div class="controls" id="controls" style="display: none;">
+                <div class="control-group">
+                    <label for="qualitySlider">圧縮品質: <span class="quality-value" id="qualityValue">70</span></label>
+                    <div class="quality-control">
+                        <input type="range" id="qualitySlider" min="1" max="100" value="70" />
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        低い値ほどファイルサイズが小さくなりますが、品質が低下します
+                    </p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="compressButton">圧縮する</button>
+                    <button class="btn btn-secondary" id="resetButton">リセット</button>
+                </div>
+            </div>
+
+            <!-- Image Preview -->
+            <div class="image-preview" id="imagePreview">
+                <div class="preview-container">
+                    <div class="preview-box">
+                        <h3>圧縮前</h3>
+                        <img id="originalImage" class="preview-image" alt="圧縮前" />
+                        <div class="preview-info">
+                            ファイルサイズ: <span class="file-size" id="originalSize">-</span>
+                        </div>
+                    </div>
+                    <div class="preview-box">
+                        <h3>圧縮後</h3>
+                        <img id="compressedImage" class="preview-image" alt="圧縮後" />
+                        <div class="preview-info">
+                            ファイルサイズ: <span class="file-size" id="compressedSize">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compression Stats -->
+                <div class="compression-stats" id="stats" style="display: none;">
+                    <div class="stat-item">
+                        <span class="stat-label">削減率</span>
+                        <span class="stat-value" id="reductionPercentage">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">削減量</span>
+                        <span class="stat-value" id="reductionSize">-</span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="downloadButton">ダウンロード</button>
+                    <button class="btn btn-secondary" id="newButton">新しい画像</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Banner 2 -->
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 ToolBox</p>
+    </footer>
+
+    <script>
+        // State management
+        let originalFile = null;
+        let originalBlob = null;
+        let compressedBlob = null;
+        let originalFileName = null;
+        let fileType = 'image/jpeg';
+
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const controls = document.getElementById('controls');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const compressButton = document.getElementById('compressButton');
+        const resetButton = document.getElementById('resetButton');
+        const imagePreview = document.getElementById('imagePreview');
+        const originalImage = document.getElementById('originalImage');
+        const compressedImage = document.getElementById('compressedImage');
+        const originalSize = document.getElementById('originalSize');
+        const compressedSize = document.getElementById('compressedSize');
+        const stats = document.getElementById('stats');
+        const reductionPercentage = document.getElementById('reductionPercentage');
+        const reductionSize = document.getElementById('reductionSize');
+        const downloadButton = document.getElementById('downloadButton');
+        const newButton = document.getElementById('newButton');
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('removing');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Handle file selection
+        function handleFile(file) {
+            if (!file) return;
+
+            // Validate file type
+            if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                showToast('JPEG または PNG ファイルのみサポートしています', 'error');
+                return;
+            }
+
+            // Validate file size (max 50MB)
+            if (file.size > 50 * 1024 * 1024) {
+                showToast('ファイルサイズが大きすぎます（最大50MB）', 'error');
+                return;
+            }
+
+            originalFile = file;
+            originalFileName = file.name;
+            fileType = file.type;
+            originalBlob = file;
+
+            // Read and display original image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                originalImage.src = e.target.result;
+                originalSize.textContent = formatFileSize(file.size);
+                controls.style.display = 'block';
+                imagePreview.classList.add('active');
+                stats.style.display = 'none';
+                compressedImage.src = '';
+                compressedSize.textContent = '-';
+                showToast('画像をアップロードしました', 'success');
+            };
+            reader.onerror = () => {
+                showToast('ファイルの読み込みに失敗しました', 'error');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Compress image
+        async function compressImage() {
+            if (!originalFile) return;
+
+            const quality = qualitySlider.value / 100;
+            const originalBtn = compressButton.innerHTML;
+            compressButton.innerHTML = '<span class="loading"></span>圧縮中...';
+            compressButton.disabled = true;
+
+            try {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    canvas.toBlob(
+                        (blob) => {
+                            if (blob) {
+                                compressedBlob = blob;
+                                compressedImage.src = canvas.toDataURL(fileType, quality);
+                                compressedSize.textContent = formatFileSize(blob.size);
+
+                                // Calculate stats
+                                const reduction = originalBlob.size - blob.size;
+                                const reductionPercent = Math.round((reduction / originalBlob.size) * 100);
+
+                                reductionPercentage.textContent = reductionPercent + '%';
+                                reductionPercentage.classList.toggle('negative', reductionPercent < 0);
+                                reductionSize.textContent = formatFileSize(Math.abs(reduction));
+                                reductionSize.classList.toggle('negative', reduction < 0);
+                                stats.style.display = 'block';
+
+                                showToast('画像を圧縮しました', 'success');
+                            } else {
+                                showToast('圧縮に失敗しました', 'error');
+                            }
+                            compressButton.innerHTML = originalBtn;
+                            compressButton.disabled = false;
+                        },
+                        fileType,
+                        quality
+                    );
+                };
+                img.onerror = () => {
+                    showToast('画像の処理に失敗しました', 'error');
+                    compressButton.innerHTML = originalBtn;
+                    compressButton.disabled = false;
+                };
+                img.src = originalImage.src;
+            } catch (error) {
+                console.error('Compression error:', error);
+                showToast('圧縮処理中にエラーが発生しました', 'error');
+                compressButton.innerHTML = originalBtn;
+                compressButton.disabled = false;
+            }
+        }
+
+        // Download compressed image
+        function downloadImage() {
+            if (!compressedBlob) {
+                showToast('圧縮された画像がありません', 'error');
+                return;
+            }
+
+            const url = URL.createObjectURL(compressedBlob);
+            const a = document.createElement('a');
+            const extension = fileType === 'image/jpeg' ? 'jpg' : 'png';
+            const originalName = originalFileName.substring(0, originalFileName.lastIndexOf('.'));
+            a.href = url;
+            a.download = `${originalName}-compressed.${extension}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('ダウンロードを開始しました', 'success');
+        }
+
+        // Reset
+        function reset() {
+            originalFile = null;
+            originalBlob = null;
+            compressedBlob = null;
+            originalFileName = null;
+            fileInput.value = '';
+            controls.style.display = 'none';
+            imagePreview.classList.remove('active');
+            qualitySlider.value = 70;
+            qualityValue.textContent = '70';
+            originalImage.src = '';
+            compressedImage.src = '';
+            originalSize.textContent = '-';
+            compressedSize.textContent = '-';
+            stats.style.display = 'none';
+            dropZone.style.display = 'block';
+            showToast('リセットしました', 'info');
+        }
+
+        // Quality slider update
+        qualitySlider.addEventListener('input', (e) => {
+            qualityValue.textContent = e.target.value;
+            if (compressedBlob) {
+                stats.style.display = 'none';
+                compressedSize.textContent = '-';
+                compressedImage.src = '';
+            }
+        });
+
+        // Upload button
+        uploadButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // File input
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // Compress button
+        compressButton.addEventListener('click', compressImage);
+
+        // Reset button
+        resetButton.addEventListener('click', reset);
+
+        // Download button
+        downloadButton.addEventListener('click', downloadImage);
+
+        // New button
+        newButton.addEventListener('click', reset);
+    </script>
+</body>
+</html>

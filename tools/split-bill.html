@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>割り勘計算機 - ToolBox</title>
+    <meta name="description" content="飲食代や出費を複数人で割り勘します。等額分割、チップ計算、端数処理に対応。">
+    <meta name="keywords" content="割り勘,割り勘計算,計算機,チップ計算,飲食代">
+    <meta property="og:title" content="割り勘計算機 - ToolBox">
+    <meta property="og:description" content="飲食代などを簡単に割り勘計算。チップ計算と複数の端数処理方法に対応。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/split-bill.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/split-bill.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .mode-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .mode-tab {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .mode-tab.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+        .mode-tab:hover {
+            border-color: #3b82f6;
+        }
+        .mode-content {
+            display: none;
+        }
+        .mode-content.active {
+            display: block;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        input[type="number"] {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        select {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #fff;
+        }
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .unit {
+            color: #6b7280;
+            font-weight: 500;
+            min-width: 2.5rem;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        button {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .btn-calculate {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .btn-calculate:hover {
+            background: #2563eb;
+        }
+        .btn-clear {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-clear:hover {
+            background: #d1d5db;
+        }
+        .btn-add {
+            background: #10b981;
+            color: #fff;
+        }
+        .btn-add:hover {
+            background: #059669;
+        }
+        .result-box {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+        .result-box.show {
+            display: block;
+        }
+        .result-main {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: #fff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .result-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #3b82f6;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .result-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .detail-item {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .detail-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .person-list {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            margin-top: 1.5rem;
+        }
+        .person-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .person-row:last-child {
+            border-bottom: none;
+        }
+        .person-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .person-amount {
+            font-weight: 700;
+            color: #3b82f6;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.125rem;
+        }
+        .person-remove {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        .person-remove:hover {
+            background: #dc2626;
+        }
+        .ad-banner {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        .advanced-section {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        .advanced-title {
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1>割り勘計算機</h1>
+        <p style="color: #6b7280; margin-bottom: 2rem;">飲食代などを複数人で割り勘します。</p>
+
+        <div class="ad-banner">広告スペース</div>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode(0)">等額分割</button>
+            <button class="mode-tab" onclick="switchMode(1)">カスタム分割</button>
+        </div>
+
+        <!-- Mode 1: 等額分割 -->
+        <div class="mode-content active">
+            <div class="input-group">
+                <label class="input-label">合計金額</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode1-amount" placeholder="例: 5000" step="100" min="0">
+                    <span class="unit">円</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">人数</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode1-people" placeholder="例: 4" step="1" min="1" max="99">
+                    <span class="unit">人</span>
+                </div>
+            </div>
+
+            <div class="advanced-section">
+                <div class="advanced-title">チップ設定（オプション）</div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label class="input-label">チップ率</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="mode1-tip" placeholder="例: 10" step="1" min="0" max="100">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advanced-section">
+                <div class="advanced-title">端数処理</div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <select id="mode1-rounding">
+                        <option value="normal">四捨五入</option>
+                        <option value="up">切り上げ</option>
+                        <option value="down">切り捨て</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-calculate" onclick="calculateMode1()">計算する</button>
+                <button class="btn-clear" onclick="clearMode1()">クリア</button>
+            </div>
+
+            <div class="result-box" id="mode1-result">
+                <div class="result-main">
+                    <div class="result-label">1人当たり</div>
+                    <div class="result-value" id="mode1-perperson">0円</div>
+                </div>
+                <div class="result-details">
+                    <div class="detail-item">
+                        <div class="detail-label">合計金額</div>
+                        <div class="detail-value" id="mode1-display-amount">0円</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">チップ</div>
+                        <div class="detail-value" id="mode1-display-tip">0円</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">総額</div>
+                        <div class="detail-value" id="mode1-display-total">0円</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">端数</div>
+                        <div class="detail-value" id="mode1-display-remainder">0円</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 2: カスタム分割 -->
+        <div class="mode-content">
+            <div class="input-group">
+                <label class="input-label">合計金額</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode2-amount" placeholder="例: 5000" step="100" min="0">
+                    <span class="unit">円</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">チップ率（オプション）</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode2-tip" placeholder="例: 10" step="1" min="0" max="100">
+                    <span class="unit">%</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">人の名前</label>
+                <input type="text" id="mode2-name" placeholder="例: Aさん" style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">金額</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode2-payment" placeholder="例: 1000" step="100" min="0">
+                    <span class="unit">円</span>
+                </div>
+            </div>
+
+            <button class="btn-add" onclick="addPerson()" style="width: 100%; margin-bottom: 1rem;">人を追加</button>
+
+            <div class="person-list" id="personList" style="display: none;">
+                <div id="peopleContainer"></div>
+            </div>
+
+            <div class="advanced-section" id="mode2-rounding-section" style="display: none;">
+                <div class="advanced-title">端数処理</div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <select id="mode2-rounding">
+                        <option value="normal">四捨五入</option>
+                        <option value="up">切り上げ</option>
+                        <option value="down">切り捨て</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="result-box" id="mode2-result">
+                <div class="result-details">
+                    <div class="detail-item" style="grid-column: 1 / -1;">
+                        <div class="detail-label">合計金額</div>
+                        <div class="detail-value" id="mode2-display-total">0円</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">チップ</div>
+                        <div class="detail-value" id="mode2-display-tip">0円</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">総額</div>
+                        <div class="detail-value" id="mode2-display-grandtotal">0円</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-clear" onclick="clearMode2()" style="width: 100%; margin-top: 1rem;">すべてクリア</button>
+        </div>
+
+        <div class="ad-banner">広告スペース</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <div id="toast"></div>
+
+    <script>
+        let people = [];
+
+        function switchMode(mode) {
+            const contents = document.querySelectorAll('.mode-content');
+            const tabs = document.querySelectorAll('.mode-tab');
+            contents.forEach(c => c.classList.remove('active'));
+            tabs.forEach(t => t.classList.remove('active'));
+            contents[mode].classList.add('active');
+            tabs[mode].classList.add('active');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: #fff; padding: 1rem 1.5rem; border-radius: 6px; z-index: 1000; display: block;';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function formatCurrency(value) {
+            return Math.round(value).toLocaleString('ja-JP') + '円';
+        }
+
+        function applyRounding(value, method) {
+            if (method === 'normal') {
+                return Math.round(value);
+            } else if (method === 'up') {
+                return Math.ceil(value);
+            } else if (method === 'down') {
+                return Math.floor(value);
+            }
+            return Math.round(value);
+        }
+
+        // Mode 1: 等額分割
+        function calculateMode1() {
+            const amount = parseFloat(document.getElementById('mode1-amount').value);
+            const people = parseInt(document.getElementById('mode1-people').value);
+            const tipRate = parseFloat(document.getElementById('mode1-tip').value) || 0;
+            const rounding = document.getElementById('mode1-rounding').value;
+
+            if (isNaN(amount) || isNaN(people) || amount < 0 || people < 1) {
+                showToast('有効な値を入力してください');
+                return;
+            }
+
+            const tip = Math.floor(amount * tipRate / 100);
+            const total = amount + tip;
+            const perPerson = total / people;
+            const rounded = applyRounding(perPerson, rounding);
+            const remainder = total - (rounded * people);
+
+            document.getElementById('mode1-perperson').textContent = formatCurrency(rounded);
+            document.getElementById('mode1-display-amount').textContent = formatCurrency(amount);
+            document.getElementById('mode1-display-tip').textContent = formatCurrency(tip);
+            document.getElementById('mode1-display-total').textContent = formatCurrency(total);
+            document.getElementById('mode1-display-remainder').textContent = Math.abs(remainder) > 0 ? formatCurrency(Math.abs(remainder)) : '0円';
+            document.getElementById('mode1-result').classList.add('show');
+        }
+
+        function clearMode1() {
+            document.getElementById('mode1-amount').value = '';
+            document.getElementById('mode1-people').value = '';
+            document.getElementById('mode1-tip').value = '';
+            document.getElementById('mode1-result').classList.remove('show');
+        }
+
+        // Mode 2: カスタム分割
+        function addPerson() {
+            const name = document.getElementById('mode2-name').value.trim();
+            const payment = parseFloat(document.getElementById('mode2-payment').value);
+
+            if (!name) {
+                showToast('名前を入力してください');
+                return;
+            }
+            if (isNaN(payment) || payment < 0) {
+                showToast('有効な金額を入力してください');
+                return;
+            }
+
+            people.push({ name, payment });
+            document.getElementById('mode2-name').value = '';
+            document.getElementById('mode2-payment').value = '';
+            renderPeople();
+            calculateMode2();
+        }
+
+        function removePerson(index) {
+            people.splice(index, 1);
+            renderPeople();
+            calculateMode2();
+        }
+
+        function renderPeople() {
+            const personList = document.getElementById('personList');
+            const container = document.getElementById('peopleContainer');
+
+            if (people.length === 0) {
+                personList.style.display = 'none';
+                document.getElementById('mode2-rounding-section').style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            personList.style.display = 'block';
+            document.getElementById('mode2-rounding-section').style.display = 'block';
+            container.innerHTML = people.map((person, index) => `
+                <div class="person-row">
+                    <div>
+                        <div class="person-name">${person.name}</div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div class="person-amount">${formatCurrency(person.payment)}</div>
+                        <button class="person-remove" onclick="removePerson(${index})">削除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function calculateMode2() {
+            const amount = parseFloat(document.getElementById('mode2-amount').value) || 0;
+            const tipRate = parseFloat(document.getElementById('mode2-tip').value) || 0;
+
+            const tip = Math.floor(amount * tipRate / 100);
+            const total = amount + tip;
+
+            document.getElementById('mode2-display-total').textContent = formatCurrency(amount);
+            document.getElementById('mode2-display-tip').textContent = formatCurrency(tip);
+            document.getElementById('mode2-display-grandtotal').textContent = formatCurrency(total);
+
+            if (people.length > 0) {
+                document.getElementById('mode2-result').classList.add('show');
+            } else {
+                document.getElementById('mode2-result').classList.remove('show');
+            }
+        }
+
+        function clearMode2() {
+            people = [];
+            document.getElementById('mode2-amount').value = '';
+            document.getElementById('mode2-tip').value = '';
+            document.getElementById('mode2-name').value = '';
+            document.getElementById('mode2-payment').value = '';
+            document.getElementById('personList').style.display = 'none';
+            document.getElementById('mode2-result').classList.remove('show');
+            renderPeople();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('mode1-amount').addEventListener('input', calculateMode1);
+            document.getElementById('mode1-people').addEventListener('input', calculateMode1);
+            document.getElementById('mode1-tip').addEventListener('input', calculateMode1);
+            document.getElementById('mode1-rounding').addEventListener('change', calculateMode1);
+            document.getElementById('mode2-amount').addEventListener('input', calculateMode2);
+            document.getElementById('mode2-tip').addEventListener('input', calculateMode2);
+        });
+    </script>
+</body>
+</html>

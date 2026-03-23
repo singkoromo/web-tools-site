@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Docker Compose設定ファイルをGUIで生成します。複数サービスの管理が簡単になります。">
+    <meta property="og:title" content="Docker Compose生成ツール - ToolBox">
+    <meta property="og:description" content="Docker Composeファイルを簡単生成。複数サービス対応、テンプレート多数。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/docker-compose.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/docker-compose.html">
+    <title>Docker Compose生成ツール - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .template-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .template-btn {
+            padding: 12px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .template-btn:hover {
+            border-color: #2563eb;
+            background: #f0f7ff;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+        select {
+            cursor: pointer;
+        }
+        .services-list {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .service-item {
+            background: white;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .service-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .service-details {
+            font-size: 12px;
+            color: #666;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .danger-btn {
+            background: #dc2626;
+        }
+        .danger-btn:hover {
+            background: #b91c1c;
+        }
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            display: none;
+        }
+        .output-section.active {
+            display: block;
+        }
+        .output-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .code-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        .service-form {
+            background: white;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🛠️ ToolBox</h1>
+                <nav class="nav">
+                    <a href="/">ホーム</a>
+                    <a href="/#tools">ツール一覧</a>
+                    <a href="/about">について</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <div class="tool-page">
+        <div class="container">
+            <div class="tool-container">
+                <h1>Docker Compose生成ツール</h1>
+                <p class="description">サービスをGUIで追加して、docker-compose.ymlファイルを生成します。</p>
+
+                <h3>テンプレートから開始</h3>
+                <div class="template-buttons">
+                    <button class="template-btn" onclick="loadTemplate('wordpress')">WordPress + MySQL</button>
+                    <button class="template-btn" onclick="loadTemplate('node')">Node.js + MongoDB</button>
+                    <button class="template-btn" onclick="loadTemplate('django')">Django + PostgreSQL</button>
+                    <button class="template-btn" onclick="loadTemplate('empty')">空から始める</button>
+                </div>
+
+                <div class="service-form">
+                    <h3>サービスを追加</h3>
+                    <div class="form-group">
+                        <label for="serviceName">サービス名</label>
+                        <input type="text" id="serviceName" placeholder="web">
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceImage">イメージ</label>
+                        <input type="text" id="serviceImage" placeholder="nginx:latest">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="containerPort">コンテナポート</label>
+                            <input type="number" id="containerPort" placeholder="80">
+                        </div>
+                        <div class="form-group">
+                            <label for="hostPort">ホストポート</label>
+                            <input type="number" id="hostPort" placeholder="8080">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceVolume">ボリューム（オプション）</label>
+                        <input type="text" id="serviceVolume" placeholder="/app:/app">
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceEnv">環境変数（オプション）</label>
+                        <input type="text" id="serviceEnv" placeholder="KEY=value">
+                    </div>
+                    <button onclick="addService()">サービスを追加</button>
+                </div>
+
+                <div class="services-list" id="servicesList">
+                    <p style="color: #999;">追加されたサービスがここに表示されます</p>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="generateCompose()">docker-compose.yml生成</button>
+                    <button class="danger-btn" onclick="clearServices()">全クリア</button>
+                </div>
+
+                <div class="output-section" id="outputSection">
+                    <div class="output-label">docker-compose.yml</div>
+                    <div class="code-box" id="output"></div>
+                    <div class="button-group">
+                        <button onclick="copyOutput()">コピー</button>
+                        <button onclick="downloadOutput()">ダウンロード</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let services = [];
+
+        const templates = {
+            wordpress: [
+                { name: 'wordpress', image: 'wordpress:latest', containerPort: 80, hostPort: 8080, volumes: [], env: ['WORDPRESS_DB_HOST=db', 'WORDPRESS_DB_NAME=wordpress'] },
+                { name: 'db', image: 'mysql:5.7', containerPort: 3306, hostPort: 3306, volumes: ['db_data:/var/lib/mysql'], env: ['MYSQL_DATABASE=wordpress', 'MYSQL_ROOT_PASSWORD=root'] }
+            ],
+            node: [
+                { name: 'app', image: 'node:18', containerPort: 3000, hostPort: 3000, volumes: ['.:/app'], env: ['NODE_ENV=development'] },
+                { name: 'mongo', image: 'mongo:latest', containerPort: 27017, hostPort: 27017, volumes: ['mongo_data:/data/db'], env: [] }
+            ],
+            django: [
+                { name: 'web', image: 'python:3.10', containerPort: 8000, hostPort: 8000, volumes: ['.:/app'], env: ['DEBUG=true'] },
+                { name: 'db', image: 'postgres:13', containerPort: 5432, hostPort: 5432, volumes: ['postgres_data:/var/lib/postgresql/data'], env: ['POSTGRES_DB=django', 'POSTGRES_PASSWORD=postgres'] }
+            ],
+            empty: []
+        };
+
+        function loadTemplate(templateName) {
+            services = JSON.parse(JSON.stringify(templates[templateName]));
+            renderServices();
+            showToast(`「${templateName}」テンプレートを読み込みました`, 'success');
+        }
+
+        function addService() {
+            const name = document.getElementById('serviceName').value;
+            const image = document.getElementById('serviceImage').value;
+            const containerPort = document.getElementById('containerPort').value;
+            const hostPort = document.getElementById('hostPort').value;
+            const volume = document.getElementById('serviceVolume').value;
+            const env = document.getElementById('serviceEnv').value;
+
+            if (!name || !image) {
+                showToast('サービス名とイメージは必須です', 'error');
+                return;
+            }
+
+            services.push({
+                name,
+                image,
+                containerPort: containerPort ? parseInt(containerPort) : null,
+                hostPort: hostPort ? parseInt(hostPort) : null,
+                volumes: volume ? [volume] : [],
+                env: env ? [env] : []
+            });
+
+            renderServices();
+            clearForm();
+            showToast('サービスを追加しました', 'success');
+        }
+
+        function removeService(index) {
+            services.splice(index, 1);
+            renderServices();
+            showToast('サービスを削除しました', 'success');
+        }
+
+        function renderServices() {
+            const list = document.getElementById('servicesList');
+            if (services.length === 0) {
+                list.innerHTML = '<p style="color: #999;">追加されたサービスがここに表示されます</p>';
+                return;
+            }
+
+            list.innerHTML = services.map((svc, idx) => `
+                <div class="service-item">
+                    <div>
+                        <div class="service-name">${svc.name}</div>
+                        <div class="service-details">${svc.image}${svc.hostPort ? ` - ポート: ${svc.hostPort}:${svc.containerPort}` : ''}</div>
+                    </div>
+                    <button class="danger-btn" onclick="removeService(${idx})">削除</button>
+                </div>
+            `).join('');
+        }
+
+        function clearForm() {
+            document.getElementById('serviceName').value = '';
+            document.getElementById('serviceImage').value = '';
+            document.getElementById('containerPort').value = '';
+            document.getElementById('hostPort').value = '';
+            document.getElementById('serviceVolume').value = '';
+            document.getElementById('serviceEnv').value = '';
+        }
+
+        function clearServices() {
+            if (confirm('全てのサービスを削除しますか？')) {
+                services = [];
+                renderServices();
+                showToast('全クリアしました', 'success');
+            }
+        }
+
+        function generateCompose() {
+            if (services.length === 0) {
+                showToast('最低1つのサービスを追加してください', 'error');
+                return;
+            }
+
+            let yaml = 'version: \'3.8\'\n\nservices:\n';
+
+            services.forEach(svc => {
+                yaml += `  ${svc.name}:\n`;
+                yaml += `    image: ${svc.image}\n`;
+
+                if (svc.containerPort) {
+                    yaml += `    ports:\n`;
+                    yaml += `      - "${svc.hostPort || svc.containerPort}:${svc.containerPort}"\n`;
+                }
+
+                if (svc.volumes && svc.volumes.length > 0) {
+                    yaml += `    volumes:\n`;
+                    svc.volumes.forEach(vol => {
+                        yaml += `      - ${vol}\n`;
+                    });
+                }
+
+                if (svc.env && svc.env.length > 0) {
+                    yaml += `    environment:\n`;
+                    svc.env.forEach(e => {
+                        yaml += `      - ${e}\n`;
+                    });
+                }
+
+                yaml += '\n';
+            });
+
+            // ボリューム定義の追加
+            const volumes = new Set();
+            services.forEach(svc => {
+                svc.volumes?.forEach(vol => {
+                    const volName = vol.split(':')[0];
+                    if (!volName.startsWith('/') && !volName.startsWith('.')) {
+                        volumes.add(volName);
+                    }
+                });
+            });
+
+            if (volumes.size > 0) {
+                yaml += 'volumes:\n';
+                volumes.forEach(vol => {
+                    yaml += `  ${vol}:\n`;
+                });
+            }
+
+            document.getElementById('output').textContent = yaml;
+            document.getElementById('outputSection').classList.add('active');
+            showToast('docker-compose.ymlを生成しました', 'success');
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                showToast('コピーしました', 'success');
+            });
+        }
+
+        function downloadOutput() {
+            const output = document.getElementById('output').textContent;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(output));
+            element.setAttribute('download', 'docker-compose.yml');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            showToast('ダウンロード開始', 'success');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

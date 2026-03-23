@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Unixタイムスタンプと日時を相互変換できるツール。ローカルタイム、UTC、ISO 8601形式に対応しています。">
+    <meta property="og:title" content="Unixタイムスタンプ変換 - ToolBox">
+    <meta property="og:description" content="Unixタイムスタンプと日時を相互変換できるツール。ローカルタイム、UTC、ISO形式対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/unix-timestamp.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/unix-timestamp.html">
+    <title>Unixタイムスタンプ変換 - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .current-time {
+            background: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .current-time-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        .current-timestamp {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .current-datetime {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            margin-top: 0;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="datetime-local"],
+        select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .output-group {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .output-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        .output-value {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .output-text {
+            flex: 1;
+            padding: 8px 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        .copy-btn {
+            padding: 8px 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .quick-btn {
+            padding: 8px 16px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        .quick-btn:hover {
+            background: #545b62;
+        }
+        .relative-time {
+            color: #666;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="tool-page">
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+
+        <div class="tool-container">
+            <h1>Unixタイムスタンプ変換</h1>
+
+            <div class="current-time">
+                <div class="current-time-label">現在時刻</div>
+                <div class="current-timestamp" id="currentTimestamp">0</div>
+                <div class="current-datetime" id="currentDatetime"></div>
+            </div>
+
+            <div class="section">
+                <h2>タイムスタンプ → 日時</h2>
+
+                <div class="form-group">
+                    <label for="timestampInput">Unixタイムスタンプ</label>
+                    <input type="text" id="timestampInput" placeholder="秒またはミリ秒を入力">
+                </div>
+
+                <div id="timestampResults"></div>
+            </div>
+
+            <div class="section">
+                <h2>日時 → タイムスタンプ</h2>
+
+                <div class="form-group">
+                    <label for="datetimeInput">日時</label>
+                    <input type="datetime-local" id="datetimeInput">
+                </div>
+
+                <div class="button-group">
+                    <button class="quick-btn" onclick="setToNow()">現在時刻</button>
+                    <button class="quick-btn" onclick="addTime(3600)">+1時間</button>
+                    <button class="quick-btn" onclick="addTime(86400)">+1日</button>
+                    <button class="quick-btn" onclick="addTime(604800)">+1週間</button>
+                </div>
+
+                <div id="datetimeResults"></div>
+            </div>
+        </div>
+
+        <div class="ad-banner">
+            <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+            </div>
+            <div class="copyright">© 2026 ToolBox</div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const seconds = Math.floor(now.getTime() / 1000);
+            document.getElementById('currentTimestamp').textContent = seconds;
+            document.getElementById('currentDatetime').textContent = now.toLocaleString('ja-JP');
+        }
+
+        function formatRelativeTime(timestamp) {
+            const now = Math.floor(Date.now() / 1000);
+            const diff = timestamp - now;
+            const absDiff = Math.abs(diff);
+
+            const seconds = absDiff;
+            const minutes = Math.floor(absDiff / 60);
+            const hours = Math.floor(absDiff / 3600);
+            const days = Math.floor(absDiff / 86400);
+            const weeks = Math.floor(absDiff / 604800);
+            const months = Math.floor(absDiff / 2592000);
+            const years = Math.floor(absDiff / 31536000);
+
+            const isFuture = diff > 0;
+            const suffix = isFuture ? '後' : '前';
+
+            if (years > 0) return `${years}年${suffix}`;
+            if (months > 0) return `${months}ヶ月${suffix}`;
+            if (weeks > 0) return `${weeks}週間${suffix}`;
+            if (days > 0) return `${days}日${suffix}`;
+            if (hours > 0) return `${hours}時間${suffix}`;
+            if (minutes > 0) return `${minutes}分${suffix}`;
+            return `${seconds}秒${suffix}`;
+        }
+
+        function isMilliseconds(timestamp) {
+            return Math.abs(timestamp) > 10000000000;
+        }
+
+        function copyOutput(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        }
+
+        document.getElementById('timestampInput').addEventListener('input', () => {
+            const input = document.getElementById('timestampInput').value.trim();
+            const resultsDiv = document.getElementById('timestampResults');
+
+            if (!input) {
+                resultsDiv.innerHTML = '';
+                return;
+            }
+
+            try {
+                let timestamp = parseInt(input);
+                let seconds = isMilliseconds(timestamp) ? Math.floor(timestamp / 1000) : timestamp;
+                let date = new Date(seconds * 1000);
+
+                const localTime = date.toLocaleString('ja-JP');
+                const utcTime = date.toUTCString();
+                const iso8601 = date.toISOString();
+                const relativeTime = formatRelativeTime(seconds);
+
+                const html = `
+                    <div class="output-group">
+                        <div class="output-label">ローカルタイム</div>
+                        <div class="output-value">
+                            <div class="output-text">${localTime}</div>
+                            <button class="copy-btn" onclick="copyOutput('${localTime}')">コピー</button>
+                        </div>
+                    </div>
+                    <div class="output-group">
+                        <div class="output-label">UTC</div>
+                        <div class="output-value">
+                            <div class="output-text">${utcTime}</div>
+                            <button class="copy-btn" onclick="copyOutput('${utcTime}')">コピー</button>
+                        </div>
+                    </div>
+                    <div class="output-group">
+                        <div class="output-label">ISO 8601</div>
+                        <div class="output-value">
+                            <div class="output-text">${iso8601}</div>
+                            <button class="copy-btn" onclick="copyOutput('${iso8601}')">コピー</button>
+                        </div>
+                    </div>
+                    <div class="relative-time">相対時間: ${relativeTime}</div>
+                `;
+                resultsDiv.innerHTML = html;
+            } catch (e) {
+                resultsDiv.innerHTML = '<div style="color: #dc3545;">無効なタイムスタンプです</div>';
+            }
+        });
+
+        document.getElementById('datetimeInput').addEventListener('input', () => {
+            const input = document.getElementById('datetimeInput').value;
+            const resultsDiv = document.getElementById('datetimeResults');
+
+            if (!input) {
+                resultsDiv.innerHTML = '';
+                return;
+            }
+
+            try {
+                const date = new Date(input);
+                const seconds = Math.floor(date.getTime() / 1000);
+                const milliseconds = date.getTime();
+
+                const html = `
+                    <div class="output-group">
+                        <div class="output-label">秒（Unix時間）</div>
+                        <div class="output-value">
+                            <div class="output-text">${seconds}</div>
+                            <button class="copy-btn" onclick="copyOutput('${seconds}')">コピー</button>
+                        </div>
+                    </div>
+                    <div class="output-group">
+                        <div class="output-label">ミリ秒</div>
+                        <div class="output-value">
+                            <div class="output-text">${milliseconds}</div>
+                            <button class="copy-btn" onclick="copyOutput('${milliseconds}')">コピー</button>
+                        </div>
+                    </div>
+                `;
+                resultsDiv.innerHTML = html;
+            } catch (e) {
+                resultsDiv.innerHTML = '<div style="color: #dc3545;">無効な日時です</div>';
+            }
+        });
+
+        function setToNow() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('datetimeInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            document.getElementById('datetimeInput').dispatchEvent(new Event('input'));
+        }
+
+        function addTime(seconds) {
+            const input = document.getElementById('datetimeInput').value;
+            if (!input) {
+                setToNow();
+                return;
+            }
+
+            const date = new Date(input);
+            date.setSeconds(date.getSeconds() + seconds);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            document.getElementById('datetimeInput').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            document.getElementById('datetimeInput').dispatchEvent(new Event('input'));
+        }
+
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+
+        setToNow();
+    </script>
+</body>
+</html>

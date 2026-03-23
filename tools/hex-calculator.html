@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プログラマー電卓 - ToolBox</title>
+    <meta name="description" content="複数の進数とビット演算に対応した電卓ツール">
+    <meta name="keywords" content="電卓, 進数, ビット演算, HEX, OCT, BIN">
+    <meta property="og:url" content="https://web-tool-site.com/tools/hex-calculator.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="プログラマー電卓 - ToolBox">
+    <meta property="og:description" content="複数の進数とビット演算に対応した電卓ツール">
+    <link rel="canonical" href="https://web-tool-site.com/tools/hex-calculator.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .tool-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .main-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .mode-btn {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .mode-btn:hover {
+            border-color: #667eea;
+        }
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .width-selector {
+            margin-bottom: 1.5rem;
+        }
+        .width-selector label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #333;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        .width-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+        .width-btn {
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .width-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .display {
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: right;
+            font-size: 1.8rem;
+            word-break: break-all;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .number-base-display {
+            background: #2a2a2a;
+            color: #999;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .base-info {
+            padding: 0.75rem;
+            background: #1a1a1a;
+            border-radius: 3px;
+            border-left: 2px solid #667eea;
+        }
+        .base-label {
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 0.25rem;
+        }
+        .base-value {
+            color: #0f0;
+            font-weight: 600;
+            word-break: break-all;
+        }
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .calc-btn {
+            padding: 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .calc-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        .calc-btn.operator {
+            background: #f0f0f0;
+            font-weight: 700;
+        }
+        .calc-btn.operator:hover {
+            background: #667eea;
+            color: white;
+        }
+        .calc-btn.equals {
+            background: #667eea;
+            color: white;
+            grid-column: span 2;
+        }
+        .calc-btn.equals:hover {
+            background: #5568d3;
+        }
+        .calc-btn.clear {
+            background: #ff6b6b;
+            color: white;
+            grid-column: span 2;
+        }
+        .calc-btn.clear:hover {
+            background: #ff5252;
+        }
+        .calc-btn.hex {
+            background: #e0e0e0;
+        }
+        .bit-visualization {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+        .bit-visualization h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .bit-row {
+            display: flex;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .bit {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: white;
+            border: 1px solid #ddd;
+            transition: all 0.2s;
+        }
+        .bit.zero {
+            background: #f8f9fa;
+            color: #999;
+        }
+        .bit.one {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .bit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 3rem;
+        }
+        @media (max-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .calc-btn.equals,
+            .calc-btn.clear {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="tool-title">プログラマー電卓</h1>
+
+        <div class="ad-banner">広告スペース: プログラマー電卓</div>
+
+        <div class="main-section">
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="dec">10進数</button>
+                <button class="mode-btn" data-mode="hex">16進数</button>
+                <button class="mode-btn" data-mode="oct">8進数</button>
+                <button class="mode-btn" data-mode="bin">2進数</button>
+            </div>
+
+            <div class="width-selector">
+                <label>ビット幅</label>
+                <div class="width-options">
+                    <button class="width-btn" data-width="8">8 bit</button>
+                    <button class="width-btn active" data-width="16">16 bit</button>
+                    <button class="width-btn" data-width="32">32 bit</button>
+                    <button class="width-btn" data-width="64">64 bit</button>
+                </div>
+            </div>
+
+            <div class="display" id="display">0</div>
+
+            <div class="number-base-display" id="baseDisplay"></div>
+
+            <div id="bitVisualization"></div>
+
+            <div class="calculator-grid">
+                <button class="calc-btn" onclick="calc.clear()">C</button>
+                <button class="calc-btn operator" onclick="calc.appendOperator('&')">AND</button>
+                <button class="calc-btn operator" onclick="calc.appendOperator('|')">OR</button>
+                <button class="calc-btn operator" onclick="calc.appendOperator('^')">XOR</button>
+
+                <button class="calc-btn" onclick="calc.appendNumber('7')">7</button>
+                <button class="calc-btn" onclick="calc.appendNumber('8')">8</button>
+                <button class="calc-btn" onclick="calc.appendNumber('9')">9</button>
+                <button class="calc-btn operator" onclick="calc.appendOperator('/')">÷</button>
+
+                <button class="calc-btn" onclick="calc.appendNumber('4')">4</button>
+                <button class="calc-btn" onclick="calc.appendNumber('5')">5</button>
+                <button class="calc-btn" onclick="calc.appendNumber('6')">6</button>
+                <button class="calc-btn operator" onclick="calc.appendOperator('*')">×</button>
+
+                <button class="calc-btn" onclick="calc.appendNumber('1')">1</button>
+                <button class="calc-btn" onclick="calc.appendNumber('2')">2</button>
+                <button class="calc-btn" onclick="calc.appendNumber('3')">3</button>
+                <button class="calc-btn operator" onclick="calc.appendOperator('-')">−</button>
+
+                <button class="calc-btn" onclick="calc.appendNumber('0')">0</button>
+                <button class="calc-btn operator" onclick="calc.toggleSign()">±</button>
+                <button class="calc-btn operator" onclick="calc.appendOperator('+')">+</button>
+                <button class="calc-btn equals" onclick="calc.calculate()">=</button>
+
+                <button class="calc-btn hex" id="aBtn" style="display: none;" onclick="calc.appendNumber('A')">A</button>
+                <button class="calc-btn hex" id="bBtn" style="display: none;" onclick="calc.appendNumber('B')">B</button>
+                <button class="calc-btn hex" id="cBtn" style="display: none;" onclick="calc.appendNumber('C')">C</button>
+                <button class="calc-btn hex" id="dBtn" style="display: none;" onclick="calc.appendNumber('D')">D</button>
+                <button class="calc-btn hex" id="eBtn" style="display: none;" onclick="calc.appendNumber('E')">E</button>
+                <button class="calc-btn hex" id="fBtn" style="display: none;" onclick="calc.appendNumber('F')">F</button>
+
+                <button class="calc-btn operator" onclick="calc.appendOperator('<<')" style="grid-column: span 1;">«</button>
+                <button class="calc-btn operator" onclick="calc.appendOperator('>>')" style="grid-column: span 1;">»</button>
+                <button class="calc-btn operator" onclick="calc.bitNot()" style="grid-column: span 1;">NOT</button>
+                <button class="calc-btn clear" onclick="calc.backspace()" style="grid-column: span 1;">← Back</button>
+            </div>
+        </div>
+
+        <div class="ad-banner">広告スペース: プログラマー電卓下部</div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const calc = {
+            display: '0',
+            accumulator: 0,
+            currentOperator: null,
+            inputValue: '',
+            bitWidth: 16,
+            currentMode: 'dec',
+
+            appendNumber(num) {
+                if (this.inputValue.length > 20) return;
+
+                if (this.currentMode === 'hex') {
+                    num = num.toUpperCase();
+                    if (!/^[0-9A-F]$/.test(num)) return;
+                } else if (this.currentMode === 'oct' && !/^[0-7]$/.test(num)) {
+                    return;
+                } else if (this.currentMode === 'bin' && !/^[0-1]$/.test(num)) {
+                    return;
+                }
+
+                if (this.inputValue === '0') {
+                    this.inputValue = num;
+                } else {
+                    this.inputValue += num;
+                }
+                this.updateDisplay();
+            },
+
+            appendOperator(op) {
+                if (this.currentOperator && this.inputValue) {
+                    this.calculate();
+                }
+                this.accumulator = parseInt(this.inputValue || '0', this.getBase());
+                this.currentOperator = op;
+                this.inputValue = '';
+            },
+
+            calculate() {
+                const current = parseInt(this.inputValue || '0', this.getBase());
+                let result;
+
+                switch (this.currentOperator) {
+                    case '+': result = this.accumulator + current; break;
+                    case '-': result = this.accumulator - current; break;
+                    case '*': result = this.accumulator * current; break;
+                    case '/': result = Math.floor(this.accumulator / current); break;
+                    case '&': result = this.accumulator & current; break;
+                    case '|': result = this.accumulator | current; break;
+                    case '^': result = this.accumulator ^ current; break;
+                    case '<<': result = this.accumulator << current; break;
+                    case '>>': result = this.accumulator >> current; break;
+                    default: result = current;
+                }
+
+                this.accumulator = result;
+                this.inputValue = '';
+                this.currentOperator = null;
+                this.updateDisplay();
+            },
+
+            bitNot() {
+                const val = parseInt(this.inputValue || '0', this.getBase());
+                const maxVal = (1 << this.bitWidth) - 1;
+                this.inputValue = (~val & maxVal).toString(this.getBase());
+                this.updateDisplay();
+            },
+
+            toggleSign() {
+                const val = parseInt(this.inputValue || '0', this.getBase());
+                this.inputValue = (-val).toString(this.getBase());
+                this.updateDisplay();
+            },
+
+            backspace() {
+                this.inputValue = this.inputValue.slice(0, -1) || '0';
+                this.updateDisplay();
+            },
+
+            clear() {
+                this.inputValue = '0';
+                this.accumulator = 0;
+                this.currentOperator = null;
+                this.updateDisplay();
+            },
+
+            getBase() {
+                const bases = { dec: 10, hex: 16, oct: 8, bin: 2 };
+                return bases[this.currentMode];
+            },
+
+            updateDisplay() {
+                const value = this.inputValue || '0';
+                const decimal = parseInt(value, this.getBase());
+
+                document.getElementById('display').textContent = value || '0';
+
+                const baseDisplay = document.getElementById('baseDisplay');
+                baseDisplay.innerHTML = `
+                    <div class="base-info">
+                        <div class="base-label">10進数 (DEC)</div>
+                        <div class="base-value">${decimal}</div>
+                    </div>
+                    <div class="base-info">
+                        <div class="base-label">16進数 (HEX)</div>
+                        <div class="base-value">${decimal.toString(16).toUpperCase()}</div>
+                    </div>
+                    <div class="base-info">
+                        <div class="base-label">8進数 (OCT)</div>
+                        <div class="base-value">${decimal.toString(8)}</div>
+                    </div>
+                    <div class="base-info">
+                        <div class="base-label">2進数 (BIN)</div>
+                        <div class="base-value">${decimal.toString(2)}</div>
+                    </div>
+                `;
+
+                this.updateBitVisualization(decimal);
+            },
+
+            updateBitVisualization(value) {
+                const container = document.getElementById('bitVisualization');
+                const bits = [];
+
+                for (let i = this.bitWidth - 1; i >= 0; i--) {
+                    bits.push((value >> i) & 1);
+                }
+
+                let html = '<h3>ビット表示</h3><div class="bit-row">';
+                bits.forEach((bit, idx) => {
+                    html += `<div class="bit ${bit === 1 ? 'one' : 'zero'}" onclick="calc.toggleBit(${this.bitWidth - 1 - idx})" title="ビット ${this.bitWidth - 1 - idx}">${bit}</div>`;
+                });
+                html += '</div>';
+
+                container.innerHTML = html;
+            },
+
+            toggleBit(bitIndex) {
+                const value = parseInt(this.inputValue || '0', this.getBase());
+                const newValue = value ^ (1 << bitIndex);
+                this.inputValue = newValue.toString(this.getBase());
+                this.updateDisplay();
+            },
+
+            setMode(mode) {
+                this.currentMode = mode;
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.mode === mode) btn.classList.add('active');
+                });
+
+                document.querySelectorAll('.calc-btn.hex').forEach(btn => {
+                    btn.style.display = mode === 'hex' ? 'block' : 'none';
+                });
+
+                this.updateDisplay();
+            },
+
+            setWidth(width) {
+                this.bitWidth = parseInt(width);
+                document.querySelectorAll('.width-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.width === width) btn.classList.add('active');
+                });
+                this.updateDisplay();
+            }
+        };
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => calc.setMode(btn.dataset.mode));
+        });
+
+        document.querySelectorAll('.width-btn').forEach(btn => {
+            btn.addEventListener('click', () => calc.setWidth(btn.dataset.width));
+        });
+
+        calc.updateDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iCalendar (.ics) 生成 | ToolBox</title>
+    <meta name="description" content="イベント情報からiCalendar形式(.ics)ファイルを生成する無料ツール。繰り返し設定対応。">
+    <meta name="keywords" content="iCalendar, ics, イベント, カレンダー, 生成">
+    <meta name="author" content="ToolBox">
+    <link rel="canonical" href="./tools/ical-generator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #4a90e2;
+        }
+
+        .ad-banner {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .ad-placeholder {
+            background: #e8e8e8;
+            padding: 2rem;
+            color: #999;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .tool-page {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .tool-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tool-content {
+            padding: 2rem;
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #f99;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #efe;
+            border: 1px solid #9f9;
+            color: #3c3;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group.full {
+            grid-template-columns: 1fr;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        textarea,
+        select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        textarea {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hide {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+
+            .tool-header h1 {
+                font-size: 1.8rem;
+            }
+
+            button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav>
+                <ul>
+                    <li><a href="../index.html">ホーム</a></li>
+                    <li><a href="../index.html#tools">ツール一覧</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Ad Banner 1 -->
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <!-- Tool Page -->
+    <div class="tool-page">
+        <div class="tool-header">
+            <h1>iCalendar (.ics) 生成</h1>
+            <p>イベント情報から.icsファイルを生成します</p>
+        </div>
+
+        <div class="tool-content">
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
+            <!-- Event Details -->
+            <div class="form-section">
+                <h3>イベント情報</h3>
+
+                <div class="form-group full">
+                    <label for="eventTitle">イベント名 *</label>
+                    <input type="text" id="eventTitle" placeholder="イベント名を入力してください" required>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="eventDate">開始日付 *</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div>
+                        <label for="eventTime">開始時間</label>
+                        <input type="time" id="eventTime">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div>
+                        <label for="eventEndDate">終了日付</label>
+                        <input type="date" id="eventEndDate">
+                    </div>
+                    <div>
+                        <label for="eventEndTime">終了時間</label>
+                        <input type="time" id="eventEndTime">
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label for="eventLocation">場所</label>
+                    <input type="text" id="eventLocation" placeholder="イベントの場所を入力してください">
+                </div>
+
+                <div class="form-group full">
+                    <label for="eventDescription">説明</label>
+                    <textarea id="eventDescription" placeholder="イベントの詳細説明を入力してください"></textarea>
+                </div>
+            </div>
+
+            <!-- Recurrence -->
+            <div class="form-section">
+                <h3>繰り返し設定</h3>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableRecurrence">
+                        <label for="enableRecurrence" style="margin: 0;">繰り返しを有効にする</label>
+                    </div>
+                </div>
+
+                <div id="recurrenceOptions" style="display: none;">
+                    <div class="form-group">
+                        <label for="recurrenceType">繰り返しの種類</label>
+                        <select id="recurrenceType">
+                            <option value="DAILY">毎日</option>
+                            <option value="WEEKLY">毎週</option>
+                            <option value="MONTHLY">毎月</option>
+                            <option value="YEARLY">毎年</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            <label for="recurrenceInterval">間隔</label>
+                            <input type="text" id="recurrenceInterval" value="1" placeholder="1">
+                        </div>
+                        <div>
+                            <label for="recurrenceCount">繰り返し回数</label>
+                            <input type="text" id="recurrenceCount" placeholder="回数（空白で無制限）">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="form-section">
+                <h3>連絡先</h3>
+
+                <div class="form-group">
+                    <label for="organizerName">主催者名</label>
+                    <input type="text" id="organizerName" placeholder="イベント主催者の名前">
+                </div>
+
+                <div class="form-group">
+                    <label for="organizerEmail">主催者メール</label>
+                    <input type="text" id="organizerEmail" placeholder="example@example.com">
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-group">
+                <button class="btn-success" id="generateBtn">ICS ファイル生成</button>
+                <button class="btn-primary" id="copyBtn">テキストをコピー</button>
+                <button class="btn-danger" id="clearBtn">クリア</button>
+            </div>
+
+            <!-- Preview -->
+            <div class="form-section" id="previewSection" style="display: none;">
+                <h3>プレビュー</h3>
+                <textarea id="preview" readonly style="background: #f9f9f9;"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Banner 2 -->
+    <div class="ad-banner">
+        <div class="ad-placeholder">広告スペース（Google AdSense）</div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 ToolBox</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" style="display: none;"></div>
+
+    <script>
+        const eventTitle = document.getElementById('eventTitle');
+        const eventDate = document.getElementById('eventDate');
+        const eventTime = document.getElementById('eventTime');
+        const eventEndDate = document.getElementById('eventEndDate');
+        const eventEndTime = document.getElementById('eventEndTime');
+        const eventLocation = document.getElementById('eventLocation');
+        const eventDescription = document.getElementById('eventDescription');
+        const enableRecurrence = document.getElementById('enableRecurrence');
+        const recurrenceOptions = document.getElementById('recurrenceOptions');
+        const recurrenceType = document.getElementById('recurrenceType');
+        const recurrenceInterval = document.getElementById('recurrenceInterval');
+        const recurrenceCount = document.getElementById('recurrenceCount');
+        const organizerName = document.getElementById('organizerName');
+        const organizerEmail = document.getElementById('organizerEmail');
+        const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const preview = document.getElementById('preview');
+        const previewSection = document.getElementById('previewSection');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const toast = document.getElementById('toast');
+
+        let generatedIcs = '';
+
+        enableRecurrence.addEventListener('change', () => {
+            recurrenceOptions.style.display = enableRecurrence.checked ? 'block' : 'none';
+        });
+
+        function clearMessages() {
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+        }
+
+        function showError(message) {
+            clearMessages();
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            clearMessages();
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = 'block';
+            toast.classList.remove('hide');
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 2000);
+        }
+
+        function escapeIcs(str) {
+            return String(str || '')
+                .replace(/\\/g, '\\\\')
+                .replace(/,/g, '\\,')
+                .replace(/;/g, '\\;')
+                .replace(/\n/g, '\\n');
+        }
+
+        function formatIcsDate(dateStr, timeStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            let dateOnly = date.toISOString().split('T')[0].replace(/-/g, '');
+
+            if (timeStr) {
+                const [hour, minute] = timeStr.split(':');
+                return dateOnly + 'T' + hour + minute + '00Z';
+            }
+            return dateOnly;
+        }
+
+        function generateIcs() {
+            clearMessages();
+
+            if (!eventTitle.value.trim()) {
+                showError('イベント名は必須です');
+                return;
+            }
+
+            if (!eventDate.value) {
+                showError('開始日付は必須です');
+                return;
+            }
+
+            try {
+                const uid = 'toolbox-' + Date.now() + '@web-tool-site.com';
+                const now = new Date().toISOString().replace(/[-:.]/g, '').split('Z')[0] + 'Z';
+
+                let ics = 'BEGIN:VCALENDAR\n';
+                ics += 'VERSION:2.0\n';
+                ics += 'PRODID:-//ToolBox//Calendar//EN\n';
+                ics += 'CALSCALE:GREGORIAN\n';
+                ics += 'METHOD:PUBLISH\n';
+                ics += 'BEGIN:VEVENT\n';
+                ics += 'UID:' + uid + '\n';
+                ics += 'DTSTAMP:' + now + '\n';
+                ics += 'DTSTART:' + formatIcsDate(eventDate.value, eventTime.value) + '\n';
+
+                if (eventEndDate.value) {
+                    ics += 'DTEND:' + formatIcsDate(eventEndDate.value, eventEndTime.value) + '\n';
+                } else if (eventTime.value) {
+                    const endDate = new Date(eventDate.value);
+                    if (eventEndTime.value) {
+                        ics += 'DTEND:' + formatIcsDate(eventDate.value, eventEndTime.value) + '\n';
+                    } else {
+                        endDate.setHours(endDate.getHours() + 1);
+                        ics += 'DTEND:' + formatIcsDate(eventDate.value, eventTime.value) + '\n';
+                    }
+                }
+
+                ics += 'SUMMARY:' + escapeIcs(eventTitle.value) + '\n';
+
+                if (eventLocation.value.trim()) {
+                    ics += 'LOCATION:' + escapeIcs(eventLocation.value) + '\n';
+                }
+
+                if (eventDescription.value.trim()) {
+                    ics += 'DESCRIPTION:' + escapeIcs(eventDescription.value) + '\n';
+                }
+
+                if (organizerName.value.trim() || organizerEmail.value.trim()) {
+                    let organizer = 'ORGANIZER';
+                    if (organizerName.value.trim()) {
+                        organizer += ';CN=' + escapeIcs(organizerName.value);
+                    }
+                    if (organizerEmail.value.trim()) {
+                        organizer += ':mailto:' + organizerEmail.value;
+                    } else {
+                        organizer += ':';
+                    }
+                    ics += organizer + '\n';
+                }
+
+                if (enableRecurrence.checked) {
+                    ics += 'RRULE:FREQ=' + recurrenceType.value;
+                    if (recurrenceInterval.value && recurrenceInterval.value !== '1') {
+                        ics += ';INTERVAL=' + recurrenceInterval.value;
+                    }
+                    if (recurrenceCount.value) {
+                        ics += ';COUNT=' + recurrenceCount.value;
+                    }
+                    ics += '\n';
+                }
+
+                ics += 'STATUS:CONFIRMED\n';
+                ics += 'SEQUENCE:0\n';
+                ics += 'END:VEVENT\n';
+                ics += 'END:VCALENDAR\n';
+
+                generatedIcs = ics;
+                preview.value = ics;
+                previewSection.style.display = 'block';
+                showSuccess('ICS ファイルを生成しました');
+
+            } catch (error) {
+                showError('エラー: ' + error.message);
+            }
+        }
+
+        generateBtn.addEventListener('click', generateIcs);
+
+        copyBtn.addEventListener('click', () => {
+            if (!generatedIcs) {
+                showError('先に ICS ファイルを生成してください');
+                return;
+            }
+
+            navigator.clipboard.writeText(generatedIcs).then(() => {
+                showToast('ICS ファイルをコピーしました');
+            }).catch(() => {
+                preview.select();
+                document.execCommand('copy');
+                showToast('ICS ファイルをコピーしました');
+            });
+        });
+
+        clearBtn.addEventListener('click', () => {
+            eventTitle.value = '';
+            eventDate.value = '';
+            eventTime.value = '';
+            eventEndDate.value = '';
+            eventEndTime.value = '';
+            eventLocation.value = '';
+            eventDescription.value = '';
+            enableRecurrence.checked = false;
+            recurrenceOptions.style.display = 'none';
+            recurrenceType.value = 'DAILY';
+            recurrenceInterval.value = '1';
+            recurrenceCount.value = '';
+            organizerName.value = '';
+            organizerEmail.value = '';
+            preview.value = '';
+            previewSection.style.display = 'none';
+            generatedIcs = '';
+            clearMessages();
+        });
+
+        // Download button in preview
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'downloadFromPreview' || (e.target.classList.contains('btn-success') && e.target.textContent.includes('ダウンロード'))) {
+                if (!generatedIcs) {
+                    showError('先に ICS ファイルを生成してください');
+                    return;
+                }
+
+                const blob = new Blob([generatedIcs], { type: 'text/calendar' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = eventTitle.value ? eventTitle.value.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.ics' : 'event.ics';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('ファイルをダウンロードしました');
+            }
+        });
+
+        // Add download button to preview section
+        previewSection.addEventListener('DOMNodeInserted', () => {
+            if (!document.getElementById('downloadFromPreview')) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.id = 'downloadFromPreview';
+                downloadBtn.className = 'btn-success';
+                downloadBtn.textContent = 'ICS ファイル ダウンロード';
+                previewSection.appendChild(downloadBtn);
+            }
+        });
+    </script>
+</body>
+</html>

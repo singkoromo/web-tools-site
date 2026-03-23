@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声速度・ピッチ変更 - ToolBox</title>
+    <meta name="description" content="音声ファイルの再生速度とピッチを調整できるオンラインツール。0.25倍速から4倍速まで対応。">
+    <meta name="keywords" content="速度変更, ピッチ変更, 再生速度, 音声編集, 音声ツール">
+    <meta property="og:title" content="音声速度・ピッチ変更 - ToolBox">
+    <meta property="og:description" content="音声の速度とピッチを自由に調整できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/audio-speed.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/audio-speed.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-page { padding: 2rem 1rem; }
+        .tool-container { max-width: 900px; margin: 0 auto; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #666; margin-bottom: 2rem; }
+        .drop-zone {
+            border: 2px dashed #ccc; border-radius: 8px; padding: 2rem;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            background: #f9f9f9;
+        }
+        .drop-zone.dragover { border-color: #0066cc; background: #f0f7ff; }
+        .file-info {
+            margin-top: 2rem; padding: 1rem; background: #f5f5f5;
+            border-radius: 8px; display: none;
+        }
+        .file-info.show { display: block; }
+        .info-row { display: flex; justify-content: space-between; margin: 0.5rem 0; }
+        .controls-panel {
+            margin-top: 2rem; display: none;
+        }
+        .controls-panel.show { display: block; }
+        .control-group {
+            margin-bottom: 1.5rem; padding: 1.5rem;
+            background: #f9f9f9; border-radius: 8px;
+        }
+        .control-label {
+            font-weight: 600; margin-bottom: 1rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .control-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem; color: #0066cc; font-weight: 700;
+        }
+        input[type="range"] {
+            width: 100%; height: 6px;
+            border-radius: 3px; background: #ddd;
+            outline: none; -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #0066cc; cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #0066cc; cursor: pointer; border: none;
+        }
+        .toggle-switch {
+            display: flex; align-items: center; gap: 1rem;
+            margin-top: 1rem;
+        }
+        .switch {
+            position: relative; display: inline-block; width: 50px; height: 24px;
+        }
+        .switch input {
+            opacity: 0; width: 0; height: 0;
+        }
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: 0.4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: "";
+            height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #0066cc;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .playback-section {
+            margin-top: 2rem; padding: 1.5rem;
+            background: #f9f9f9; border-radius: 8px;
+            display: none;
+        }
+        .playback-section.show { display: block; }
+        .progress-bar {
+            width: 100%; height: 4px; background: #e0e0e0;
+            border-radius: 2px; margin: 1rem 0; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: #0066cc; width: 0%;
+            transition: width 0.1s;
+        }
+        .time-display {
+            display: flex; justify-content: space-between;
+            font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        button {
+            padding: 0.75rem 1.5rem; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; transition: all 0.3s;
+        }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #ccc; }
+        .button-group {
+            display: flex; gap: 1rem; margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .duration-info {
+            margin-top: 1rem; padding: 1rem;
+            background: white; border-radius: 8px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+        }
+        .duration-item {
+            text-align: center;
+        }
+        .duration-label { font-size: 0.9rem; color: #666; }
+        .duration-time {
+            font-size: 1.3rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace; color: #0066cc;
+        }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 1rem 1.5rem; background: #333; color: white;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(20px); transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="header-inner">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg> ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<div class="tool-page">
+    <div class="tool-container">
+        <h1>音声速度・ピッチ変更</h1>
+        <p class="subtitle">再生速度とピッチを独立して調整。リアルタイムプレビュー対応</p>
+
+        <div class="drop-zone" id="dropZone">
+            <p>音声ファイルをドラッグ&ドロップするか、クリックして選択</p>
+            <p style="font-size: 0.9rem; color: #999; margin-top: 0.5rem;">対応形式: MP3, WAV, OGG, M4A, WebM など</p>
+            <input type="file" id="audioInput" accept="audio/*" style="display: none;">
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="info-row">
+                <span>ファイル名:</span>
+                <span id="infoFilename">-</span>
+            </div>
+            <div class="info-row">
+                <span>再生時間:</span>
+                <span id="infoDuration">-</span>
+            </div>
+        </div>
+
+        <div class="controls-panel" id="controlsPanel">
+            <div class="control-group">
+                <div class="control-label">
+                    <span>再生速度</span>
+                    <span class="control-value" id="speedValue">1.00x</span>
+                </div>
+                <input type="range" id="speedSlider" min="25" max="400" value="100" step="5">
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">0.25倍速 ～ 4.0倍速</p>
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>ピッチシフト</span>
+                    <span class="control-value" id="pitchValue">0</span>
+                </div>
+                <input type="range" id="pitchSlider" min="-12" max="12" value="0" step="1">
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">-12 ～ +12 セミトーン</p>
+            </div>
+
+            <div class="control-group">
+                <div class="toggle-switch">
+                    <label class="switch">
+                        <input type="checkbox" id="pitchPreserve">
+                        <span class="slider"></span>
+                    </label>
+                    <span>ピッチを維持して速度変更</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem;">オンの場合、速度変更時にピッチは変わりません</p>
+            </div>
+
+            <div class="playback-section" id="playbackSection">
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" id="playBtn">再生</button>
+                    <button class="btn-secondary" id="pauseBtn" style="display: none;">一時停止</button>
+                    <button class="btn-secondary" id="stopBtn">停止</button>
+                </div>
+
+                <div class="duration-info">
+                    <div class="duration-item">
+                        <div class="duration-label">元の再生時間</div>
+                        <div class="duration-time" id="originalDuration">-</div>
+                    </div>
+                    <div class="duration-item">
+                        <div class="duration-label">調整後の再生時間</div>
+                        <div class="duration-time" id="adjustedDuration">-</div>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 1.5rem;">
+                    <button class="btn-primary" id="exportBtn">適用して保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ad-banner">
+    <div class="ad-placeholder">広告スペース</div>
+</div>
+
+<footer class="footer">
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+class AudioSpeedPitch {
+    constructor() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.audioBuffer = null;
+        this.source = null;
+        this.isPlaying = false;
+        this.playbackStartTime = 0;
+        this.playbackPausedTime = 0;
+        this.speed = 1;
+        this.pitch = 0;
+        this.pitchPreserve = false;
+
+        this.initElements();
+        this.attachEventListeners();
+    }
+
+    initElements() {
+        this.dropZone = document.getElementById('dropZone');
+        this.audioInput = document.getElementById('audioInput');
+        this.fileInfo = document.getElementById('fileInfo');
+        this.controlsPanel = document.getElementById('controlsPanel');
+        this.playbackSection = document.getElementById('playbackSection');
+        this.speedSlider = document.getElementById('speedSlider');
+        this.speedValue = document.getElementById('speedValue');
+        this.pitchSlider = document.getElementById('pitchSlider');
+        this.pitchValue = document.getElementById('pitchValue');
+        this.pitchPreserveToggle = document.getElementById('pitchPreserve');
+        this.playBtn = document.getElementById('playBtn');
+        this.pauseBtn = document.getElementById('pauseBtn');
+        this.stopBtn = document.getElementById('stopBtn');
+        this.progressFill = document.getElementById('progressFill');
+        this.exportBtn = document.getElementById('exportBtn');
+        this.currentTimeDisplay = document.getElementById('currentTime');
+        this.totalTimeDisplay = document.getElementById('totalTime');
+        this.originalDurationDisplay = document.getElementById('originalDuration');
+        this.adjustedDurationDisplay = document.getElementById('adjustedDuration');
+    }
+
+    attachEventListeners() {
+        this.dropZone.addEventListener('click', () => this.audioInput.click());
+        this.dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.add('dragover');
+        });
+        this.dropZone.addEventListener('dragleave', () => {
+            this.dropZone.classList.remove('dragover');
+        });
+        this.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                this.handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        this.audioInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) this.handleFile(e.target.files[0]);
+        });
+
+        this.speedSlider.addEventListener('input', (e) => {
+            this.speed = parseFloat(e.target.value) / 100;
+            this.speedValue.textContent = this.speed.toFixed(2) + 'x';
+            this.updateDurationDisplay();
+        });
+
+        this.pitchSlider.addEventListener('input', (e) => {
+            this.pitch = parseInt(e.target.value);
+            this.pitchValue.textContent = this.pitch;
+        });
+
+        this.pitchPreserveToggle.addEventListener('change', (e) => {
+            this.pitchPreserve = e.target.checked;
+        });
+
+        this.playBtn.addEventListener('click', () => this.play());
+        this.pauseBtn.addEventListener('click', () => this.pause());
+        this.stopBtn.addEventListener('click', () => this.stop());
+        this.exportBtn.addEventListener('click', () => this.export());
+    }
+
+    async handleFile(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        try {
+            this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.displayFileInfo(file);
+            this.fileInfo.classList.add('show');
+            this.controlsPanel.classList.add('show');
+            this.playbackSection.classList.add('show');
+            this.updateDurationDisplay();
+        } catch (error) {
+            this.showToast('ファイルのデコードに失敗しました');
+        }
+    }
+
+    displayFileInfo(file) {
+        document.getElementById('infoFilename').textContent = file.name;
+        document.getElementById('infoDuration').textContent = this.formatTime(this.audioBuffer.duration);
+    }
+
+    updateDurationDisplay() {
+        const originalDuration = this.audioBuffer.duration;
+        const adjustedDuration = originalDuration / this.speed;
+        this.originalDurationDisplay.textContent = this.formatTime(originalDuration);
+        this.adjustedDurationDisplay.textContent = this.formatTime(adjustedDuration);
+        this.totalTimeDisplay.textContent = this.formatTime(adjustedDuration);
+    }
+
+    play() {
+        if (this.isPlaying) return;
+
+        this.isPlaying = true;
+        this.playBtn.style.display = 'none';
+        this.pauseBtn.style.display = 'inline-block';
+
+        this.source = this.audioContext.createBufferSource();
+        this.source.buffer = this.audioBuffer;
+        this.source.playbackRate.value = this.pitchPreserve ? this.speed : 1;
+        this.source.detune.value = this.pitchPreserve ? this.pitch : this.pitch * (100 / this.speed);
+
+        this.source.connect(this.audioContext.destination);
+        this.playbackStartTime = this.audioContext.currentTime - this.playbackPausedTime;
+        this.source.start(0, this.playbackPausedTime / this.speed);
+
+        this.animateProgress();
+    }
+
+    pause() {
+        if (!this.isPlaying) return;
+
+        this.playbackPausedTime = (this.audioContext.currentTime - this.playbackStartTime) * this.speed;
+        this.source.stop();
+        this.isPlaying = false;
+        this.playBtn.style.display = 'inline-block';
+        this.pauseBtn.style.display = 'none';
+    }
+
+    stop() {
+        if (this.source && this.isPlaying) {
+            this.source.stop();
+        }
+        this.isPlaying = false;
+        this.playbackPausedTime = 0;
+        this.currentTimeDisplay.textContent = '0:00';
+        this.progressFill.style.width = '0%';
+        this.playBtn.style.display = 'inline-block';
+        this.pauseBtn.style.display = 'none';
+    }
+
+    animateProgress() {
+        const totalDuration = this.audioBuffer.duration / this.speed;
+        const updateProgress = () => {
+            if (!this.isPlaying) return;
+
+            const elapsed = (this.audioContext.currentTime - this.playbackStartTime) * this.speed;
+            const percent = (elapsed / totalDuration) * 100;
+            this.progressFill.style.width = Math.min(percent, 100) + '%';
+            this.currentTimeDisplay.textContent = this.formatTime(elapsed);
+
+            if (elapsed < totalDuration) {
+                requestAnimationFrame(updateProgress);
+            } else {
+                this.stop();
+            }
+        };
+        updateProgress();
+    }
+
+    async export() {
+        this.stop();
+        this.showToast('処理中...');
+
+        try {
+            const adjustedDuration = this.audioBuffer.duration / this.speed;
+            const offlineContext = new OfflineAudioContext(
+                this.audioBuffer.numberOfChannels,
+                Math.ceil(adjustedDuration * this.audioBuffer.sampleRate),
+                this.audioBuffer.sampleRate
+            );
+
+            const source = offlineContext.createBufferSource();
+            source.buffer = this.audioBuffer;
+            source.playbackRate.value = this.pitchPreserve ? this.speed : 1;
+            source.detune.value = this.pitchPreserve ? this.pitch : this.pitch * (100 / this.speed);
+            source.connect(offlineContext.destination);
+            source.start(0);
+
+            const renderedBuffer = await offlineContext.startRendering();
+            const blob = this.encodeWAV(renderedBuffer);
+            this.downloadBlob(blob, 'adjusted_audio.wav');
+            this.showToast('ファイルをダウンロードしました');
+        } catch (error) {
+            this.showToast('エクスポートに失敗しました');
+        }
+    }
+
+    encodeWAV(audioBuffer) {
+        const numberOfChannels = audioBuffer.numberOfChannels;
+        const sampleRate = audioBuffer.sampleRate;
+        const format = 1;
+        const bitDepth = 16;
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numberOfChannels * bytesPerSample;
+
+        const channelData = [];
+        for (let i = 0; i < numberOfChannels; i++) {
+            channelData.push(audioBuffer.getChannelData(i));
+        }
+
+        const length = audioBuffer.length * numberOfChannels * bytesPerSample;
+        const buffer = new ArrayBuffer(44 + length);
+        const view = new DataView(buffer);
+
+        const writeString = (offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        writeString(0, 'RIFF');
+        view.setUint32(4, 36 + length, true);
+        writeString(8, 'WAVE');
+        writeString(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numberOfChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(36, 'data');
+        view.setUint32(40, length, true);
+
+        let offset = 44;
+        for (let i = 0; i < audioBuffer.length; i++) {
+            for (let channel = 0; channel < numberOfChannels; channel++) {
+                let sample = Math.max(-1, Math.min(1, channelData[channel][i]));
+                sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+                view.setInt16(offset, sample, true);
+                offset += 2;
+            }
+        }
+
+        return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = (seconds % 60).toFixed(0);
+        return `${minutes}:${String(secs).padStart(2, '0')}`;
+    }
+
+    showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new AudioSpeedPitch();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LICENSEファイルをGUIで生成します。MIT、Apache 2.0、GPL v3など主要なライセンスに対応。">
+    <meta property="og:title" content="ライセンス生成ツール - ToolBox">
+    <meta property="og:description" content="LICENSEファイルを簡単生成。MIT、Apache、GPL、BSDなど主要ライセンス対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/license-generator.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/license-generator.html">
+    <title>ライセンス生成ツール - ToolBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+        }
+        select {
+            cursor: pointer;
+        }
+        .license-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2563eb;
+        }
+        .license-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .license-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .license-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .feature {
+            font-size: 12px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        .feature-yes {
+            color: #22c55e;
+            font-weight: 600;
+        }
+        .feature-no {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        .form-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .output-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            display: none;
+        }
+        .output-section.active {
+            display: block;
+        }
+        .output-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .code-box {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+        }
+        @media (max-width: 768px) {
+            .license-features, .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🛠️ ToolBox</h1>
+                <nav class="nav">
+                    <a href="/">ホーム</a>
+                    <a href="/#tools">ツール一覧</a>
+                    <a href="/about">について</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <div class="tool-page">
+        <div class="container">
+            <div class="tool-container">
+                <h1>ライセンス生成ツール</h1>
+                <p class="description">オープンソースプロジェクト用のLICENSEファイルを生成します。MIT、Apache 2.0、GPL v3など主要なライセンスに対応しています。</p>
+
+                <div class="form-section">
+                    <h3>ライセンス選択</h3>
+                    <div class="form-group">
+                        <label for="licenseType">ライセンスを選択</label>
+                        <select id="licenseType" onchange="updateLicenseInfo()">
+                            <option value="MIT">MIT</option>
+                            <option value="Apache2">Apache License 2.0</option>
+                            <option value="GPL3">GNU General Public License v3.0</option>
+                            <option value="BSD2">BSD 2-Clause License</option>
+                            <option value="BSD3">BSD 3-Clause License</option>
+                            <option value="ISC">ISC License</option>
+                            <option value="MPL2">Mozilla Public License 2.0</option>
+                            <option value="AGPL3">GNU Affero General Public License v3.0</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="licenseInfoPanel" class="license-info"></div>
+
+                <div class="form-section">
+                    <h3>著者情報</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="authorName">著者名</label>
+                            <input type="text" id="authorName" placeholder="Your Name" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="copyrightYear">年号</label>
+                            <input type="text" id="copyrightYear" placeholder="2026" value="">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="generateLicense()">LICENSEファイル生成</button>
+                </div>
+
+                <div class="output-section" id="outputSection">
+                    <div class="output-label">生成されたLICENSEファイル</div>
+                    <div class="code-box" id="output"></div>
+                    <div class="button-group">
+                        <button onclick="copyLicense()">コピー</button>
+                        <button onclick="downloadLicense()">ダウンロード</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <div class="container">
+            広告スペース
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const licenseData = {
+            MIT: {
+                name: 'MIT License',
+                desc: 'シンプルで許容的なオープンソースライセンス。ほぼ無制限の使用が可能。',
+                features: [
+                    { text: '商用利用', value: true },
+                    { text: '修正', value: true },
+                    { text: '配布', value: true },
+                    { text: 'プライベート使用', value: true },
+                    { text: 'ライセンス記載', required: true },
+                    { text: '責任免除', waived: true }
+                ],
+                template: (author, year) => `MIT License
+
+Copyright (c) ${year} ${author}
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.`
+            },
+            Apache2: {
+                name: 'Apache License 2.0',
+                desc: '正式な言語を持つ許容的なライセンス。特許権についての明示的な規定あり。',
+                features: [
+                    { text: '商用利用', value: true },
+                    { text: '修正', value: true },
+                    { text: '配布', value: true },
+                    { text: 'プライベート使用', value: true },
+                    { text: '特許保護', value: true },
+                    { text: '責任免除', waived: true }
+                ],
+                template: (author, year) => `Apache License
+Version 2.0, January 2004
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+Copyright [${year}] [${author}]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.`
+            },
+            GPL3: {
+                name: 'GNU General Public License v3.0',
+                desc: '強い制限があるコピーレフトライセンス。派生物も同じライセンスである必要があります。',
+                features: [
+                    { text: '商用利用', value: true },
+                    { text: '修正', value: true },
+                    { text: '配布', value: true },
+                    { text: 'プライベート使用', value: true },
+                    { text: '同じライセンス必須', required: true },
+                    { text: 'ソース公開必須', required: true }
+                ],
+                template: (author, year) => `GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Copyright (C) ${year} ${author}
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.`
+            },
+            BSD2: {
+                name: 'BSD 2-Clause License',
+                desc: 'シンプルな許容的ライセンス。条件は少なく、MIT同様に一般的。',
+                features: [
+                    { text: '商用利用', value: true },
+                    { text: '修正', value: true },
+                    { text: '配布', value: true },
+                    { text: 'プライベート使用', value: true },
+                    { text: 'ライセンス記載', required: true },
+                    { text: '責任免除', waived: true }
+                ],
+                template: (author, year) => `BSD 2-Clause License
+
+Copyright (c) ${year}, ${author}
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.`
+            },
+            BSD3: {
+                name: 'BSD 3-Clause License',
+                desc: '修正版BSD。より厳しい条件があります。',
+                features: [
+                    { text: '商用利用', value: true },
+                    { text: '修正', value: true },
+                    { text: '配布', value: true },
+                    { text: 'プライベート使用', value: true },
+                    { text: '非推薦条項', required: true },
+                    { text: '責任免除', waived: true }
+                ],
+                template: (author, year) => `BSD 3-Clause License
+
+Copyright (c) ${year}, ${author}
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.`
+            },
+            ISC: {
+                name: 'ISC License',
+                desc: 'MITとBSD 2-Clauseに似た、シンプルで寛容なライセンス。',
+                features: [
+                    { text: '商用利用', value: true },
+                    { text: '修正', value: true },
+                    { text: '配布', value: true },
+                    { text: 'プライベート使用', value: true },
+                    { text: 'ライセンス記載', required: true },
+                    { text: '責任免除', waived: true }
+                ],
+                template: (author, year) => `ISC License
+
+Copyright (c) ${year} ${author}
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.`
+            },
+            MPL2: {
+                name: 'Mozilla Public License 2.0',
+                desc: 'ファイルレベルのコピーレフト。同じファイルなら変更が必須。',
+                features: [
+                    { text: '商用利用', value: true },
+                    { text: '修正', value: true },
+                    { text: '配布', value: true },
+                    { text: 'プライベート使用', value: true },
+                    { text: '特許保護', value: true },
+                    { text: 'ソース公開', required: true }
+                ],
+                template: (author, year) => `Mozilla Public License Version 2.0
+
+Copyright (c) ${year} ${author}
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.`
+            },
+            AGPL3: {
+                name: 'GNU Affero General Public License v3.0',
+                desc: 'GPLv3の強化版。ネットワーク利用でもソース公開が必須。',
+                features: [
+                    { text: '商用利用', value: true },
+                    { text: '修正', value: true },
+                    { text: '配布', value: true },
+                    { text: 'ネットワーク公開', required: true },
+                    { text: '同じライセンス必須', required: true },
+                    { text: 'ソース公開必須', required: true }
+                ],
+                template: (author, year) => `GNU AFFERO GENERAL PUBLIC LICENSE
+Version 3, 19 November 2007
+
+Copyright (C) ${year} ${author}
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.`
+            }
+        };
+
+        function updateLicenseInfo() {
+            const selected = document.getElementById('licenseType').value;
+            const data = licenseData[selected];
+            const panel = document.getElementById('licenseInfoPanel');
+
+            let html = `<div class="license-name">${data.name}</div>
+                        <div class="license-description">${data.desc}</div>
+                        <div class="license-features">`;
+
+            data.features.forEach(feat => {
+                let label = feat.text;
+                let className = 'feature-no';
+                if (feat.value) className = 'feature-yes';
+                if (feat.required) className = 'feature-yes';
+                if (feat.waived) className = 'feature-yes';
+
+                html += `<div class="feature"><span class="${className}">●</span> ${label}</div>`;
+            });
+
+            html += '</div>';
+            panel.innerHTML = html;
+        }
+
+        function generateLicense() {
+            const licenseType = document.getElementById('licenseType').value;
+            const authorName = document.getElementById('authorName').value || 'Author Name';
+            const year = document.getElementById('copyrightYear').value || new Date().getFullYear();
+
+            if (!authorName || authorName === 'Author Name') {
+                showToast('著者名を入力してください', 'error');
+                return;
+            }
+
+            const data = licenseData[licenseType];
+            const licenseText = data.template(authorName, year);
+
+            document.getElementById('output').textContent = licenseText;
+            document.getElementById('outputSection').classList.add('active');
+            showToast(`${data.name}を生成しました`, 'success');
+        }
+
+        function copyLicense() {
+            const output = document.getElementById('output').textContent;
+            navigator.clipboard.writeText(output).then(() => {
+                showToast('コピーしました', 'success');
+            });
+        }
+
+        function downloadLicense() {
+            const output = document.getElementById('output').textContent;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(output));
+            element.setAttribute('download', 'LICENSE');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            showToast('ダウンロード開始', 'success');
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize
+        updateLicenseInfo();
+        document.getElementById('copyrightYear').value = new Date().getFullYear();
+    </script>
+</body>
+</html>
