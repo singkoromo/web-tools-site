@@ -216,25 +216,6 @@
     <div class="tool-container">
         <h1>日付計算</h1>
         <p style="color: #6b7280; margin-bottom: 2rem;">日付に関する様々な計算ができます。</p>
-
-        <div class="ad-banner">広告スペース</div>
-
-        <div class="mode-tabs">
-            <button class="mode-tab active" onclick="switchMode(0)">日付の差</button>
-            <button class="mode-tab" onclick="switchMode(1)">加算・減算</button>
-            <button class="mode-tab" onclick="switchMode(2)">曜日</button>
-        </div>
-
-        <!-- Mode 1: 2つの日付の差 -->
-        <div class="mode-content active">
-            <div class="input-group">
-                <label class="input-label">開始日</label>
-                <input type="date" id="mode1-date1">
-                <div class="quick-buttons">
-                    <button class="quick-btn" onclick="setMode1Date1Today()">今日</button>
-                    <button class="quick-btn" onclick="setMode1Date1Tomorrow()">明日</button>
-                </div>
-            </div>
             <div class="input-group">
                 <label class="input-label">終了日</label>
                 <input type="date" id="mode1-date2">
@@ -343,8 +324,24 @@
             </div>
         </div>
 
-        <div class="ad-banner">広告スペース</div>
-    </div>
+    
+    <!-- SEO Content Section -->
+    <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+        <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+            <h2 style="font-size:1.2rem;margin-bottom:12px;">日付計算とは？</h2>
+            <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">日付の加算、減算、差分計算を行うツールです。2つの日付間の日数差を計算したり、指定日から何日後の日付を算出できます。</p>
+            <h3 style="font-size:1rem;margin-bottom:8px;">こんな時に便利</h3>
+            <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+                <li>納期の計算</li>
+                <li>イベントまでの日数確認</li>
+                <li>プロジェクト期間の算出</li>
+                <li>契約期間の確認</li>
+            </ul>
+            <p style="font-size:13px;color:#888;margin-top:16px;">
+                このツールはブラウザ上で完全に動作します。入力データがサーバーに送信されることはありません。
+            </p>
+        </div>
+    </section>
 
     <footer class="footer">
     <div class="footer-inner">

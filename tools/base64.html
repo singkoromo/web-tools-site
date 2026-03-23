@@ -194,28 +194,6 @@
     </header>
 
     <!-- Ad Banner (Before Tool) -->
-    <div class="ad-banner ad-before">
-        <p>広告スペース</p>
-    </div>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="tool-header">
-            <h1>Base64 エンコード・デコード</h1>
-            <p>テキストやファイルをBase64形式に変換、またはBase64形式のテキストをデコードします。</p>
-        </div>
-
-        <div class="tool-container">
-            <div class="sections-grid">
-                <!-- Encode Section -->
-                <div>
-                    <div class="textarea-group">
-                        <label for="encodeInput">エンコード対象テキスト</label>
-                        <div class="textarea-wrapper">
-                            <textarea id="encodeInput" class="tool-textarea" placeholder="ここにテキストを入力するか、ファイルをアップロードしてください..."></textarea>
-                            <span class="textarea-info" id="encodeInfo">0 文字</span>
-                        </div>
-                    </div>
                     <div class="button-group">
                         <button class="btn btn-primary" onclick="encodeToBase64()">エンコード</button>
                         <div class="file-input-wrapper">
@@ -266,14 +244,30 @@
     </main>
 
     <!-- Ad Banner (After Tool) -->
-    <div class="ad-banner ad-after">
-        <p>広告スペース</p>
-    </div>
 
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
     <!-- Footer -->
+    
+    <!-- SEO Content Section -->
+    <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+        <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+            <h2 style="font-size:1.2rem;margin-bottom:12px;">Base64エンコード/デコードとは？</h2>
+            <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">テキストやファイルをBase64形式に変換するツールです。テキストのBase64エンコードとデコードに加え、画像などのバイナリファイルもBase64文字列に変換できます。</p>
+            <h3 style="font-size:1rem;margin-bottom:8px;">こんな時に便利</h3>
+            <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+                <li>APIリクエストのデータエンコード</li>
+                <li>画像のData URI変換</li>
+                <li>メール添付データの処理</li>
+                <li>認証トークンの確認</li>
+            </ul>
+            <p style="font-size:13px;color:#888;margin-top:16px;">
+                このツールはブラウザ上で完全に動作します。入力データがサーバーに送信されることはありません。
+            </p>
+        </div>
+    </section>
+
     <footer class="footer">
     <div class="footer-inner">
         <div class="footer-links">

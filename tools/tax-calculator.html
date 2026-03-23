@@ -241,23 +241,6 @@
         <h1>消費税計算機</h1>
         <p style="color: #6b7280; margin-bottom: 2rem;">消費税（10%・8%）を簡単に計算できます。</p>
 
-        <div class="ad-banner">広告スペース</div>
-
-        <div class="mode-tabs">
-            <button class="mode-tab active" onclick="switchMode(0)">単品計算</button>
-            <button class="mode-tab" onclick="switchMode(1)">まとめ計算</button>
-        </div>
-
-        <!-- Mode 1: 単品計算 -->
-        <div class="mode-content active">
-            <div class="input-group">
-                <label class="input-label">価格</label>
-                <div class="input-wrapper">
-                    <input type="number" id="mode1-price" placeholder="例: 1000" step="1" min="0">
-                    <span class="unit">円</span>
-                </div>
-            </div>
-
             <div class="input-group">
                 <label class="input-label">税率</label>
                 <select id="mode1-rate">
@@ -346,8 +329,24 @@
             <button class="btn-clear" onclick="clearMode2()" style="width: 100%; margin-top: 1rem;">すべてクリア</button>
         </div>
 
-        <div class="ad-banner">広告スペース</div>
-    </div>
+    
+    <!-- SEO Content Section -->
+    <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+        <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+            <h2 style="font-size:1.2rem;margin-bottom:12px;">税金計算機とは？</h2>
+            <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">消費税の計算を行うツールです。税抜から税込、税込から税抜の計算に対応。軽減税率と標準税率に対応しています。</p>
+            <h3 style="font-size:1rem;margin-bottom:8px;">こんな時に便利</h3>
+            <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+                <li>見積もり作成</li>
+                <li>請求書の金額確認</li>
+                <li>買い物の税計算</li>
+                <li>経費精算</li>
+            </ul>
+            <p style="font-size:13px;color:#888;margin-top:16px;">
+                このツールはブラウザ上で完全に動作します。入力データがサーバーに送信されることはありません。
+            </p>
+        </div>
+    </section>
 
     <footer class="footer">
     <div class="footer-inner">
