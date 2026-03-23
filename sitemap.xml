@@ -92,6 +92,28 @@
   <!-- 生成・ランダム -->
   <url><loc>https://web-tool-site.com/tools/uuid-generator.html</loc><lastmod>2026-03-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://web-tool-site.com/tools/dummy-data.html</loc><lastmod>2026-03-23</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <!-- その他 -->
-  <url><loc>https://web-tool-site.com/privacy.html</loc><lastmod>2026-03-22</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <!-- IT・インフラ -->
+  <url><loc>https://web-tool-site.com/tools/cron-builder.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/env-parser.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/docker-compose.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/nginx-config.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/git-command.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/gitignore-generator.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/readme-generator.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <!-- 追加ツール -->
+  <url><loc>https://web-tool-site.com/tools/image-exif.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/pdf-to-image.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/subtitle-converter.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/ascii-art.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/curl-builder.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/sql-formatter.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/xml-formatter.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/jwt-generator.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/code-minifier.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://web-tool-site.com/tools/license-generator.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <!-- サイトページ -->
+  <url><loc>https://web-tool-site.com/about.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://web-tool-site.com/contact.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://web-tool-site.com/terms.html</loc><lastmod>2026-03-24</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://web-tool-site.com/privacy.html</loc><lastmod>2026-03-24</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>

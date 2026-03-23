@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToolBoxについて - 無料オンラインツール集</title>
+  <meta name="description" content="ToolBoxは開発者・クリエイター向けの無料オンラインツール集です。すべてブラウザ上で動作し、データはサーバーに送信されません。">
+  <meta property="og:title" content="ToolBoxについて - 無料オンラインツール集">
+  <meta property="og:description" content="90種類以上の無料ツールを提供するToolBoxのサイト概要ページです。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://web-tool-site.com/about.html">
+  <link rel="canonical" href="https://web-tool-site.com/about.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .about-hero {
+      text-align: center; padding: 40px 20px; margin-bottom: 32px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+      border-radius: 16px;
+    }
+    [data-theme="dark"] .about-hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+    .about-hero h2 { font-size: 1.8rem; margin-bottom: 12px; }
+    .about-hero p { font-size: 1.05rem; color: #555; max-width: 640px; margin: 0 auto; line-height: 1.8; }
+    [data-theme="dark"] .about-hero p { color: #aaa; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 32px 0; }
+    @media (max-width: 768px) { .feature-grid { grid-template-columns: 1fr; } }
+    .feature-card {
+      background: #fff; border: 1px solid #eee; border-radius: 12px;
+      padding: 28px 24px; text-align: center; transition: transform .2s, box-shadow .2s;
+    }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+    [data-theme="dark"] .feature-card { background: #1e1e2e; border-color: #333; }
+    .feature-icon { font-size: 2.4rem; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: #666; line-height: 1.7; }
+    [data-theme="dark"] .feature-card p { color: #aaa; }
+    .stats-row { display: flex; justify-content: center; gap: 48px; margin: 32px 0; flex-wrap: wrap; }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 2.4rem; font-weight: 800; color: #007bff; }
+    .stat-label { font-size: 14px; color: #666; margin-top: 4px; }
+    [data-theme="dark"] .stat-label { color: #aaa; }
+    .section-block { margin: 40px 0; }
+    .section-block h2 { font-size: 1.3rem; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #007bff; display: inline-block; }
+    .section-block p, .section-block li { font-size: 15px; color: #444; line-height: 1.9; }
+    [data-theme="dark"] .section-block p, [data-theme="dark"] .section-block li { color: #bbb; }
+    .section-block ul { padding-left: 24px; margin-top: 8px; }
+    .section-block li { margin-bottom: 6px; }
+    .category-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+    .cat-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+      background: #f8f9fa; border-radius: 8px; font-size: 14px; font-weight: 500;
+    }
+    [data-theme="dark"] .cat-item { background: #1e1e2e; }
+    .cat-emoji { font-size: 1.3rem; }
+    .cta-section {
+      text-align: center; margin-top: 40px; padding: 32px;
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      border-radius: 16px; color: #fff;
+    }
+    .cta-section h2 { font-size: 1.4rem; margin-bottom: 8px; color: #fff; }
+    .cta-section p { font-size: 15px; margin-bottom: 20px; opacity: .9; }
+    .cta-btn {
+      display: inline-block; padding: 14px 32px; background: #fff; color: #007bff;
+      border-radius: 8px; font-weight: 700; font-size: 16px; text-decoration: none;
+      transition: transform .2s;
+    }
+    .cta-btn:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        ToolBox
+      </a>
+      <nav class="nav">
+        <a href="index.html">ホーム</a>
+        <a href="index.html#tools">ツール一覧</a>
+        <a href="about.html">このサイトについて</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="tool-page">
+    <div class="tool-container">
+      <div class="about-hero">
+        <h2>ToolBoxについて</h2>
+        <p>ToolBoxは、開発者やクリエイターが日常的に使う便利ツールを無料で提供するWebサービスです。
+        すべてのツールはブラウザ上で完結し、あなたのデータは一切外部に送信されません。</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-num">90+</div>
+          <div class="stat-label">ツール数</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">13</div>
+          <div class="stat-label">カテゴリー</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">0</div>
+          <div class="stat-label">サーバー送信データ</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">無料</div>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>プライバシー保護</h3>
+          <p>すべての処理はブラウザ内で完結します。テキスト、画像、音声、動画などの入力データが外部サーバーに送信されることは一切ありません。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>高速・軽量</h3>
+          <p>サーバーとの通信が不要なため、ツールは瞬時に動作します。ネットワーク速度に依存せず、オフラインでも利用可能なツールもあります。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🆓</div>
+          <h3>完全無料</h3>
+          <p>すべてのツールを無料でご利用いただけます。ユーザー登録やログインも不要。今すぐ使い始められます。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>レスポンシブ対応</h3>
+          <p>PC、タブレット、スマートフォンなど、あらゆるデバイスで快適にご利用いただけるレスポンシブデザインを採用しています。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌙</div>
+          <h3>ダークモード</h3>
+          <p>目に優しいダークモードに対応。長時間の作業でも快適にお使いいただけます。ワンクリックで切替可能です。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔧</div>
+          <h3>プロ向け機能</h3>
+          <p>開発者やITエンジニアの業務を効率化する本格的なツールを多数収録。cURLビルダー、JWT解析、正規表現テスターなど。</p>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h2>提供しているツールカテゴリー</h2>
+        <div class="category-list">
+          <div class="cat-item"><span class="cat-emoji">🖼️</span>画像・メディアツール</div>
+          <div class="cat-item"><span class="cat-emoji">💻</span>開発者向けツール</div>
+          <div class="cat-item"><span class="cat-emoji">🎨</span>Web開発・CSSツール</div>
+          <div class="cat-item"><span class="cat-emoji">📝</span>テキスト・文章ツール</div>
+          <div class="cat-item"><span class="cat-emoji">🔄</span>変換ツール</div>
+          <div class="cat-item"><span class="cat-emoji">🧮</span>計算・数学ツール</div>
+          <div class="cat-item"><span class="cat-emoji">🔒</span>セキュリティツール</div>
+          <div class="cat-item"><span class="cat-emoji">📄</span>PDFツール</div>
+          <div class="cat-item"><span class="cat-emoji">🎵</span>オーディオツール</div>
+          <div class="cat-item"><span class="cat-emoji">🎬</span>動画・メディアツール</div>
+          <div class="cat-item"><span class="cat-emoji">🎲</span>生成・ランダムツール</div>
+          <div class="cat-item"><span class="cat-emoji">🖥️</span>IT・インフラツール</div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h2>ToolBoxの特徴</h2>
+        <ul>
+          <li><strong>クライアントサイド処理:</strong> JavaScriptによるブラウザ内処理で、データの安全性を確保</li>
+          <li><strong>登録不要:</strong> アカウント作成やログインなしで、すべてのツールをすぐに利用可能</li>
+          <li><strong>広告が控えめ:</strong> ユーザー体験を最優先に、最小限の広告のみ表示</li>
+          <li><strong>継続的なアップデート:</strong> 新しいツールの追加や既存ツールの改善を定期的に実施</li>
+          <li><strong>日本語対応:</strong> すべてのツールが日本語インターフェースで使いやすい</li>
+        </ul>
+      </div>
+
+      <div class="section-block">
+        <h2>運営者について</h2>
+        <p>
+          ToolBoxは、開発者・クリエイターの日常業務を効率化したいという想いから生まれたプロジェクトです。
+          「必要なツールをすぐに使える、安全で無料のプラットフォーム」を目指して運営しています。
+        </p>
+        <p style="margin-top:12px;">
+          ツールに関するご質問、ご要望、不具合報告は<a href="contact.html" style="color:#007bff;">お問い合わせページ</a>よりお気軽にご連絡ください。
+        </p>
+      </div>
+
+      <div class="cta-section">
+        <h2>さっそくツールを使ってみよう</h2>
+        <p>90種類以上の無料ツールであなたの作業を効率化しましょう。</p>
+        <a href="index.html#tools" class="cta-btn">ツール一覧を見る</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="index.html">ホーム</a>
+        <a href="index.html#tools">ツール一覧</a>
+        <a href="about.html">このサイトについて</a>
+        <a href="contact.html">お問い合わせ</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+      </div>
+      <p>&copy; 2026 ToolBox. All rights reserved.</p>
+      <p class="footer-note">すべてのツールはブラウザ上で動作します。データはサーバーに送信されません。</p>
+    </div>
+  </footer>
+
+  <script>
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) { html.setAttribute('data-theme', saved); toggle.textContent = saved === 'dark' ? '☀️' : '🌙'; }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { html.setAttribute('data-theme', 'dark'); toggle.textContent = '☀️'; }
+  toggle.addEventListener('click', () => {
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    toggle.textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  });
+  </script>
+
+</body>
+</html>

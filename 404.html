@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ページが見つかりません - ToolBox</title>
+  <meta name="description" content="お探しのページが見つかりませんでした。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .error-page {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 60vh; text-align: center; padding: 40px 20px;
+    }
+    .error-code { font-size: 8rem; font-weight: 800; color: #007bff; line-height: 1; margin-bottom: 8px; }
+    .error-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 12px; }
+    .error-desc { font-size: 1rem; color: #666; margin-bottom: 32px; max-width: 480px; line-height: 1.7; }
+    [data-theme="dark"] .error-desc { color: #aaa; }
+    .error-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .btn-home {
+      padding: 14px 28px; background: #007bff; color: #fff; border-radius: 8px;
+      font-weight: 700; font-size: 15px; text-decoration: none; transition: background .2s;
+    }
+    .btn-home:hover { background: #0056b3; }
+    .btn-tools {
+      padding: 14px 28px; background: #f8f9fa; color: #333; border-radius: 8px;
+      font-weight: 600; font-size: 15px; text-decoration: none; border: 1px solid #ddd; transition: background .2s;
+    }
+    .btn-tools:hover { background: #e9ecef; }
+    [data-theme="dark"] .btn-tools { background: #2a2a3e; color: #ddd; border-color: #444; }
+    .error-emoji { font-size: 4rem; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        ToolBox
+      </a>
+      <nav class="nav">
+        <a href="index.html">ホーム</a>
+        <a href="index.html#tools">ツール一覧</a>
+        <a href="about.html">このサイトについて</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="error-page">
+    <div class="error-emoji">🔍</div>
+    <div class="error-code">404</div>
+    <div class="error-title">ページが見つかりません</div>
+    <div class="error-desc">
+      お探しのページは移動または削除された可能性があります。
+      URLをご確認いただくか、以下のリンクからお探しのツールを見つけてください。
+    </div>
+    <div class="error-actions">
+      <a href="index.html" class="btn-home">ホームに戻る</a>
+      <a href="index.html#tools" class="btn-tools">ツール一覧を見る</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="index.html">ホーム</a>
+        <a href="index.html#tools">ツール一覧</a>
+        <a href="about.html">このサイトについて</a>
+        <a href="contact.html">お問い合わせ</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+      </div>
+      <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) { html.setAttribute('data-theme', saved); toggle.textContent = saved === 'dark' ? '☀️' : '🌙'; }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { html.setAttribute('data-theme', 'dark'); toggle.textContent = '☀️'; }
+  toggle.addEventListener('click', () => {
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    toggle.textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お問い合わせ - ToolBox</title>
+  <meta name="description" content="ToolBoxへのお問い合わせ。ご質問、ご要望、不具合報告などお気軽にご連絡ください。">
+  <meta property="og:title" content="お問い合わせ - ToolBox">
+  <meta property="og:description" content="ToolBoxへのお問い合わせページです。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://web-tool-site.com/contact.html">
+  <link rel="canonical" href="https://web-tool-site.com/contact.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 24px; }
+    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-weight: 600; font-size: 14px; color: #333; }
+    .form-group input, .form-group textarea, .form-group select {
+      padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px;
+      font-family: inherit; font-size: 14px; transition: border-color .2s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none; border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,.1);
+    }
+    .form-group textarea { min-height: 160px; resize: vertical; }
+    .btn-submit {
+      padding: 14px 28px; background: #007bff; color: #fff; border: none;
+      border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: background .2s;
+    }
+    .btn-submit:hover { background: #0056b3; }
+    .btn-submit:disabled { background: #aaa; cursor: not-allowed; }
+    .contact-info { display: flex; flex-direction: column; gap: 20px; }
+    .info-card {
+      background: #f8f9fa; border-radius: 12px; padding: 24px;
+      border: 1px solid #eee;
+    }
+    .info-card h3 { font-size: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .info-card p { font-size: 14px; color: #555; line-height: 1.7; }
+    .info-card a { color: #007bff; text-decoration: none; }
+    .info-card a:hover { text-decoration: underline; }
+    .faq-section { margin-top: 40px; }
+    .faq-item { border-bottom: 1px solid #eee; padding: 16px 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #333; }
+    .faq-a { font-size: 14px; color: #555; line-height: 1.7; }
+    .success-msg {
+      background: #d4edda; border: 1px solid #c3e6cb; color: #155724;
+      padding: 16px; border-radius: 8px; font-size: 14px; display: none;
+    }
+    [data-theme="dark"] .form-group label { color: #ddd; }
+    [data-theme="dark"] .info-card { background: #1e1e2e; border-color: #333; }
+    [data-theme="dark"] .info-card p, [data-theme="dark"] .faq-a { color: #aaa; }
+    [data-theme="dark"] .faq-q { color: #eee; }
+    [data-theme="dark"] .faq-item { border-color: #333; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        ToolBox
+      </a>
+      <nav class="nav">
+        <a href="index.html">ホーム</a>
+        <a href="index.html#tools">ツール一覧</a>
+        <a href="about.html">このサイトについて</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="テーマ切替">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="tool-page">
+    <h1>お問い合わせ</h1>
+    <p class="desc">ご質問、ご要望、不具合のご報告など、お気軽にお問い合わせください。</p>
+
+    <div class="tool-container">
+      <div class="contact-grid">
+        <div>
+          <form class="contact-form" id="contactForm">
+            <div class="form-group">
+              <label for="name">お名前</label>
+              <input type="text" id="name" name="name" placeholder="山田 太郎" required>
+            </div>
+            <div class="form-group">
+              <label for="email">メールアドレス</label>
+              <input type="email" id="email" name="email" placeholder="example@mail.com" required>
+            </div>
+            <div class="form-group">
+              <label for="category">お問い合わせ種別</label>
+              <select id="category" name="category">
+                <option value="question">ご質問</option>
+                <option value="request">機能リクエスト</option>
+                <option value="bug">不具合報告</option>
+                <option value="business">ビジネスに関するお問い合わせ</option>
+                <option value="other">その他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="message">お問い合わせ内容</label>
+              <textarea id="message" name="message" placeholder="お問い合わせ内容をご記入ください..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit" id="submitBtn">送信する</button>
+            <div class="success-msg" id="successMsg">
+              お問い合わせありがとうございます。内容を確認のうえ、メールにてご返信いたします。
+            </div>
+          </form>
+        </div>
+        <div class="contact-info">
+          <div class="info-card">
+            <h3>📧 メールでのお問い合わせ</h3>
+            <p>
+              直接メールでもお問い合わせいただけます。<br>
+              <a href="mailto:contact@web-tool-site.com">contact@web-tool-site.com</a>
+            </p>
+          </div>
+          <div class="info-card">
+            <h3>⏰ 返信について</h3>
+            <p>
+              お問い合わせいただいた内容は通常1〜3営業日以内にご返信いたします。
+              お急ぎの場合はメールにて直接ご連絡ください。
+            </p>
+          </div>
+          <div class="info-card">
+            <h3>🛡️ プライバシーについて</h3>
+            <p>
+              お問い合わせで取得した個人情報は、ご返信およびサービス改善の目的にのみ使用いたします。
+              詳しくは<a href="privacy.html">プライバシーポリシー</a>をご確認ください。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-section">
+        <h2 style="font-size:1.2rem; margin-bottom:16px;">よくあるご質問</h2>
+        <div class="faq-item">
+          <div class="faq-q">Q. ツールは本当に無料で使えますか？</div>
+          <div class="faq-a">はい、すべてのツールを無料でご利用いただけます。ユーザー登録も不要です。</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Q. データはサーバーに送信されますか？</div>
+          <div class="faq-a">いいえ。すべてのツールはブラウザ上のJavaScriptで動作するため、入力データがサーバーに送信されることはありません。安心してご利用ください。</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Q. スマートフォンでも使えますか？</div>
+          <div class="faq-a">はい、レスポンシブデザインに対応しており、スマートフォンやタブレットからもご利用いただけます。</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Q. 新しいツールのリクエストはできますか？</div>
+          <div class="faq-a">もちろんです。上記のお問い合わせフォームから「機能リクエスト」を選択してご要望をお送りください。</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Q. ツールの処理結果は正確ですか？</div>
+          <div class="faq-a">できる限り正確な処理を心がけておりますが、すべての結果の正確性を保証するものではありません。重要な用途にご利用の際はご自身でもご確認をお願いいたします。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="index.html">ホーム</a>
+        <a href="index.html#tools">ツール一覧</a>
+        <a href="about.html">このサイトについて</a>
+        <a href="contact.html">お問い合わせ</a>
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+      </div>
+      <p>&copy; 2026 ToolBox. All rights reserved.</p>
+      <p class="footer-note">すべてのツールはブラウザ上で動作します。データはサーバーに送信されません。</p>
+    </div>
+  </footer>
+
+  <script>
+  // Theme toggle
+  const toggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme');
+  if (saved) { html.setAttribute('data-theme', saved); toggle.textContent = saved === 'dark' ? '☀️' : '🌙'; }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { html.setAttribute('data-theme', 'dark'); toggle.textContent = '☀️'; }
+  toggle.addEventListener('click', () => {
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    toggle.textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  });
+
+  // Form handler (mailto fallback since no backend)
+  document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const category = document.getElementById('category').value;
+    const message = document.getElementById('message').value;
+    const categoryLabels = { question: 'ご質問', request: '機能リクエスト', bug: '不具合報告', business: 'ビジネス', other: 'その他' };
+    const subject = encodeURIComponent(`[ToolBox] ${categoryLabels[category] || 'お問い合わせ'}`);
+    const body = encodeURIComponent(`お名前: ${name}\nメールアドレス: ${email}\n種別: ${categoryLabels[category]}\n\n${message}`);
+    window.location.href = `mailto:contact@web-tool-site.com?subject=${subject}&body=${body}`;
+    document.getElementById('successMsg').style.display = 'block';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = '送信済み';
+  });
+  </script>
+
+</body>
+</html>
