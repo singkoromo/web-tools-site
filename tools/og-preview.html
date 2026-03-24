@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OGPプレビュー - ToolBox</title>
+    <meta name="description" content="OGP（Open Graph Protocol）タグを入力してSNSでのシェア表示をプレビュー。Twitter、Facebook、LINE、Slackでの見え方を確認できます。">
+    <meta name="keywords" content="OGP, Open Graph, SNS, シェア, プレビュー, Twitter, Facebook">
+    <meta property="og:title" content="OGPプレビュー - ToolBox">
+    <meta property="og:description" content="OGPタグを入力してSNSでのシェア表示をプレビュー。Twitter、Facebook、LINE、Slackでの見え方を確認できます。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/og-preview.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/og-preview.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .tool-title { font-size: 32px; font-weight: 700; margin-bottom: 30px; color: #1a1a1a; }
+        .input-section { background: #f5f5f5; padding: 24px; border-radius: 8px; margin-bottom: 30px; }
+        .field-group { margin-bottom: 16px; }
+        .field-group:last-child { margin-bottom: 0; }
+        .field-label { display: block; font-weight: 600; margin-bottom: 6px; color: #333; font-size: 13px; }
+        .field-hint { font-weight: 400; color: #999; font-size: 12px; margin-left: 8px; }
+        input[type="text"], input[type="url"], textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: Inter, sans-serif; box-sizing: border-box; }
+        input:focus, textarea:focus { outline: none; border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
+        textarea { min-height: 60px; resize: vertical; }
+        .button-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+        button { padding: 10px 20px; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: Inter, sans-serif; transition: all 0.2s ease; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e8e8e8; color: #333; }
+        .btn-secondary:hover { background: #d5d5d5; }
+        .preview-section { margin-bottom: 30px; }
+        .preview-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #333; display: flex; align-items: center; gap: 8px; }
+        .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        @media (max-width: 768px) { .preview-grid { grid-template-columns: 1fr; } }
+        .preview-card { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
+        .preview-card-title { padding: 12px 16px; background: #f9f9f9; font-weight: 600; font-size: 13px; color: #333; border-bottom: 1px solid #eee; }
+        /* Twitter card */
+        .twitter-preview { border: 1px solid #e1e8ed; border-radius: 14px; overflow: hidden; margin: 16px; font-family: -apple-system, sans-serif; }
+        .twitter-preview .og-image { width: 100%; height: 150px; background: #e8e8e8; object-fit: cover; display: block; }
+        .twitter-preview .og-body { padding: 12px; }
+        .twitter-preview .og-domain { font-size: 13px; color: #536471; }
+        .twitter-preview .og-title { font-size: 15px; font-weight: 700; color: #0f1419; margin-top: 2px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .twitter-preview .og-desc { font-size: 13px; color: #536471; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        /* Facebook card */
+        .facebook-preview { border: 1px solid #dadde1; overflow: hidden; margin: 16px; font-family: Helvetica, Arial, sans-serif; background: #f2f3f5; }
+        .facebook-preview .og-image { width: 100%; height: 150px; background: #e8e8e8; object-fit: cover; display: block; }
+        .facebook-preview .og-body { padding: 10px 12px; }
+        .facebook-preview .og-domain { font-size: 12px; color: #606770; text-transform: uppercase; }
+        .facebook-preview .og-title { font-size: 16px; font-weight: 600; color: #1d2129; margin-top: 4px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .facebook-preview .og-desc { font-size: 14px; color: #606770; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        /* Slack card */
+        .slack-preview { border-left: 4px solid #36c5f0; padding: 8px 12px; margin: 16px; font-family: Slack-Lato, sans-serif; }
+        .slack-preview .og-domain { font-size: 13px; font-weight: 700; color: #1264a3; margin-bottom: 4px; }
+        .slack-preview .og-title { font-size: 15px; font-weight: 700; color: #1264a3; margin-bottom: 4px; }
+        .slack-preview .og-desc { font-size: 14px; color: #1d1c1d; margin-bottom: 8px; }
+        .slack-preview .og-image { max-width: 200px; height: auto; border-radius: 4px; }
+        /* LINE card */
+        .line-preview { border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden; margin: 16px; font-family: -apple-system, sans-serif; }
+        .line-preview .og-image { width: 100%; height: 150px; background: #e8e8e8; object-fit: cover; display: block; }
+        .line-preview .og-body { padding: 10px 12px; background: #f7f7f7; }
+        .line-preview .og-title { font-size: 14px; font-weight: 700; color: #111; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .line-preview .og-desc { font-size: 12px; color: #999; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .og-image-placeholder { width: 100%; height: 150px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #999; font-size: 13px; }
+        .code-output { margin-top: 20px; }
+        .code-label { font-weight: 600; font-size: 14px; color: #333; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .code-box { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.8; overflow-x: auto; white-space: pre-wrap; }
+        .code-box .tag { color: #569cd6; }
+        .code-box .attr { color: #9cdcfe; }
+        .code-box .val { color: #ce9178; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 4px; font-size: 13px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: 1000; }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1 class="tool-title">OGPプレビュー</h1>
+
+        <div class="input-section">
+            <div class="field-group">
+                <label class="field-label">og:title <span class="field-hint">ページタイトル</span></label>
+                <input type="text" id="ogTitle" placeholder="例: ToolBox - 無料オンラインツール集" oninput="updatePreview()">
+            </div>
+            <div class="field-group">
+                <label class="field-label">og:description <span class="field-hint">ページの説明</span></label>
+                <textarea id="ogDesc" placeholder="例: 開発者・クリエイター向けの無料オンラインツール" oninput="updatePreview()"></textarea>
+            </div>
+            <div class="field-group">
+                <label class="field-label">og:url <span class="field-hint">ページURL</span></label>
+                <input type="url" id="ogUrl" placeholder="例: https://example.com/page" oninput="updatePreview()">
+            </div>
+            <div class="field-group">
+                <label class="field-label">og:image <span class="field-hint">画像URL (推奨: 1200x630)</span></label>
+                <input type="url" id="ogImage" placeholder="例: https://example.com/image.png" oninput="updatePreview()">
+            </div>
+            <div class="field-group">
+                <label class="field-label">og:site_name <span class="field-hint">サイト名</span></label>
+                <input type="text" id="ogSiteName" placeholder="例: ToolBox" oninput="updatePreview()">
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="updatePreview()">プレビュー更新</button>
+                <button class="btn-secondary" onclick="copyMetaTags()">メタタグをコピー</button>
+                <button class="btn-secondary" onclick="loadExample()">サンプル読み込み</button>
+                <button class="btn-secondary" onclick="clearAll()">クリア</button>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <div class="preview-title">SNSプレビュー</div>
+            <div class="preview-grid">
+                <div class="preview-card">
+                    <div class="preview-card-title">Twitter / X</div>
+                    <div class="twitter-preview" id="twitterPreview">
+                        <div class="og-image-placeholder">画像プレビュー</div>
+                        <div class="og-body">
+                            <div class="og-domain">example.com</div>
+                            <div class="og-title">タイトルを入力してください</div>
+                            <div class="og-desc">説明を入力してください</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-card">
+                    <div class="preview-card-title">Facebook</div>
+                    <div class="facebook-preview" id="facebookPreview">
+                        <div class="og-image-placeholder">画像プレビュー</div>
+                        <div class="og-body">
+                            <div class="og-domain">EXAMPLE.COM</div>
+                            <div class="og-title">タイトルを入力してください</div>
+                            <div class="og-desc">説明を入力してください</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-card">
+                    <div class="preview-card-title">Slack</div>
+                    <div class="slack-preview" id="slackPreview">
+                        <div class="og-domain">example.com</div>
+                        <div class="og-title">タイトルを入力してください</div>
+                        <div class="og-desc">説明を入力してください</div>
+                    </div>
+                </div>
+                <div class="preview-card">
+                    <div class="preview-card-title">LINE</div>
+                    <div class="line-preview" id="linePreview">
+                        <div class="og-image-placeholder">画像プレビュー</div>
+                        <div class="og-body">
+                            <div class="og-title">タイトルを入力してください</div>
+                            <div class="og-desc">説明を入力してください</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-output">
+            <div class="code-label">
+                <span>生成されたメタタグ</span>
+            </div>
+            <div class="code-box" id="codeOutput"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+        <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+            <h2 style="font-size:1.2rem;margin-bottom:12px;">OGPプレビューとは？</h2>
+            <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">OGP（Open Graph Protocol）のメタタグを設定し、Twitter/Facebook/LINE/SlackなどのSNSでシェアされた際の表示をプレビューできるツールです。</p>
+            <h3 style="font-size:1rem;margin-bottom:8px;">こんな時に便利</h3>
+            <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+                <li>OGPタグの設定確認</li>
+                <li>SNSシェア時の見え方チェック</li>
+                <li>メタタグのコード生成</li>
+                <li>各プラットフォームの表示差の確認</li>
+            </ul>
+            <p style="font-size:13px;color:#888;margin-top:16px;">このツールはブラウザ上で完全に動作します。入力データがサーバーに送信されることはありません。</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../about.html">このサイトについて</a>
+                <a href="../contact.html">お問い合わせ</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+                <a href="../terms.html">利用規約</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+        function getDomain(url) {
+            try { return new URL(url).hostname; } catch { return url || 'example.com'; }
+        }
+
+        function updatePreview() {
+            const title = document.getElementById('ogTitle').value || 'タイトルを入力してください';
+            const desc = document.getElementById('ogDesc').value || '説明を入力してください';
+            const url = document.getElementById('ogUrl').value;
+            const image = document.getElementById('ogImage').value;
+            const siteName = document.getElementById('ogSiteName').value;
+            const domain = getDomain(url);
+
+            const imgHtml = image
+                ? `<img class="og-image" src="${esc(image)}" onerror="this.outerHTML='<div class=\\'og-image-placeholder\\'>画像を読み込めません</div>'">`
+                : '<div class="og-image-placeholder">画像プレビュー</div>';
+
+            // Twitter
+            document.getElementById('twitterPreview').innerHTML = `
+                ${imgHtml}
+                <div class="og-body">
+                    <div class="og-domain">${esc(domain)}</div>
+                    <div class="og-title">${esc(title)}</div>
+                    <div class="og-desc">${esc(desc)}</div>
+                </div>`;
+
+            // Facebook
+            document.getElementById('facebookPreview').innerHTML = `
+                ${imgHtml}
+                <div class="og-body">
+                    <div class="og-domain">${esc(domain).toUpperCase()}</div>
+                    <div class="og-title">${esc(title)}</div>
+                    <div class="og-desc">${esc(desc)}</div>
+                </div>`;
+
+            // Slack
+            let slackHtml = `
+                <div class="og-domain">${esc(siteName || domain)}</div>
+                <div class="og-title">${esc(title)}</div>
+                <div class="og-desc">${esc(desc)}</div>`;
+            if (image) slackHtml += `<img class="og-image" src="${esc(image)}" onerror="this.style.display='none'">`;
+            document.getElementById('slackPreview').innerHTML = slackHtml;
+
+            // LINE
+            document.getElementById('linePreview').innerHTML = `
+                ${imgHtml}
+                <div class="og-body">
+                    <div class="og-title">${esc(title)}</div>
+                    <div class="og-desc">${esc(desc)}</div>
+                </div>`;
+
+            // Generate meta tags
+            generateMetaTags();
+        }
+
+        function generateMetaTags() {
+            const title = document.getElementById('ogTitle').value;
+            const desc = document.getElementById('ogDesc').value;
+            const url = document.getElementById('ogUrl').value;
+            const image = document.getElementById('ogImage').value;
+            const siteName = document.getElementById('ogSiteName').value;
+
+            let tags = [];
+            if (title) tags.push(`<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:title"</span> <span class="attr">content</span>=<span class="val">"${esc(title)}"</span><span class="tag">&gt;</span>`);
+            if (desc) tags.push(`<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:description"</span> <span class="attr">content</span>=<span class="val">"${esc(desc)}"</span><span class="tag">&gt;</span>`);
+            if (url) tags.push(`<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:url"</span> <span class="attr">content</span>=<span class="val">"${esc(url)}"</span><span class="tag">&gt;</span>`);
+            if (image) tags.push(`<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:image"</span> <span class="attr">content</span>=<span class="val">"${esc(image)}"</span><span class="tag">&gt;</span>`);
+            tags.push(`<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:type"</span> <span class="attr">content</span>=<span class="val">"website"</span><span class="tag">&gt;</span>`);
+            if (siteName) tags.push(`<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="val">"og:site_name"</span> <span class="attr">content</span>=<span class="val">"${esc(siteName)}"</span><span class="tag">&gt;</span>`);
+            // Twitter
+            tags.push('');
+            tags.push(`<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"twitter:card"</span> <span class="attr">content</span>=<span class="val">"summary_large_image"</span><span class="tag">&gt;</span>`);
+            if (title) tags.push(`<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"twitter:title"</span> <span class="attr">content</span>=<span class="val">"${esc(title)}"</span><span class="tag">&gt;</span>`);
+            if (desc) tags.push(`<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"twitter:description"</span> <span class="attr">content</span>=<span class="val">"${esc(desc)}"</span><span class="tag">&gt;</span>`);
+            if (image) tags.push(`<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="val">"twitter:image"</span> <span class="attr">content</span>=<span class="val">"${esc(image)}"</span><span class="tag">&gt;</span>`);
+
+            document.getElementById('codeOutput').innerHTML = tags.join('\n');
+        }
+
+        function getPlainMetaTags() {
+            const title = document.getElementById('ogTitle').value;
+            const desc = document.getElementById('ogDesc').value;
+            const url = document.getElementById('ogUrl').value;
+            const image = document.getElementById('ogImage').value;
+            const siteName = document.getElementById('ogSiteName').value;
+            let tags = [];
+            if (title) tags.push(`<meta property="og:title" content="${title}">`);
+            if (desc) tags.push(`<meta property="og:description" content="${desc}">`);
+            if (url) tags.push(`<meta property="og:url" content="${url}">`);
+            if (image) tags.push(`<meta property="og:image" content="${image}">`);
+            tags.push(`<meta property="og:type" content="website">`);
+            if (siteName) tags.push(`<meta property="og:site_name" content="${siteName}">`);
+            tags.push('');
+            tags.push(`<meta name="twitter:card" content="summary_large_image">`);
+            if (title) tags.push(`<meta name="twitter:title" content="${title}">`);
+            if (desc) tags.push(`<meta name="twitter:description" content="${desc}">`);
+            if (image) tags.push(`<meta name="twitter:image" content="${image}">`);
+            return tags.join('\n');
+        }
+
+        function copyMetaTags() {
+            const text = getPlainMetaTags();
+            if (!text.trim()) { showToast('メタタグが生成されていません'); return; }
+            navigator.clipboard.writeText(text).then(() => showToast('メタタグをコピーしました')).catch(() => showToast('コピーに失敗しました'));
+        }
+
+        function loadExample() {
+            document.getElementById('ogTitle').value = 'ToolBox - 無料オンラインツール集';
+            document.getElementById('ogDesc').value = '開発者・クリエイター向け90種類の無料オンラインツール。ブラウザ完結でプライバシーも安全。';
+            document.getElementById('ogUrl').value = 'https://web-tool-site.com/';
+            document.getElementById('ogImage').value = 'https://web-tool-site.com/images/ogp.png';
+            document.getElementById('ogSiteName').value = 'ToolBox';
+            updatePreview();
+            showToast('サンプルを読み込みました');
+        }
+
+        function clearAll() {
+            ['ogTitle', 'ogDesc', 'ogUrl', 'ogImage', 'ogSiteName'].forEach(id => document.getElementById(id).value = '');
+            updatePreview();
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        // Init
+        generateMetaTags();
+    </script>
+</body>
+</html>

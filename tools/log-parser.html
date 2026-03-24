@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログパーサー・解析 - ToolBox</title>
+    <meta name="description" content="Apache/Nginx/JSON形式のサーバーログを解析・フィルタリングするツール。ステータスコード集計、IPアドレス抽出、時間帯分析に対応。">
+    <meta name="keywords" content="ログ解析, サーバーログ, Apache, Nginx, アクセスログ">
+    <meta property="og:title" content="ログパーサー・解析 - ToolBox">
+    <meta property="og:description" content="Apache/Nginx/JSON形式のサーバーログを解析・フィルタリングするツール。ステータスコード集計、IPアドレス抽出、時間帯分析に対応。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/log-parser.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/log-parser.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .tool-title { font-size: 32px; font-weight: 700; margin-bottom: 30px; color: #1a1a1a; }
+        .controls { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .control-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+        .control-row:last-child { margin-bottom: 0; }
+        .control-label { font-weight: 600; font-size: 13px; color: #333; min-width: 80px; }
+        button { padding: 8px 16px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: Inter, sans-serif; transition: all 0.2s ease; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e8e8e8; color: #333; }
+        .btn-secondary:hover { background: #d5d5d5; }
+        select, input[type="text"] { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: Inter, sans-serif; }
+        textarea { width: 100%; min-height: 200px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6; resize: vertical; box-sizing: border-box; background: #fafafa; }
+        textarea:focus { outline: none; border-color: #0066cc; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
+        .stat-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
+        .stat-label { font-size: 12px; color: #666; font-weight: 600; margin-bottom: 4px; }
+        .stat-value { font-size: 24px; font-weight: 700; color: #333; }
+        .stat-sub { font-size: 11px; color: #999; margin-top: 4px; }
+        .result-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 12px; }
+        .result-table th, .result-table td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        .result-table th { background: #f5f5f5; font-weight: 600; }
+        .result-table tr:hover { background: #f9f9f9; }
+        .table-wrapper { overflow-x: auto; }
+        .section-title { font-size: 16px; font-weight: 600; color: #333; margin: 24px 0 12px; }
+        .bar-chart { margin-top: 8px; }
+        .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+        .bar-label { min-width: 80px; text-align: right; font-family: 'JetBrains Mono', monospace; color: #666; }
+        .bar-fill { height: 20px; background: #0066cc; border-radius: 3px; min-width: 2px; transition: width 0.3s; }
+        .bar-count { color: #333; font-weight: 600; min-width: 40px; }
+        .status-2xx { background: #28a745; }
+        .status-3xx { background: #17a2b8; }
+        .status-4xx { background: #ffc107; }
+        .status-5xx { background: #dc3545; }
+        .sample-btn { font-size: 12px; color: #0066cc; cursor: pointer; background: none; border: none; padding: 0; font-weight: 500; }
+        .sample-btn:hover { text-decoration: underline; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 4px; font-size: 13px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: 1000; }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1 class="tool-title">ログパーサー・解析</h1>
+
+        <div class="controls">
+            <div class="control-row">
+                <span class="control-label">ログ形式:</span>
+                <select id="logFormat">
+                    <option value="apache-combined">Apache Combined</option>
+                    <option value="apache-common">Apache Common</option>
+                    <option value="nginx">Nginx</option>
+                    <option value="json">JSON (1行1オブジェクト)</option>
+                </select>
+                <span class="control-label">フィルタ:</span>
+                <input type="text" id="filterText" placeholder="IP, URL, ステータスコード等" style="width:200px;">
+            </div>
+            <div class="control-row">
+                <button class="btn-primary" onclick="parseLog()">解析</button>
+                <button class="btn-secondary" onclick="clearAll()">クリア</button>
+                <button class="sample-btn" onclick="loadSample()">サンプルを読み込む</button>
+            </div>
+        </div>
+
+        <textarea id="logInput" placeholder="ログを貼り付けてください..."></textarea>
+
+        <div id="results"></div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+        <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+            <h2 style="font-size:1.2rem;margin-bottom:12px;">ログパーサーとは？</h2>
+            <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">サーバーのアクセスログを解析し、統計情報を可視化するツールです。Apache/Nginx形式のログやJSON形式のログに対応しています。</p>
+            <h3 style="font-size:1rem;margin-bottom:8px;">こんな時に便利</h3>
+            <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+                <li>アクセスログの統計分析</li>
+                <li>エラー率の確認</li>
+                <li>不正アクセスの調査</li>
+                <li>人気ページの特定</li>
+            </ul>
+            <p style="font-size:13px;color:#888;margin-top:16px;">このツールはブラウザ上で完全に動作します。入力データがサーバーに送信されることはありません。</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../about.html">このサイトについて</a>
+                <a href="../contact.html">お問い合わせ</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+                <a href="../terms.html">利用規約</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const SAMPLE_LOG = `192.168.1.10 - - [24/Mar/2026:10:15:32 +0900] "GET /index.html HTTP/1.1" 200 5423 "https://example.com/" "Mozilla/5.0"
+192.168.1.11 - - [24/Mar/2026:10:15:33 +0900] "GET /api/users HTTP/1.1" 200 1234 "-" "curl/7.88.1"
+10.0.0.5 - admin [24/Mar/2026:10:15:34 +0900] "POST /api/login HTTP/1.1" 401 89 "-" "Mozilla/5.0"
+192.168.1.10 - - [24/Mar/2026:10:15:35 +0900] "GET /css/style.css HTTP/1.1" 304 0 "https://example.com/index.html" "Mozilla/5.0"
+172.16.0.1 - - [24/Mar/2026:10:16:01 +0900] "GET /products HTTP/1.1" 200 8921 "https://google.com/" "Mozilla/5.0"
+10.0.0.5 - admin [24/Mar/2026:10:16:05 +0900] "POST /api/login HTTP/1.1" 200 512 "-" "Mozilla/5.0"
+192.168.1.12 - - [24/Mar/2026:10:16:10 +0900] "GET /favicon.ico HTTP/1.1" 404 162 "-" "Mozilla/5.0"
+172.16.0.1 - - [24/Mar/2026:10:16:15 +0900] "GET /products/1 HTTP/1.1" 200 3412 "https://example.com/products" "Mozilla/5.0"
+192.168.1.10 - - [24/Mar/2026:10:17:00 +0900] "GET /api/data HTTP/1.1" 500 45 "-" "Mozilla/5.0"
+192.168.1.13 - - [24/Mar/2026:10:17:30 +0900] "GET / HTTP/1.1" 301 0 "-" "Googlebot/2.1"
+172.16.0.2 - - [24/Mar/2026:10:18:00 +0900] "DELETE /api/users/5 HTTP/1.1" 403 78 "-" "curl/7.88.1"
+192.168.1.10 - - [24/Mar/2026:10:18:30 +0900] "GET /about HTTP/1.1" 200 4521 "https://example.com/" "Mozilla/5.0"`;
+
+        function loadSample() {
+            document.getElementById('logInput').value = SAMPLE_LOG;
+            parseLog();
+        }
+
+        function parseApacheLine(line) {
+            const regex = /^(\S+) (\S+) (\S+) \[([^\]]+)\] "(\S+) (\S+) (\S+)" (\d{3}) (\d+|-)(?: "([^"]*)" "([^"]*)")?/;
+            const m = line.match(regex);
+            if (!m) return null;
+            return {
+                ip: m[1], user: m[3], time: m[4],
+                method: m[5], url: m[6], protocol: m[7],
+                status: parseInt(m[8]), size: m[9] === '-' ? 0 : parseInt(m[9]),
+                referer: m[10] || '-', userAgent: m[11] || '-'
+            };
+        }
+
+        function parseJsonLine(line) {
+            try {
+                const obj = JSON.parse(line);
+                return {
+                    ip: obj.ip || obj.remote_addr || obj.client_ip || '-',
+                    user: obj.user || obj.remote_user || '-',
+                    time: obj.time || obj.timestamp || obj['@timestamp'] || '-',
+                    method: obj.method || obj.request_method || '-',
+                    url: obj.url || obj.path || obj.request_uri || '-',
+                    status: parseInt(obj.status || obj.status_code || 0),
+                    size: parseInt(obj.size || obj.body_bytes_sent || obj.bytes || 0),
+                    referer: obj.referer || obj.http_referer || '-',
+                    userAgent: obj.user_agent || obj.http_user_agent || '-'
+                };
+            } catch { return null; }
+        }
+
+        function parseLog() {
+            const input = document.getElementById('logInput').value.trim();
+            if (!input) return;
+            const format = document.getElementById('logFormat').value;
+            const filter = document.getElementById('filterText').value.toLowerCase();
+            const lines = input.split('\n').filter(l => l.trim());
+
+            let entries = [];
+            lines.forEach(line => {
+                let entry;
+                if (format === 'json') {
+                    entry = parseJsonLine(line);
+                } else {
+                    entry = parseApacheLine(line);
+                }
+                if (entry) {
+                    if (filter) {
+                        const searchStr = JSON.stringify(entry).toLowerCase();
+                        if (!searchStr.includes(filter)) return;
+                    }
+                    entries.push(entry);
+                }
+            });
+
+            renderResults(entries, lines.length);
+        }
+
+        function renderResults(entries, totalLines) {
+            if (entries.length === 0) {
+                document.getElementById('results').innerHTML = '<p style="color:#999;text-align:center;padding:40px;">解析結果がありません。ログ形式を確認してください。</p>';
+                return;
+            }
+
+            // Stats
+            const statusCounts = {};
+            const ipCounts = {};
+            const urlCounts = {};
+            const methodCounts = {};
+            let totalSize = 0;
+            let errorCount = 0;
+
+            entries.forEach(e => {
+                statusCounts[e.status] = (statusCounts[e.status] || 0) + 1;
+                ipCounts[e.ip] = (ipCounts[e.ip] || 0) + 1;
+                urlCounts[e.url] = (urlCounts[e.url] || 0) + 1;
+                methodCounts[e.method] = (methodCounts[e.method] || 0) + 1;
+                totalSize += e.size;
+                if (e.status >= 400) errorCount++;
+            });
+
+            const errorRate = ((errorCount / entries.length) * 100).toFixed(1);
+            const avgSize = Math.round(totalSize / entries.length);
+
+            let html = '';
+
+            // Summary cards
+            html += '<div class="stats-grid">';
+            html += `<div class="stat-card"><div class="stat-label">総リクエスト数</div><div class="stat-value">${entries.length}</div><div class="stat-sub">${totalLines}行中 ${entries.length}行を解析</div></div>`;
+            html += `<div class="stat-card"><div class="stat-label">エラー率</div><div class="stat-value" style="color:${errorRate > 10 ? '#dc3545' : '#28a745'}">${errorRate}%</div><div class="stat-sub">${errorCount}件のエラー (4xx/5xx)</div></div>`;
+            html += `<div class="stat-card"><div class="stat-label">ユニークIP数</div><div class="stat-value">${Object.keys(ipCounts).length}</div></div>`;
+            html += `<div class="stat-card"><div class="stat-label">平均レスポンスサイズ</div><div class="stat-value">${formatBytes(avgSize)}</div><div class="stat-sub">合計: ${formatBytes(totalSize)}</div></div>`;
+            html += '</div>';
+
+            // Status code chart
+            html += '<div class="section-title">ステータスコード分布</div>';
+            html += '<div class="bar-chart">';
+            const maxStatus = Math.max(...Object.values(statusCounts));
+            Object.keys(statusCounts).sort().forEach(code => {
+                const count = statusCounts[code];
+                const pct = (count / maxStatus) * 100;
+                const cls = code < 300 ? 'status-2xx' : code < 400 ? 'status-3xx' : code < 500 ? 'status-4xx' : 'status-5xx';
+                html += `<div class="bar-row"><span class="bar-label">${code}</span><div class="bar-fill ${cls}" style="width:${pct}%"></div><span class="bar-count">${count}</span></div>`;
+            });
+            html += '</div>';
+
+            // Top IPs
+            html += '<div class="section-title">アクセス元IP (上位10)</div>';
+            html += renderTopTable(ipCounts, 'IPアドレス', 10);
+
+            // Top URLs
+            html += '<div class="section-title">アクセス先URL (上位10)</div>';
+            html += renderTopTable(urlCounts, 'URL', 10);
+
+            // Method distribution
+            html += '<div class="section-title">HTTPメソッド分布</div>';
+            html += renderTopTable(methodCounts, 'メソッド', 10);
+
+            // Log entries table
+            html += '<div class="section-title">解析済みエントリ</div>';
+            html += '<div class="table-wrapper"><table class="result-table"><thead><tr><th>IP</th><th>メソッド</th><th>URL</th><th>ステータス</th><th>サイズ</th><th>時刻</th></tr></thead><tbody>';
+            entries.slice(0, 100).forEach(e => {
+                const statusColor = e.status >= 500 ? '#dc3545' : e.status >= 400 ? '#ffc107' : e.status >= 300 ? '#17a2b8' : '#28a745';
+                html += `<tr><td>${esc(e.ip)}</td><td>${esc(e.method)}</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(e.url)}</td><td style="color:${statusColor};font-weight:600;">${e.status}</td><td>${formatBytes(e.size)}</td><td style="font-size:11px;">${esc(e.time)}</td></tr>`;
+            });
+            if (entries.length > 100) html += `<tr><td colspan="6" style="text-align:center;color:#999;">...他${entries.length - 100}件</td></tr>`;
+            html += '</tbody></table></div>';
+
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function renderTopTable(counts, label, limit) {
+            const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, limit);
+            let html = '<div class="table-wrapper"><table class="result-table"><thead><tr><th>#</th><th>' + label + '</th><th>件数</th></tr></thead><tbody>';
+            sorted.forEach(([key, count], i) => {
+                html += `<tr><td>${i + 1}</td><td>${esc(key)}</td><td>${count}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        function formatBytes(b) {
+            if (b === 0) return '0 B';
+            if (b < 1024) return b + ' B';
+            if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+            return (b / 1048576).toFixed(1) + ' MB';
+        }
+
+        function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function clearAll() {
+            document.getElementById('logInput').value = '';
+            document.getElementById('filterText').value = '';
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>

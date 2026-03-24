@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Schema生成器 - ToolBox</title>
+    <meta name="description" content="JSONデータからJSON Schemaを自動生成するツール。型推論、必須フィールド検出、Draft-07準拠のスキーマを出力します。">
+    <meta name="keywords" content="JSON Schema, バリデーション, スキーマ生成, API">
+    <meta property="og:title" content="JSON Schema生成器 - ToolBox">
+    <meta property="og:description" content="JSONデータからJSON Schemaを自動生成するツール。型推論、必須フィールド検出、Draft-07準拠のスキーマを出力します。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/json-schema-generator.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/json-schema-generator.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .tool-title { font-size: 32px; font-weight: 700; margin-bottom: 30px; color: #1a1a1a; }
+        .editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        @media (max-width: 768px) { .editor-grid { grid-template-columns: 1fr; } }
+        .editor-panel { display: flex; flex-direction: column; }
+        .editor-label { font-weight: 600; margin-bottom: 8px; color: #333; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        textarea { width: 100%; min-height: 400px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; resize: vertical; box-sizing: border-box; background: #fafafa; }
+        textarea:focus { outline: none; border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
+        .button-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        button { padding: 10px 20px; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: Inter, sans-serif; transition: all 0.2s ease; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e8e8e8; color: #333; }
+        .btn-secondary:hover { background: #d5d5d5; }
+        .options-row { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; background: #f5f5f5; padding: 16px; border-radius: 8px; }
+        .option-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .option-item label { cursor: pointer; user-select: none; }
+        .option-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .option-item select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .error-box { background: #fff0f0; border: 1px solid #ffcccc; color: #cc0000; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px; font-size: 13px; display: none; }
+        .error-box.show { display: block; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 4px; font-size: 13px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: 1000; }
+        .toast.show { opacity: 1; }
+        .sample-btn { font-size: 12px; color: #0066cc; cursor: pointer; background: none; border: none; padding: 0; font-weight: 500; }
+        .sample-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1 class="tool-title">JSON Schema生成器</h1>
+
+        <div class="options-row">
+            <div class="option-item">
+                <input type="checkbox" id="optRequired" checked>
+                <label for="optRequired">全フィールドをrequired</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="optAdditional">
+                <label for="optAdditional">additionalProperties許可</label>
+            </div>
+            <div class="option-item">
+                <label>Draft:</label>
+                <select id="draftVersion">
+                    <option value="draft-07">Draft-07</option>
+                    <option value="draft-04">Draft-04</option>
+                    <option value="2020-12">2020-12</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="generate()">スキーマ生成</button>
+            <button class="btn-secondary" onclick="clearAll()">クリア</button>
+            <button class="btn-secondary" onclick="copySchema()">スキーマをコピー</button>
+        </div>
+
+        <div class="error-box" id="errorBox"></div>
+
+        <div class="editor-grid">
+            <div class="editor-panel">
+                <div class="editor-label">
+                    <span>入力 JSON</span>
+                    <button class="sample-btn" onclick="loadSample()">サンプルを読み込む</button>
+                </div>
+                <textarea id="inputJson" placeholder="JSONデータを貼り付けてください..."></textarea>
+            </div>
+            <div class="editor-panel">
+                <div class="editor-label"><span>生成されたJSON Schema</span></div>
+                <textarea id="outputSchema" readonly placeholder="ここにスキーマが表示されます"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+        <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+            <h2 style="font-size:1.2rem;margin-bottom:12px;">JSON Schema生成とは？</h2>
+            <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">JSONデータの構造を解析し、JSON Schemaを自動生成するツールです。APIのリクエスト/レスポンス仕様の定義やバリデーションルールの作成に役立ちます。</p>
+            <h3 style="font-size:1rem;margin-bottom:8px;">こんな時に便利</h3>
+            <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+                <li>APIレスポンスのスキーマ定義</li>
+                <li>バリデーションルールの自動生成</li>
+                <li>設定ファイルの型定義</li>
+                <li>OpenAPI仕様書の作成補助</li>
+            </ul>
+            <p style="font-size:13px;color:#888;margin-top:16px;">このツールはブラウザ上で完全に動作します。入力データがサーバーに送信されることはありません。</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../about.html">このサイトについて</a>
+                <a href="../contact.html">お問い合わせ</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+                <a href="../terms.html">利用規約</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const SAMPLE = {
+            "id": 1,
+            "name": "田中太郎",
+            "email": "tanaka@example.com",
+            "age": 30,
+            "active": true,
+            "tags": ["developer", "admin"],
+            "address": {
+                "city": "東京",
+                "zip": "100-0001"
+            },
+            "scores": [95, 82, 78]
+        };
+
+        function loadSample() {
+            document.getElementById('inputJson').value = JSON.stringify(SAMPLE, null, 2);
+            generate();
+        }
+
+        function getDraftUrl() {
+            const v = document.getElementById('draftVersion').value;
+            if (v === 'draft-04') return 'http://json-schema.org/draft-04/schema#';
+            if (v === '2020-12') return 'https://json-schema.org/draft/2020-12/schema';
+            return 'http://json-schema.org/draft-07/schema#';
+        }
+
+        function inferSchema(value, allRequired, allowAdditional) {
+            if (value === null) return { type: 'null' };
+            if (typeof value === 'boolean') return { type: 'boolean' };
+            if (typeof value === 'number') {
+                return Number.isInteger(value) ? { type: 'integer' } : { type: 'number' };
+            }
+            if (typeof value === 'string') {
+                // detect formats
+                if (/^\d{4}-\d{2}-\d{2}T/.test(value)) return { type: 'string', format: 'date-time' };
+                if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return { type: 'string', format: 'date' };
+                if (/^[^@]+@[^@]+\.[^@]+$/.test(value)) return { type: 'string', format: 'email' };
+                if (/^https?:\/\//.test(value)) return { type: 'string', format: 'uri' };
+                if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)) return { type: 'string', format: 'uuid' };
+                return { type: 'string' };
+            }
+            if (Array.isArray(value)) {
+                const schema = { type: 'array' };
+                if (value.length > 0) {
+                    // Check if all items same type
+                    const types = new Set(value.map(v => typeof v));
+                    if (types.size === 1) {
+                        schema.items = inferSchema(value[0], allRequired, allowAdditional);
+                    } else {
+                        schema.items = {};
+                    }
+                }
+                return schema;
+            }
+            if (typeof value === 'object') {
+                const schema = { type: 'object', properties: {} };
+                const keys = Object.keys(value);
+                keys.forEach(key => {
+                    schema.properties[key] = inferSchema(value[key], allRequired, allowAdditional);
+                });
+                if (allRequired && keys.length > 0) {
+                    schema.required = keys;
+                }
+                if (!allowAdditional) {
+                    schema.additionalProperties = false;
+                }
+                return schema;
+            }
+            return {};
+        }
+
+        function generate() {
+            const errorBox = document.getElementById('errorBox');
+            errorBox.classList.remove('show');
+            const input = document.getElementById('inputJson').value.trim();
+            if (!input) {
+                errorBox.textContent = 'JSONを入力してください';
+                errorBox.classList.add('show');
+                return;
+            }
+            try {
+                const data = JSON.parse(input);
+                const allRequired = document.getElementById('optRequired').checked;
+                const allowAdditional = document.getElementById('optAdditional').checked;
+                const schema = inferSchema(data, allRequired, allowAdditional);
+                schema['$schema'] = getDraftUrl();
+                document.getElementById('outputSchema').value = JSON.stringify(schema, null, 2);
+            } catch (e) {
+                errorBox.textContent = 'JSON解析エラー: ' + e.message;
+                errorBox.classList.add('show');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('inputJson').value = '';
+            document.getElementById('outputSchema').value = '';
+            document.getElementById('errorBox').classList.remove('show');
+        }
+
+        function copySchema() {
+            const text = document.getElementById('outputSchema').value;
+            if (!text) { showToast('スキーマが生成されていません'); return; }
+            navigator.clipboard.writeText(text).then(() => showToast('コピーしました')).catch(() => showToast('コピーに失敗しました'));
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>

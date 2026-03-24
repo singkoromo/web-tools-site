@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdownテーブル作成 - ToolBox</title>
+    <meta name="description" content="Markdownテーブルをビジュアルに作成・編集できるツール。行列の追加削除、配置変更、CSV読み込みに対応。">
+    <meta name="keywords" content="Markdown, テーブル, 表, CSV, GitHub">
+    <meta property="og:title" content="Markdownテーブル作成 - ToolBox">
+    <meta property="og:description" content="Markdownテーブルをビジュアルに作成・編集できるツール。行列の追加削除、配置変更、CSV読み込みに対応。">
+    <meta property="og:url" content="https://web-tool-site.com/tools/markdown-table.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://web-tool-site.com/tools/markdown-table.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .tool-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .tool-title { font-size: 32px; font-weight: 700; margin-bottom: 30px; color: #1a1a1a; }
+        .controls { background: #f5f5f5; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        button { padding: 8px 16px; border: none; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: Inter, sans-serif; transition: all 0.2s ease; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-primary:hover { background: #0052a3; }
+        .btn-secondary { background: #e8e8e8; color: #333; }
+        .btn-secondary:hover { background: #d5d5d5; }
+        .btn-danger { background: #e74c3c; color: white; font-size: 12px; }
+        .btn-danger:hover { background: #c0392b; }
+        .table-wrapper { overflow-x: auto; margin-bottom: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 0; }
+        th { background: #f0f4ff; }
+        .cell-input { width: 100%; min-width: 100px; padding: 10px 12px; border: none; font-family: Inter, sans-serif; font-size: 13px; background: transparent; box-sizing: border-box; }
+        .cell-input:focus { outline: none; background: #fff8e1; }
+        .header-input { font-weight: 600; }
+        .align-controls { display: flex; gap: 2px; padding: 4px; justify-content: center; }
+        .align-btn { padding: 2px 6px; font-size: 11px; background: #e8e8e8; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; }
+        .align-btn.active { background: #0066cc; color: white; border-color: #0066cc; }
+        .row-actions { padding: 4px; text-align: center; background: #fafafa; }
+        .output-section { margin-top: 20px; }
+        .output-label { font-weight: 600; margin-bottom: 8px; color: #333; font-size: 14px; display: flex; justify-content: space-between; }
+        textarea { width: 100%; min-height: 150px; padding: 16px; border: 1px solid #ddd; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; resize: vertical; box-sizing: border-box; background: #fafafa; }
+        textarea:focus { outline: none; border-color: #0066cc; }
+        .preview-section { margin-top: 20px; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; overflow-x: auto; }
+        .preview-section table { border-collapse: collapse; }
+        .preview-section th, .preview-section td { border: 1px solid #ddd; padding: 8px 12px; font-size: 13px; }
+        .preview-section th { background: #f5f5f5; font-weight: 600; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 4px; font-size: 13px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: 1000; }
+        .toast.show { opacity: 1; }
+        .csv-area { margin-bottom: 20px; }
+        .csv-area textarea { min-height: 80px; }
+        .tab-bar { display: flex; gap: 0; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; background: #e8e8e8; border: 1px solid #ddd; cursor: pointer; font-size: 13px; font-weight: 600; font-family: Inter, sans-serif; }
+        .tab-btn:first-child { border-radius: 4px 0 0 4px; }
+        .tab-btn:last-child { border-radius: 0 4px 4px 0; }
+        .tab-btn.active { background: #0066cc; color: white; border-color: #0066cc; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="../index.html" class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+                </svg>
+                ToolBox
+            </a>
+            <nav class="nav">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="tool-container">
+        <h1 class="tool-title">Markdownテーブル作成</h1>
+
+        <div class="controls">
+            <button class="btn-primary" onclick="addColumn()">列を追加</button>
+            <button class="btn-primary" onclick="addRow()">行を追加</button>
+            <button class="btn-secondary" onclick="generateMarkdown()">Markdown生成</button>
+            <button class="btn-secondary" onclick="copyMarkdown()">コピー</button>
+            <button class="btn-secondary" onclick="resetTable()">リセット</button>
+        </div>
+
+        <div class="csv-area">
+            <div style="font-size:13px;color:#666;margin-bottom:6px;">CSVから読み込み（カンマ区切り、1行目がヘッダー）:</div>
+            <textarea id="csvInput" placeholder="name,age,city&#10;田中,30,東京&#10;佐藤,25,大阪" style="min-height:60px;"></textarea>
+            <button class="btn-secondary" style="margin-top:8px;" onclick="importCSV()">CSVを読み込む</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="editTable"></table>
+        </div>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('markdown')">Markdown</button>
+            <button class="tab-btn" onclick="switchTab('preview')">プレビュー</button>
+        </div>
+
+        <div id="tab-markdown" class="tab-content active">
+            <div class="output-section">
+                <div class="output-label"><span>Markdown出力</span></div>
+                <textarea id="markdownOutput" readonly></textarea>
+            </div>
+        </div>
+
+        <div id="tab-preview" class="tab-content">
+            <div class="preview-section" id="previewArea"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+        <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+            <h2 style="font-size:1.2rem;margin-bottom:12px;">Markdownテーブル作成とは？</h2>
+            <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">GUIでMarkdown形式の表を簡単に作成できるツールです。CSVの読み込みやプレビュー表示にも対応しています。</p>
+            <h3 style="font-size:1rem;margin-bottom:8px;">こんな時に便利</h3>
+            <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+                <li>GitHubのREADMEに表を挿入</li>
+                <li>技術ドキュメントの表作成</li>
+                <li>CSVデータのMarkdown変換</li>
+                <li>ブログ記事の表組み</li>
+            </ul>
+            <p style="font-size:13px;color:#888;margin-top:16px;">このツールはブラウザ上で完全に動作します。入力データがサーバーに送信されることはありません。</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../about.html">このサイトについて</a>
+                <a href="../contact.html">お問い合わせ</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+                <a href="../terms.html">利用規約</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let cols = 3, rows = 3;
+        let headers = ['ヘッダー1', 'ヘッダー2', 'ヘッダー3'];
+        let data = [['', '', ''], ['', '', ''], ['', '', '']];
+        let aligns = ['left', 'left', 'left'];
+
+        function renderTable() {
+            const table = document.getElementById('editTable');
+            let html = '<thead><tr>';
+            // header row
+            headers.forEach((h, ci) => {
+                html += `<th><input class="cell-input header-input" value="${escapeHtml(h)}" onchange="headers[${ci}]=this.value;generateMarkdown()">`;
+                html += `<div class="align-controls">`;
+                ['left', 'center', 'right'].forEach(a => {
+                    const label = a === 'left' ? '←' : a === 'center' ? '↔' : '→';
+                    html += `<button class="align-btn${aligns[ci]===a?' active':''}" onclick="setAlign(${ci},'${a}')">${label}</button>`;
+                });
+                html += `</div></th>`;
+            });
+            html += '<th style="width:40px;background:#fff;border:none;"></th></tr></thead><tbody>';
+            // data rows
+            data.forEach((row, ri) => {
+                html += '<tr>';
+                row.forEach((cell, ci) => {
+                    html += `<td><input class="cell-input" value="${escapeHtml(cell)}" onchange="data[${ri}][${ci}]=this.value;generateMarkdown()"></td>`;
+                });
+                html += `<td class="row-actions"><button class="btn-danger" onclick="removeRow(${ri})">✕</button></td>`;
+                html += '</tr>';
+            });
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        function escapeHtml(s) {
+            return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        function setAlign(ci, a) { aligns[ci] = a; renderTable(); generateMarkdown(); }
+        function addColumn() {
+            headers.push('ヘッダー' + (headers.length + 1));
+            aligns.push('left');
+            data.forEach(row => row.push(''));
+            cols++;
+            renderTable(); generateMarkdown();
+        }
+        function addRow() {
+            data.push(new Array(cols).fill(''));
+            rows++;
+            renderTable(); generateMarkdown();
+        }
+        function removeRow(ri) {
+            if (data.length <= 1) return;
+            data.splice(ri, 1);
+            rows--;
+            renderTable(); generateMarkdown();
+        }
+        function resetTable() {
+            cols = 3; rows = 3;
+            headers = ['ヘッダー1', 'ヘッダー2', 'ヘッダー3'];
+            data = [['', '', ''], ['', '', ''], ['', '', '']];
+            aligns = ['left', 'left', 'left'];
+            renderTable(); generateMarkdown();
+        }
+
+        function generateMarkdown() {
+            // sync inputs
+            document.querySelectorAll('.header-input').forEach((inp, i) => { headers[i] = inp.value; });
+            document.querySelectorAll('tbody .cell-input').forEach((inp, idx) => {
+                const ri = Math.floor(idx / cols);
+                const ci = idx % cols;
+                data[ri][ci] = inp.value;
+            });
+
+            const pad = (s, len) => s + ' '.repeat(Math.max(0, len - s.length));
+            // calc widths
+            const widths = headers.map((h, ci) => {
+                let max = h.length;
+                data.forEach(row => { if (row[ci].length > max) max = row[ci].length; });
+                return Math.max(max, 3);
+            });
+
+            let lines = [];
+            // header
+            lines.push('| ' + headers.map((h, i) => pad(h, widths[i])).join(' | ') + ' |');
+            // separator
+            lines.push('| ' + aligns.map((a, i) => {
+                const w = widths[i];
+                if (a === 'center') return ':' + '-'.repeat(w - 2) + ':';
+                if (a === 'right') return '-'.repeat(w - 1) + ':';
+                return ':' + '-'.repeat(w - 1);
+            }).join(' | ') + ' |');
+            // rows
+            data.forEach(row => {
+                lines.push('| ' + row.map((c, i) => pad(c, widths[i])).join(' | ') + ' |');
+            });
+
+            const md = lines.join('\n');
+            document.getElementById('markdownOutput').value = md;
+            renderPreview(md);
+        }
+
+        function renderPreview(md) {
+            const lines = md.split('\n').filter(l => l.trim());
+            if (lines.length < 2) { document.getElementById('previewArea').innerHTML = ''; return; }
+            const parseRow = l => l.split('|').slice(1, -1).map(c => c.trim());
+            const hdrs = parseRow(lines[0]);
+            const sep = parseRow(lines[1]);
+            const alignMap = sep.map(s => {
+                if (s.startsWith(':') && s.endsWith(':')) return 'center';
+                if (s.endsWith(':')) return 'right';
+                return 'left';
+            });
+            let html = '<table><thead><tr>';
+            hdrs.forEach((h, i) => { html += `<th style="text-align:${alignMap[i]}">${escapeHtml(h)}</th>`; });
+            html += '</tr></thead><tbody>';
+            for (let i = 2; i < lines.length; i++) {
+                const cells = parseRow(lines[i]);
+                html += '<tr>';
+                cells.forEach((c, j) => { html += `<td style="text-align:${alignMap[j]||'left'}">${escapeHtml(c)}</td>`; });
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            document.getElementById('previewArea').innerHTML = html;
+        }
+
+        function importCSV() {
+            const csv = document.getElementById('csvInput').value.trim();
+            if (!csv) return;
+            const lines = csv.split('\n').map(l => l.split(',').map(c => c.trim()));
+            if (lines.length < 1) return;
+            headers = lines[0];
+            cols = headers.length;
+            aligns = new Array(cols).fill('left');
+            data = lines.slice(1);
+            if (data.length === 0) data = [new Array(cols).fill('')];
+            // pad rows
+            data.forEach(row => { while (row.length < cols) row.push(''); });
+            rows = data.length;
+            renderTable(); generateMarkdown();
+            showToast('CSVを読み込みました');
+        }
+
+        function copyMarkdown() {
+            const t = document.getElementById('markdownOutput').value;
+            if (!t) { showToast('Markdownが生成されていません'); return; }
+            navigator.clipboard.writeText(t).then(() => showToast('コピーしました')).catch(() => showToast('コピーに失敗しました'));
+        }
+
+        function switchTab(name) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + name).classList.add('active');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        // init
+        renderTable();
+        generateMarkdown();
+    </script>
+</body>
+</html>
