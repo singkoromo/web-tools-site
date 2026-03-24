@@ -253,24 +253,16 @@
         function encodeGIF(frames, totalFrames) {
             document.getElementById('progressText').textContent = 'GIFをエンコード中...';
 
-            // Simple GIF encoder
-            setTimeout(() => {
-                const gifEncoder = new GIFEncoder(frames[0].canvas || getCanvasFromDataURL(frames[0]));
-
-                // For simplicity, create animated WebP or use canvas frames as WebM via MediaRecorder
-                // Since true GIF encoding is complex, we'll use a simplified approach with canvas animation
-
+            const img = new Image();
+            img.onload = function() {
                 const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = parseInt(frames[0].split('s=')[1] || '640');
-                canvas.height = Math.round(canvas.width * 0.75);
+                canvas.width = img.naturalWidth || 640;
+                canvas.height = img.naturalHeight || 480;
 
-                // Create animated image using canvas animation (will be converted to video then to GIF)
                 const gifBinary = createAnimatedGIF(frames, canvas.width, canvas.height, 100);
 
                 gifData = gifBinary;
 
-                // Create preview
                 const blob = new Blob([gifBinary], { type: 'image/gif' });
                 const url = URL.createObjectURL(blob);
                 document.getElementById('gifPreview').src = url;
@@ -280,7 +272,8 @@
                 document.getElementById('convertBtn').disabled = false;
 
                 showToast('GIFの変換が完了しました');
-            }, 100);
+            };
+            img.src = frames[0];
         }
 
         function createAnimatedGIF(frames, w, h, delay) {
