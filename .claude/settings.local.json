@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node add-ga4.js)"
+    ]
+  }
+}
