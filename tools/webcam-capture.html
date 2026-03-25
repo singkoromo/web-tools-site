@@ -381,8 +381,15 @@
                     'brightness': `brightness(${50 + parseInt(document.getElementById('filterSlider').value) / 2}%)`,
                     'contrast': `contrast(${50 + parseInt(document.getElementById('filterSlider').value) / 2}%)`
                 };
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(canvas, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.filter = filters[currentFilter];
-                ctx.drawImage(canvas, 0, 0);
+                ctx.drawImage(tempCanvas, 0, 0);
+                ctx.filter = 'none';
             }
 
             capturedData = canvas.toDataURL();
