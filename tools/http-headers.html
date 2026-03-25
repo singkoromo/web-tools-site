@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTPヘッダー リファレンス・解析 | ToolBox</title>
+    <meta name="description" content="HTTPリクエスト・レスポンスヘッダーの一覧リファレンスと解析ツール。Content-Type、Authorization、Cache-Controlなど主要ヘッダーの説明付き。">
+    <meta name="keywords" content="HTTP ヘッダー リファレンス 解析 Content-Type Authorization Cache-Control CORS">
+    <meta name="author" content="ToolBox">
+    <meta property="og:title" content="HTTPヘッダー リファレンス・解析 | ToolBox">
+    <meta property="og:description" content="HTTPヘッダーの一覧リファレンスと貼り付け解析。主要ヘッダーの説明・用途付き。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/http-headers.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/http-headers.html">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"HTTPヘッダー リファレンス・解析","description":"HTTPヘッダーのリファレンスと解析ツール","url":"https://web-tool-site.com/tools/http-headers.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; min-height: 100vh; }
+        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { color: #555; text-decoration: none; font-weight: 500; }
+        nav a:hover { color: #4a90e2; }
+        .tool-page { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+        .tool-card-wrap { background: white; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); overflow: hidden; margin-bottom: 1.5rem; }
+        .tool-header { background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%); color: white; padding: 2rem; text-align: center; }
+        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .tool-header p { font-size: 1rem; opacity: 0.85; }
+        .tool-content { padding: 1.5rem 2rem; }
+        /* Analyzer */
+        .analyzer-area { display: flex; flex-direction: column; gap: 1rem; }
+        .analyzer-area label { font-weight: 600; font-size: 0.95rem; }
+        textarea.analyzer-input { min-height: 160px; width: 100%; padding: 0.9rem 1rem; border: 1px solid #ddd; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.83rem; line-height: 1.6; resize: vertical; }
+        textarea.analyzer-input:focus { outline: none; border-color: #4ca1af; box-shadow: 0 0 0 3px rgba(76,161,175,0.15); }
+        .btn-analyze { background: #2c3e50; color: white; border: none; border-radius: 8px; padding: 0.7rem 1.5rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-analyze:hover { background: #1a252f; }
+        .analyzed-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .analyzed-table th { background: #f0f4f8; padding: 0.6rem 1rem; text-align: left; font-weight: 700; color: #555; border-bottom: 2px solid #e0e0e0; }
+        .analyzed-table td { padding: 0.6rem 1rem; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+        .analyzed-table td:first-child { font-family: 'JetBrains Mono', monospace; color: #2c3e50; font-weight: 600; white-space: nowrap; }
+        .analyzed-table td:nth-child(2) { font-family: 'JetBrains Mono', monospace; color: #555; word-break: break-all; }
+        .analyzed-table td:last-child { color: #777; font-size: 0.82rem; font-style: italic; }
+        .analyzed-table tr:hover { background: #f8f9fa; }
+        /* Search */
+        .search-bar { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .search-bar input { flex: 1; min-width: 200px; border: 1px solid #ddd; border-radius: 8px; padding: 0.65rem 1rem; font-size: 0.92rem; }
+        .search-bar input:focus { outline: none; border-color: #4ca1af; }
+        .filter-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .filter-btn { background: #f0f4f8; border: 1px solid #ddd; border-radius: 20px; padding: 0.35rem 0.9rem; font-size: 0.82rem; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .filter-btn.active { background: #2c3e50; color: white; border-color: #2c3e50; }
+        /* Reference table */
+        .ref-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .ref-table th { background: #2c3e50; color: white; padding: 0.75rem 1rem; text-align: left; font-weight: 600; position: sticky; top: 60px; }
+        .ref-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+        .ref-table tr:hover { background: #f8f9fa; }
+        .ref-table td:first-child { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #2c3e50; white-space: nowrap; min-width: 200px; }
+        .badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-req { background: #dbeafe; color: #1d4ed8; }
+        .badge-res { background: #dcfce7; color: #166534; }
+        .badge-both { background: #fef3c7; color: #92400e; }
+        .badge-security { background: #fce7f3; color: #9d174d; }
+        .example { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #888; margin-top: 0.25rem; display: block; }
+        .table-wrap { max-height: 600px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 0.9rem 1.4rem; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        .toast.hide { animation: slideOut 0.3s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { to { transform: translateX(400px); opacity: 0; } }
+        footer { background: #2c3e50; color: #ccc; text-align: center; padding: 1.5rem; margin-top: 2rem; font-size: 0.9rem; }
+        footer a { color: #aaa; text-decoration: none; }
+        .seo-section { max-width: 900px; margin: 32px auto; padding: 0 20px; }
+        .seo-box { background: #f8f9fa; border-radius: 12px; padding: 28px 24px; border: 1px solid #eee; }
+        .seo-box h2 { font-size: 1.2rem; margin-bottom: 12px; }
+        .seo-box p, .seo-box li { font-size: 14px; color: #555; line-height: 1.8; }
+        .seo-box ul { padding-left: 20px; }
+        @media (max-width: 768px) { .header-container { flex-direction: column; gap: 0.75rem; } nav ul { gap: 1rem; } .ref-table td:first-child { min-width: 140px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">🔧 ToolBox</a>
+            <nav><ul>
+                <li><a href="../index.html">ホーム</a></li>
+                <li><a href="../index.html#tools">ツール一覧</a></li>
+            </ul></nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <!-- Analyzer -->
+        <div class="tool-card-wrap">
+            <div class="tool-header">
+                <h1>📡 HTTPヘッダー リファレンス・解析</h1>
+                <p>HTTPヘッダーの一覧リファレンスとヘッダー文字列解析ツール</p>
+            </div>
+            <div class="tool-content">
+                <div class="analyzer-area">
+                    <label for="headerInput">HTTPヘッダーを貼り付けて解析</label>
+                    <textarea class="analyzer-input" id="headerInput" placeholder="例:
+Content-Type: application/json
+Authorization: Bearer eyJhbGci...
+Cache-Control: no-cache, no-store
+X-Request-ID: abc-123"></textarea>
+                    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                        <button class="btn-analyze" onclick="analyzeHeaders()">解析する</button>
+                        <button class="btn-analyze" style="background:#6c757d;" onclick="clearAnalyzer()">クリア</button>
+                        <button class="btn-analyze" style="background:#27ae60;" onclick="loadSample()">サンプル</button>
+                    </div>
+                    <div id="analyzeResult" style="display:none;">
+                        <div class="table-wrap">
+                            <table class="analyzed-table">
+                                <thead><tr><th>ヘッダー名</th><th>値</th><th>説明</th></tr></thead>
+                                <tbody id="analyzeBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reference -->
+        <div class="tool-card-wrap">
+            <div class="tool-content">
+                <h2 style="margin-bottom:1rem;font-size:1.2rem;">HTTPヘッダー リファレンス一覧</h2>
+                <div class="search-bar">
+                    <input type="text" id="refSearch" placeholder="ヘッダー名・説明で検索..." oninput="filterRef()">
+                    <div class="filter-btns">
+                        <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">すべて</button>
+                        <button class="filter-btn" data-filter="request" onclick="setFilter('request',this)">リクエスト</button>
+                        <button class="filter-btn" data-filter="response" onclick="setFilter('response',this)">レスポンス</button>
+                        <button class="filter-btn" data-filter="both" onclick="setFilter('both',this)">共通</button>
+                        <button class="filter-btn" data-filter="security" onclick="setFilter('security',this)">セキュリティ</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="ref-table" id="refTable">
+                        <thead><tr><th>ヘッダー名</th><th>種別</th><th>説明・用途</th></tr></thead>
+                        <tbody id="refBody"></tbody>
+                    </table>
+                </div>
+                <div id="refCount" style="margin-top:0.75rem;font-size:0.85rem;color:#888;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="seo-section">
+        <div class="seo-box">
+            <h2>HTTPヘッダー リファレンス・解析ツールとは？</h2>
+            <p>HTTPリクエスト・レスポンスのヘッダー文字列を解析し、各ヘッダーの意味と用途を説明するリファレンスツールです。curlの出力やブラウザDevToolsのヘッダーを貼り付けて内容を確認できます。</p>
+            <ul>
+                <li>リクエスト・レスポンス・セキュリティ系ヘッダーを網羅</li>
+                <li>ヘッダー文字列を貼り付けてパース・説明表示</li>
+                <li>検索・カテゴリフィルタで素早く目的のヘッダーを検索</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 ToolBox. All rights reserved. | <a href="../index.html">ホーム</a> | <a href="../privacy.html">プライバシーポリシー</a></p>
+    </footer>
+
+    <script>
+    const HEADERS = [
+        // Request
+        { name: 'Accept', type: 'request', desc: 'クライアントが受け付けるメディアタイプを指定', example: 'Accept: application/json, text/html' },
+        { name: 'Accept-Encoding', type: 'request', desc: 'クライアントが対応する圧縮方式を指定', example: 'Accept-Encoding: gzip, deflate, br' },
+        { name: 'Accept-Language', type: 'request', desc: 'クライアントが希望する言語を指定', example: 'Accept-Language: ja, en;q=0.9' },
+        { name: 'Authorization', type: 'request', desc: '認証情報（Bearer トークン、Basic 認証など）を送信', example: 'Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...' },
+        { name: 'Cookie', type: 'request', desc: 'サーバーに送信するクッキーを含む', example: 'Cookie: session=abc123; theme=dark' },
+        { name: 'Host', type: 'request', desc: 'リクエスト先のホスト名とポート番号（HTTP/1.1必須）', example: 'Host: api.example.com' },
+        { name: 'Origin', type: 'request', desc: 'CORSリクエストの発信元オリジン', example: 'Origin: https://example.com' },
+        { name: 'Referer', type: 'request', desc: 'リクエスト元ページのURL', example: 'Referer: https://example.com/page' },
+        { name: 'User-Agent', type: 'request', desc: 'クライアントのブラウザ・OSなどの情報', example: 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)...' },
+        { name: 'X-Forwarded-For', type: 'request', desc: 'プロキシ経由時のクライアントIPアドレス', example: 'X-Forwarded-For: 203.0.113.1, 198.51.100.1' },
+        { name: 'X-Requested-With', type: 'request', desc: 'AJAXリクエストを識別するためのヘッダー', example: 'X-Requested-With: XMLHttpRequest' },
+        { name: 'If-None-Match', type: 'request', desc: 'ETagと組み合わせた条件付きリクエスト（304返却）', example: 'If-None-Match: "33a64df551425fcc55e4d42a148795d9f25f89d4"' },
+        { name: 'If-Modified-Since', type: 'request', desc: '指定日時以降に更新された場合のみ取得', example: 'If-Modified-Since: Wed, 21 Oct 2025 07:28:00 GMT' },
+        { name: 'Range', type: 'request', desc: 'リソースの一部範囲のみ要求（ダウンロード再開など）', example: 'Range: bytes=200-1023' },
+        // Response
+        { name: 'Access-Control-Allow-Origin', type: 'response', desc: 'CORSで許可するオリジンを指定', example: 'Access-Control-Allow-Origin: *' },
+        { name: 'Access-Control-Allow-Methods', type: 'response', desc: 'CORSで許可するHTTPメソッドを指定', example: 'Access-Control-Allow-Methods: GET, POST, PUT, DELETE' },
+        { name: 'Access-Control-Allow-Headers', type: 'response', desc: 'CORSで許可するリクエストヘッダーを指定', example: 'Access-Control-Allow-Headers: Content-Type, Authorization' },
+        { name: 'ETag', type: 'response', desc: 'リソースのバージョン識別子（キャッシュ検証）', example: 'ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"' },
+        { name: 'Last-Modified', type: 'response', desc: 'リソースの最終更新日時', example: 'Last-Modified: Wed, 21 Oct 2025 07:28:00 GMT' },
+        { name: 'Location', type: 'response', desc: 'リダイレクト先のURL（3xx）またはリソース作成場所（201）', example: 'Location: https://example.com/new-page' },
+        { name: 'Retry-After', type: 'response', desc: 'レート制限後の再試行待機時間（429・503）', example: 'Retry-After: 120' },
+        { name: 'Server', type: 'response', desc: 'サーバーソフトウェア情報（セキュリティ上非推奨）', example: 'Server: nginx/1.24.0' },
+        { name: 'Set-Cookie', type: 'response', desc: 'クライアントにクッキーをセット', example: 'Set-Cookie: session=abc123; Secure; HttpOnly; SameSite=Strict' },
+        { name: 'Vary', type: 'response', desc: 'キャッシュキーに含めるべきリクエストヘッダー', example: 'Vary: Accept-Encoding, Accept-Language' },
+        { name: 'WWW-Authenticate', type: 'response', desc: '401応答でサポートする認証方式を示す', example: 'WWW-Authenticate: Bearer realm="api"' },
+        // Both
+        { name: 'Cache-Control', type: 'both', desc: 'キャッシュ動作を制御するディレクティブ', example: 'Cache-Control: no-store / max-age=3600, s-maxage=7200' },
+        { name: 'Content-Encoding', type: 'both', desc: 'コンテンツの圧縮方式', example: 'Content-Encoding: gzip' },
+        { name: 'Content-Length', type: 'both', desc: 'リクエスト/レスポンスボディのバイト数', example: 'Content-Length: 1024' },
+        { name: 'Content-Type', type: 'both', desc: 'コンテンツのメディアタイプと文字エンコーディング', example: 'Content-Type: application/json; charset=utf-8' },
+        { name: 'Transfer-Encoding', type: 'both', desc: '転送エンコーディング（chunked など）', example: 'Transfer-Encoding: chunked' },
+        { name: 'Date', type: 'both', desc: 'メッセージ生成日時', example: 'Date: Wed, 21 Oct 2025 07:28:00 GMT' },
+        // Security
+        { name: 'Content-Security-Policy', type: 'security', desc: 'XSS・インジェクション対策のコンテンツセキュリティポリシー', example: "Content-Security-Policy: default-src 'self'; img-src https:" },
+        { name: 'Strict-Transport-Security', type: 'security', desc: 'HTTPS強制（HSTS）。ブラウザにHTTPSのみ使用させる', example: 'Strict-Transport-Security: max-age=31536000; includeSubDomains' },
+        { name: 'X-Content-Type-Options', type: 'security', desc: 'MIMEタイプスニッフィングを防止', example: 'X-Content-Type-Options: nosniff' },
+        { name: 'X-Frame-Options', type: 'security', desc: 'クリックジャッキング対策。iframe埋め込みを制御', example: 'X-Frame-Options: DENY' },
+        { name: 'X-XSS-Protection', type: 'security', desc: 'ブラウザのXSSフィルターを有効化（CSPで代替推奨）', example: 'X-XSS-Protection: 1; mode=block' },
+        { name: 'Permissions-Policy', type: 'security', desc: 'ブラウザ機能（カメラ・位置情報など）へのアクセス制御', example: 'Permissions-Policy: camera=(), geolocation=()' },
+        { name: 'Referrer-Policy', type: 'security', desc: 'Refererヘッダーの送信ポリシー', example: 'Referrer-Policy: strict-origin-when-cross-origin' },
+    ];
+
+    const HEADER_DESC_MAP = {};
+    HEADERS.forEach(h => { HEADER_DESC_MAP[h.name.toLowerCase()] = h.desc; });
+
+    let currentFilter = 'all';
+
+    function renderRef(list) {
+        const body = document.getElementById('refBody');
+        const typeLabel = { request: ['リクエスト', 'badge-req'], response: ['レスポンス', 'badge-res'], both: ['共通', 'badge-both'], security: ['セキュリティ', 'badge-security'] };
+        body.innerHTML = list.map(h => {
+            const [label, cls] = typeLabel[h.type];
+            return `<tr>
+                <td>${h.name}<span class="example">${h.example}</span></td>
+                <td><span class="badge ${cls}">${label}</span></td>
+                <td>${h.desc}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('refCount').textContent = `${list.length} 件表示`;
+    }
+
+    function filterRef() {
+        const q = document.getElementById('refSearch').value.toLowerCase();
+        let list = HEADERS;
+        if (currentFilter !== 'all') list = list.filter(h => h.type === currentFilter);
+        if (q) list = list.filter(h => h.name.toLowerCase().includes(q) || h.desc.includes(q) || h.example.toLowerCase().includes(q));
+        renderRef(list);
+    }
+
+    function setFilter(type, btn) {
+        currentFilter = type;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterRef();
+    }
+
+    function analyzeHeaders() {
+        const input = document.getElementById('headerInput').value.trim();
+        if (!input) return;
+        const lines = input.split('\n').filter(l => l.trim() && l.includes(':'));
+        const rows = lines.map(line => {
+            const colonIdx = line.indexOf(':');
+            const name = line.substring(0, colonIdx).trim();
+            const value = line.substring(colonIdx + 1).trim();
+            const desc = HEADER_DESC_MAP[name.toLowerCase()] || '—';
+            return `<tr>
+                <td onclick="copyCell('${name}')" style="cursor:pointer" title="クリックでコピー">${name}</td>
+                <td onclick="copyCell('${value}')" style="cursor:pointer" title="クリックでコピー">${value}</td>
+                <td>${desc}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('analyzeBody').innerHTML = rows;
+        document.getElementById('analyzeResult').style.display = 'block';
+    }
+
+    function copyCell(text) {
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました！'));
+    }
+
+    function clearAnalyzer() {
+        document.getElementById('headerInput').value = '';
+        document.getElementById('analyzeResult').style.display = 'none';
+    }
+
+    function loadSample() {
+        document.getElementById('headerInput').value = `Content-Type: application/json; charset=utf-8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Cache-Control: no-cache, no-store, must-revalidate
+X-Request-ID: 550e8400-e29b-41d4-a716-446655440000
+Accept: application/json
+User-Agent: Mozilla/5.0 (compatible; MyApp/1.0)
+X-Forwarded-For: 203.0.113.195
+Strict-Transport-Security: max-age=31536000; includeSubDomains`;
+        analyzeHeaders();
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 300); }, 2000);
+    }
+
+    renderRef(HEADERS);
+    </script>
+</body>
+</html>

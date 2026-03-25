@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicode文字検索・コードポイント確認 | ToolBox</title>
+    <meta name="description" content="Unicode文字をコードポイント・文字名で検索。任意の文字のUTF-8バイト列・HTMLエンティティ・JavaScript表記を確認できる無料オンラインツール。">
+    <meta name="keywords" content="Unicode 文字 検索 コードポイント UTF-8 HTML エンティティ 絵文字 記号">
+    <meta name="author" content="ToolBox">
+    <meta property="og:title" content="Unicode文字検索・コードポイント確認 | ToolBox">
+    <meta property="og:description" content="Unicode文字のコードポイント・UTF-8バイト・HTMLエンティティを即確認。文字名検索対応。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/unicode-search.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/unicode-search.html">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"Unicode文字検索","description":"Unicode文字のコードポイントやUTF-8バイト列を確認するツール","url":"https://web-tool-site.com/tools/unicode-search.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; min-height: 100vh; }
+        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { color: #555; text-decoration: none; font-weight: 500; }
+        nav a:hover { color: #4a90e2; }
+        .tool-page { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); overflow: hidden; margin-bottom: 1.5rem; }
+        .tool-header { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: white; padding: 2rem; text-align: center; }
+        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .tool-header p { font-size: 1rem; opacity: 0.9; }
+        .card-body { padding: 1.75rem 2rem; }
+        /* Inspector */
+        .inspector-area { display: flex; gap: 1.5rem; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; }
+        .char-display { width: 120px; height: 120px; background: linear-gradient(135deg, #a18cd1, #fbc2eb); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 4rem; box-shadow: 0 4px 16px rgba(161,140,209,0.4); flex-shrink: 0; }
+        .inspector-input { flex: 1; min-width: 220px; }
+        .inspector-input label { font-size: 0.85rem; font-weight: 600; color: #888; display: block; margin-bottom: 0.4rem; }
+        .char-input { width: 100%; border: 2px solid #ddd; border-radius: 10px; padding: 0.75rem 1rem; font-size: 1.5rem; font-family: 'JetBrains Mono', monospace; transition: border-color 0.2s; text-align: center; letter-spacing: 0.1em; }
+        .char-input:focus { outline: none; border-color: #a18cd1; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin-top: 1.25rem; }
+        .info-item { background: #f8f9fa; border-radius: 8px; padding: 0.8rem 1rem; cursor: pointer; transition: background 0.15s; }
+        .info-item:hover { background: #ede9fe; }
+        .info-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 0.3rem; }
+        .info-val { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; color: #333; word-break: break-all; }
+        /* Category browser */
+        .cat-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+        .cat-tab { background: #f0f4f8; border: 1px solid #ddd; border-radius: 20px; padding: 0.35rem 0.85rem; font-size: 0.82rem; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .cat-tab.active { background: #a18cd1; color: white; border-color: #a18cd1; }
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 0.5rem; max-height: 360px; overflow-y: auto; padding: 0.25rem; }
+        .char-tile { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 0.5rem; text-align: center; cursor: pointer; transition: all 0.15s; }
+        .char-tile:hover { background: #ede9fe; border-color: #a18cd1; transform: scale(1.08); }
+        .char-tile .ch { font-size: 1.5rem; display: block; line-height: 1.2; }
+        .char-tile .cp { font-size: 0.6rem; color: #aaa; font-family: 'JetBrains Mono', monospace; }
+        .search-bar { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; }
+        .search-bar input { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 0.65rem 1rem; font-size: 0.92rem; }
+        .search-bar input:focus { outline: none; border-color: #a18cd1; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 0.9rem 1.4rem; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        .toast.hide { animation: slideOut 0.3s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { to { transform: translateX(400px); opacity: 0; } }
+        footer { background: #2c3e50; color: #ccc; text-align: center; padding: 1.5rem; margin-top: 2rem; font-size: 0.9rem; }
+        footer a { color: #aaa; text-decoration: none; }
+        .seo-section { max-width: 900px; margin: 32px auto; padding: 0 20px; }
+        .seo-box { background: #f8f9fa; border-radius: 12px; padding: 28px 24px; border: 1px solid #eee; }
+        .seo-box h2 { font-size: 1.2rem; margin-bottom: 12px; }
+        .seo-box p, .seo-box li { font-size: 14px; color: #555; line-height: 1.8; }
+        .seo-box ul { padding-left: 20px; }
+        @media (max-width: 600px) { .inspector-area { flex-direction: column; } .char-display { width: 80px; height: 80px; font-size: 2.5rem; } .header-container { flex-direction: column; gap: 0.75rem; } nav ul { gap: 1rem; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">🔧 ToolBox</a>
+            <nav><ul>
+                <li><a href="../index.html">ホーム</a></li>
+                <li><a href="../index.html#tools">ツール一覧</a></li>
+            </ul></nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <!-- Inspector -->
+        <div class="card">
+            <div class="tool-header">
+                <h1>🔣 Unicode文字検索・解析</h1>
+                <p>文字のコードポイント・UTF-8バイト・HTMLエンティティを即確認</p>
+            </div>
+            <div class="card-body">
+                <div class="inspector-area">
+                    <div class="char-display" id="charDisplay">？</div>
+                    <div class="inspector-input" style="flex:1">
+                        <label>文字を入力（1文字または U+コードポイント）</label>
+                        <input type="text" class="char-input" id="charInput" placeholder="A または U+0041" oninput="inspect()">
+                        <div style="margin-top:0.6rem;font-size:0.8rem;color:#aaa;">例: A・あ・😀・U+1F600・&#9829;</div>
+                    </div>
+                </div>
+                <div class="info-grid" id="infoGrid">
+                    <div style="color:#aaa;font-size:0.9rem;grid-column:1/-1">文字を入力するかカテゴリから選択してください</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Browser -->
+        <div class="card">
+            <div class="card-body">
+                <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;color:#444;">文字カテゴリブラウザ</h2>
+                <div class="cat-tabs" id="catTabs"></div>
+                <div class="search-bar">
+                    <input type="text" id="charSearch" placeholder="コードポイント (U+0041) または16進 (0041) で検索..." oninput="searchChars()">
+                </div>
+                <div class="char-grid" id="charGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="seo-section">
+        <div class="seo-box">
+            <h2>Unicode文字検索ツールとは？</h2>
+            <p>任意の文字のUnicodeコードポイント・UTF-8バイト列・HTMLエンティティ・JavaScriptエスケープを確認できるツールです。絵文字・特殊文字・数学記号などの調査に便利です。</p>
+            <ul>
+                <li>文字 → コードポイント（U+XXXX形式）の変換</li>
+                <li>UTF-8バイト列・UTF-16コードユニット表示</li>
+                <li>HTMLエンティティ（&#数値; &amp;名前;）のコピー</li>
+                <li>カテゴリブラウザで絵文字・矢印・記号などを一覧表示</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 ToolBox. All rights reserved. | <a href="../index.html">ホーム</a> | <a href="../privacy.html">プライバシーポリシー</a></p>
+    </footer>
+
+    <script>
+    const CATEGORIES = {
+        '絵文字（顔）': { start: 0x1F600, end: 0x1F64F },
+        '絵文字（自然）': { start: 0x1F300, end: 0x1F3FF },
+        '絵文字（物・食）': { start: 0x1F400, end: 0x1F5FF },
+        '矢印': { start: 0x2190, end: 0x21FF },
+        '数学演算子': { start: 0x2200, end: 0x22FF },
+        'ボックス描画': { start: 0x2500, end: 0x257F },
+        'ブロック要素': { start: 0x2580, end: 0x259F },
+        '幾何学図形': { start: 0x25A0, end: 0x25FF },
+        'その他記号': { start: 0x2600, end: 0x26FF },
+        'ラテン拡張': { start: 0x00C0, end: 0x024F },
+        'ギリシャ文字': { start: 0x0391, end: 0x03C9 },
+        'ひらがな': { start: 0x3041, end: 0x3096 },
+        'カタカナ': { start: 0x30A1, end: 0x30F6 },
+        '漢字（基本）': { start: 0x4E00, end: 0x4E7F },
+    };
+
+    const HTML_ENTITIES = { '<': 'lt', '>': 'gt', '&': 'amp', '"': 'quot', "'": 'apos', '©': 'copy', '®': 'reg', '™': 'trade', '€': 'euro', '£': 'pound', '¥': 'yen', '°': 'deg', '±': 'plusmn', '×': 'times', '÷': 'divide', '→': 'rarr', '←': 'larr', '↑': 'uarr', '↓': 'darr', '♥': 'hearts', '♠': 'spades', '♣': 'clubs', '♦': 'diams' };
+
+    let currentCat = Object.keys(CATEGORIES)[0];
+
+    function inspect(char) {
+        if (!char) {
+            const input = document.getElementById('charInput').value.trim();
+            // Handle U+XXXX format
+            const cpMatch = input.match(/^[Uu]\+([0-9A-Fa-f]{1,6})$/);
+            if (cpMatch) {
+                const cp = parseInt(cpMatch[1], 16);
+                char = String.fromCodePoint(cp);
+                document.getElementById('charInput').value = char;
+            } else if (input.length >= 1) {
+                // Get first character (handle surrogate pairs)
+                char = [...input][0];
+            } else return;
+        }
+
+        const chars = [...char];
+        const cp = chars[0].codePointAt(0);
+        const cpHex = cp.toString(16).toUpperCase().padStart(4, '0');
+        const cpFormatted = `U+${cpHex}`;
+
+        // UTF-8 bytes
+        const encoder = new TextEncoder();
+        const bytes = encoder.encode(chars[0]);
+        const utf8 = Array.from(bytes).map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
+
+        // HTML entity
+        const entityName = HTML_ENTITIES[chars[0]];
+        const htmlNum = `&#${cp};`;
+        const htmlHex = `&#x${cpHex};`;
+        const htmlNamed = entityName ? `&${entityName};` : htmlNum;
+
+        // JS escape
+        const jsEscape = cp > 0xFFFF ? `\\u{${cpHex}}` : `\\u${cpHex}`;
+
+        // CSS escape
+        const cssEscape = `\\${cpHex}`;
+
+        // Category (rough)
+        let category = 'General';
+        if (cp >= 0x1F600 && cp <= 0x1FAFF) category = '絵文字';
+        else if (cp >= 0x3040 && cp <= 0x309F) category = 'ひらがな';
+        else if (cp >= 0x30A0 && cp <= 0x30FF) category = 'カタカナ';
+        else if (cp >= 0x4E00 && cp <= 0x9FFF) category = '漢字';
+        else if (cp >= 0x0020 && cp <= 0x007E) category = 'ASCII基本ラテン';
+        else if (cp >= 0x00C0 && cp <= 0x024F) category = 'ラテン拡張';
+        else if (cp >= 0x0391 && cp <= 0x03C9) category = 'ギリシャ文字';
+        else if (cp >= 0x0400 && cp <= 0x04FF) category = 'キリル文字';
+        else if (cp >= 0x0600 && cp <= 0x06FF) category = 'アラビア文字';
+
+        document.getElementById('charDisplay').textContent = chars[0];
+
+        const items = [
+            { label: 'コードポイント', val: cpFormatted },
+            { label: '10進コードポイント', val: cp.toString() },
+            { label: 'UTF-8 バイト列', val: utf8 },
+            { label: 'UTF-8 バイト数', val: `${bytes.length} byte${bytes.length > 1 ? 's' : ''}` },
+            { label: 'HTML 数値参照 (10進)', val: htmlNum },
+            { label: 'HTML 数値参照 (16進)', val: htmlHex },
+            { label: 'HTML 名前参照', val: htmlNamed },
+            { label: 'JavaScript エスケープ', val: jsEscape },
+            { label: 'CSS エスケープ', val: cssEscape },
+            { label: 'カテゴリ', val: category },
+        ];
+
+        document.getElementById('infoGrid').innerHTML = items.map(item => `
+            <div class="info-item" onclick="copyText('${item.val.replace(/'/g,"\\'")}')">
+                <div class="info-label">${item.label}</div>
+                <div class="info-val">${item.val}</div>
+            </div>
+        `).join('');
+    }
+
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => showToast(`コピー: ${text}`));
+    }
+
+    function renderCatTabs() {
+        document.getElementById('catTabs').innerHTML = Object.keys(CATEGORIES).map(cat =>
+            `<button class="cat-tab ${cat === currentCat ? 'active' : ''}" onclick="selectCat('${cat}',this)">${cat}</button>`
+        ).join('');
+        renderCharGrid();
+    }
+
+    function selectCat(cat, btn) {
+        currentCat = cat;
+        document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderCharGrid();
+    }
+
+    function renderCharGrid(chars) {
+        if (!chars) {
+            const { start, end } = CATEGORIES[currentCat];
+            chars = [];
+            for (let cp = start; cp <= Math.min(end, start + 127); cp++) {
+                try { chars.push({ cp, ch: String.fromCodePoint(cp) }); } catch(e) {}
+            }
+        }
+        document.getElementById('charGrid').innerHTML = chars.slice(0, 200).map(({ cp, ch }) => {
+            const hex = cp.toString(16).toUpperCase().padStart(4, '0');
+            return `<div class="char-tile" onclick="pickChar('${ch.replace(/'/g,"\\'")}','${hex}')" title="U+${hex}">
+                <span class="ch">${ch}</span>
+                <span class="cp">U+${hex}</span>
+            </div>`;
+        }).join('') || '<div style="color:#aaa;padding:1rem">結果がありません</div>';
+    }
+
+    function pickChar(ch, hex) {
+        document.getElementById('charInput').value = ch;
+        inspect(ch);
+        document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function searchChars() {
+        const q = document.getElementById('charSearch').value.trim().replace(/^[Uu]\+/, '');
+        if (!q) { renderCharGrid(); return; }
+        const cp = parseInt(q, 16);
+        if (!isNaN(cp)) {
+            const chars = [];
+            const start = Math.max(0, cp - 16);
+            const end = Math.min(0x10FFFF, cp + 16);
+            for (let c = start; c <= end; c++) {
+                try { chars.push({ cp: c, ch: String.fromCodePoint(c) }); } catch(e) {}
+            }
+            renderCharGrid(chars);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 300); }, 2200);
+    }
+
+    renderCatTabs();
+    </script>
+</body>
+</html>
