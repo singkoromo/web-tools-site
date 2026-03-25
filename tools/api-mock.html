@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APIモック・レスポンス生成 | ToolBox</title>
+    <meta name="description" content="ダミーAPIレスポンスを生成・テスト。HTTPメソッド・ステータスコード・ヘッダー・ボディを設定してモックレスポンスを作成できる無料オンラインツール。">
+    <meta name="keywords" content="API モック レスポンス 生成 テスト HTTP ステータスコード JSON ダミー">
+    <meta name="author" content="ToolBox">
+    <meta property="og:title" content="APIモック・レスポンス生成 | ToolBox">
+    <meta property="og:description" content="ダミーAPIレスポンスを生成・テスト。HTTPメソッド・ステータス・ヘッダー・ボディを自由に設定。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/api-mock.html">
+    <link rel="canonical" href="https://web-tool-site.com/tools/api-mock.html">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"APIモック・レスポンス生成","description":"ダミーAPIレスポンスを生成・テストするツール","url":"https://web-tool-site.com/tools/api-mock.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #eee; min-height: 100vh; }
+        header { background: rgba(255,255,255,0.06); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #fff; text-decoration: none; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { color: #ccc; text-decoration: none; font-weight: 500; }
+        nav a:hover { color: #fff; }
+        .tool-page { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+        .tool-header { text-align: center; padding: 2rem 1rem; margin-bottom: 2rem; }
+        .tool-header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #84fab0, #8fd3f4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem; }
+        .tool-header p { color: #aaa; font-size: 1rem; }
+        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .panel { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 1.75rem; backdrop-filter: blur(10px); }
+        .panel h2 { font-size: 1rem; font-weight: 700; color: #84fab0; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+        .field { margin-bottom: 1.1rem; }
+        .field label { display: block; font-size: 0.8rem; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+        .field input, .field select, .field textarea {
+            width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+            color: #fff; padding: 0.65rem 0.9rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; transition: border-color 0.2s;
+        }
+        .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: #84fab0; }
+        .field select option { background: #1a1a2e; }
+        .field textarea { font-family: 'JetBrains Mono', monospace; font-size: 0.83rem; resize: vertical; min-height: 120px; line-height: 1.6; }
+        .method-row { display: flex; gap: 0.5rem; }
+        .method-btn { flex: 1; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; background: rgba(255,255,255,0.05); color: #ccc; transition: all 0.2s; }
+        .method-btn.active { color: white; border-color: transparent; }
+        .method-btn[data-m="GET"].active { background: #27ae60; }
+        .method-btn[data-m="POST"].active { background: #3498db; }
+        .method-btn[data-m="PUT"].active { background: #f39c12; }
+        .method-btn[data-m="PATCH"].active { background: #9b59b6; }
+        .method-btn[data-m="DELETE"].active { background: #e74c3c; }
+        .status-row { display: grid; grid-template-columns: 1fr 2fr; gap: 0.5rem; }
+        .headers-table { width: 100%; }
+        .headers-table .hrow { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.4rem; margin-bottom: 0.4rem; }
+        .headers-table input { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #fff; padding: 0.4rem 0.6rem; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; width: 100%; }
+        .headers-table input:focus { outline: none; border-color: #84fab0; }
+        .del-btn { background: rgba(231,76,60,0.3); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 5px; padding: 0.35rem 0.5rem; cursor: pointer; font-size: 0.75rem; }
+        .add-header-btn { background: rgba(132,250,176,0.15); color: #84fab0; border: 1px solid rgba(132,250,176,0.3); border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.82rem; cursor: pointer; font-weight: 600; margin-top: 0.25rem; }
+        .run-btn { width: 100%; background: linear-gradient(135deg, #84fab0, #8fd3f4); color: #1a1a2e; border: none; border-radius: 10px; padding: 0.9rem; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; }
+        .run-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(132,250,176,0.3); }
+        /* Response panel */
+        .response-panel { grid-column: 1 / -1; }
+        .response-top { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .status-badge { font-family: 'JetBrains Mono', monospace; font-size: 1rem; font-weight: 700; padding: 0.35rem 0.9rem; border-radius: 20px; }
+        .status-1xx { background: rgba(100,100,100,0.3); color: #aaa; }
+        .status-2xx { background: rgba(39,174,96,0.25); color: #2ecc71; }
+        .status-3xx { background: rgba(52,152,219,0.25); color: #3498db; }
+        .status-4xx { background: rgba(231,76,60,0.25); color: #e74c3c; }
+        .status-5xx { background: rgba(142,68,173,0.25); color: #9b59b6; }
+        .latency-badge { font-size: 0.82rem; color: #84fab0; background: rgba(132,250,176,0.1); border: 1px solid rgba(132,250,176,0.2); border-radius: 20px; padding: 0.3rem 0.75rem; }
+        .resp-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .resp-tab { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 0.4rem 0.9rem; font-size: 0.82rem; cursor: pointer; font-weight: 600; color: #aaa; transition: all 0.2s; }
+        .resp-tab.active { background: rgba(132,250,176,0.15); border-color: rgba(132,250,176,0.4); color: #84fab0; }
+        .resp-content { background: rgba(0,0,0,0.3); border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.7; padding: 1.25rem; min-height: 200px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; color: #cdd6f4; max-height: 400px; overflow-y: auto; }
+        .resp-actions { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+        .resp-action-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 7px; padding: 0.45rem 1rem; font-size: 0.82rem; cursor: pointer; color: #ccc; font-weight: 600; transition: all 0.2s; }
+        .resp-action-btn:hover { background: rgba(132,250,176,0.15); color: #84fab0; border-color: rgba(132,250,176,0.3); }
+        /* Templates */
+        .templates { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .tpl-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 0.3rem 0.8rem; font-size: 0.78rem; cursor: pointer; color: #aaa; transition: all 0.2s; }
+        .tpl-btn:hover { background: rgba(132,250,176,0.12); color: #84fab0; border-color: rgba(132,250,176,0.3); }
+        .delay-row { display: flex; align-items: center; gap: 0.75rem; }
+        .delay-row input[type="range"] { flex: 1; accent-color: #84fab0; }
+        .delay-val { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #84fab0; min-width: 48px; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 0.9rem 1.4rem; border-radius: 8px; z-index: 1000; animation: slideIn 0.3s ease; }
+        .toast.hide { animation: slideOut 0.3s ease forwards; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { to { transform: translateX(400px); opacity: 0; } }
+        footer { background: rgba(0,0,0,0.3); color: #666; text-align: center; padding: 1.5rem; margin-top: 2rem; font-size: 0.9rem; border-top: 1px solid rgba(255,255,255,0.05); }
+        footer a { color: #888; text-decoration: none; }
+        .seo-section { max-width: 900px; margin: 32px auto; padding: 0 20px; }
+        .seo-box { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 28px 24px; border: 1px solid rgba(255,255,255,0.08); }
+        .seo-box h2 { font-size: 1.2rem; margin-bottom: 12px; color: #84fab0; }
+        .seo-box p, .seo-box li { font-size: 14px; color: #aaa; line-height: 1.8; }
+        .seo-box ul { padding-left: 20px; }
+        @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } .response-panel { grid-column: 1; } .header-container { flex-direction: column; gap: 0.75rem; } nav ul { gap: 1rem; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">🔧 ToolBox</a>
+            <nav><ul>
+                <li><a href="../index.html">ホーム</a></li>
+                <li><a href="../index.html#tools">ツール一覧</a></li>
+            </ul></nav>
+        </div>
+    </header>
+
+    <div class="tool-page">
+        <div class="tool-header">
+            <h1>🚀 APIモック・レスポンス生成</h1>
+            <p>ダミーAPIレスポンスを設定・生成してフロントエンド開発をサポート</p>
+        </div>
+
+        <div style="margin-bottom:1rem">
+            <div style="font-size:0.82rem;color:#888;margin-bottom:0.5rem;">テンプレート</div>
+            <div class="templates">
+                <button class="tpl-btn" onclick="loadTemplate('success')">✅ 成功 200</button>
+                <button class="tpl-btn" onclick="loadTemplate('created')">✨ 作成 201</button>
+                <button class="tpl-btn" onclick="loadTemplate('list')">📋 リスト 200</button>
+                <button class="tpl-btn" onclick="loadTemplate('paginated')">📄 ページネーション</button>
+                <button class="tpl-btn" onclick="loadTemplate('error400')">⚠️ Bad Request 400</button>
+                <button class="tpl-btn" onclick="loadTemplate('error401')">🔒 Unauthorized 401</button>
+                <button class="tpl-btn" onclick="loadTemplate('error404')">🔍 Not Found 404</button>
+                <button class="tpl-btn" onclick="loadTemplate('error500')">💥 Server Error 500</button>
+                <button class="tpl-btn" onclick="loadTemplate('empty')">🫙 空 204</button>
+            </div>
+        </div>
+
+        <div class="layout">
+            <!-- Request Config -->
+            <div class="panel">
+                <h2>⚙️ リクエスト設定</h2>
+                <div class="field">
+                    <label>エンドポイント URL（参考表示）</label>
+                    <input type="text" id="endpoint" placeholder="https://api.example.com/users/1" value="https://api.example.com/users/1">
+                </div>
+                <div class="field">
+                    <label>HTTPメソッド</label>
+                    <div class="method-row">
+                        <button class="method-btn active" data-m="GET" onclick="setMethod('GET',this)">GET</button>
+                        <button class="method-btn" data-m="POST" onclick="setMethod('POST',this)">POST</button>
+                        <button class="method-btn" data-m="PUT" onclick="setMethod('PUT',this)">PUT</button>
+                        <button class="method-btn" data-m="PATCH" onclick="setMethod('PATCH',this)">PATCH</button>
+                        <button class="method-btn" data-m="DELETE" onclick="setMethod('DELETE',this)">DELETE</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>リクエストヘッダー（任意）</label>
+                    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.75rem;">
+                        <div class="hrow" style="margin-bottom:0.25rem"><span style="font-size:0.72rem;color:#888">キー</span><span style="font-size:0.72rem;color:#888">値</span><span></span></div>
+                        <div id="reqHeaders">
+                            <div class="hrow"><input placeholder="Content-Type" value="Content-Type"><input placeholder="application/json" value="application/json"><button class="del-btn" onclick="delRow(this)">×</button></div>
+                            <div class="hrow"><input placeholder="Authorization"><input placeholder="Bearer token"><button class="del-btn" onclick="delRow(this)">×</button></div>
+                        </div>
+                        <button class="add-header-btn" onclick="addReqHeader()">+ ヘッダー追加</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>リクエストボディ（POST/PUT/PATCH）</label>
+                    <textarea id="reqBody" placeholder='{"name": "Alice", "email": "alice@example.com"}'></textarea>
+                </div>
+            </div>
+
+            <!-- Response Config -->
+            <div class="panel">
+                <h2>📦 レスポンス設定</h2>
+                <div class="field">
+                    <label>ステータスコード</label>
+                    <div class="status-row">
+                        <input type="number" id="statusCode" value="200" min="100" max="599" oninput="updateStatusText()">
+                        <input type="text" id="statusText" value="OK" placeholder="OK">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Content-Type</label>
+                    <select id="contentType">
+                        <option value="application/json">application/json</option>
+                        <option value="text/plain">text/plain</option>
+                        <option value="text/html">text/html</option>
+                        <option value="application/xml">application/xml</option>
+                        <option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>レスポンスヘッダー</label>
+                    <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:0.75rem;">
+                        <div id="resHeaders">
+                            <div class="hrow"><input placeholder="X-Request-ID" value="X-Request-ID"><input placeholder="abc-123-def" value="abc-123-def-456"><button class="del-btn" onclick="delRow(this)">×</button></div>
+                            <div class="hrow"><input placeholder="X-RateLimit-Remaining" value="X-RateLimit-Remaining"><input placeholder="99" value="99"><button class="del-btn" onclick="delRow(this)">×</button></div>
+                        </div>
+                        <button class="add-header-btn" onclick="addResHeader()">+ ヘッダー追加</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>レスポンスボディ (JSON)</label>
+                    <textarea id="resBody" rows="8">{"id": 1, "name": "Alice", "email": "alice@example.com", "createdAt": "2026-03-26T00:00:00Z"}</textarea>
+                </div>
+                <div class="field">
+                    <label>模擬レイテンシ（遅延）</label>
+                    <div class="delay-row">
+                        <span style="font-size:0.82rem;color:#aaa">0ms</span>
+                        <input type="range" id="delay" min="0" max="3000" step="50" value="200" oninput="document.getElementById('delayVal').textContent=this.value+'ms'">
+                        <span style="font-size:0.82rem;color:#aaa">3s</span>
+                        <span class="delay-val" id="delayVal">200ms</span>
+                    </div>
+                </div>
+                <button class="run-btn" onclick="runMock()">▶ モックレスポンス生成</button>
+            </div>
+
+            <!-- Response Output -->
+            <div class="panel response-panel">
+                <h2>📡 レスポンス</h2>
+                <div class="response-top" id="responseTop" style="display:none">
+                    <span class="status-badge" id="respStatusBadge"></span>
+                    <span class="latency-badge" id="respLatency"></span>
+                    <span style="font-size:0.8rem;color:#888" id="respSize"></span>
+                </div>
+                <div class="resp-tabs">
+                    <button class="resp-tab active" onclick="showRespTab('body',this)">ボディ</button>
+                    <button class="resp-tab" onclick="showRespTab('headers',this)">ヘッダー</button>
+                    <button class="resp-tab" onclick="showRespTab('curl',this)">cURL</button>
+                    <button class="resp-tab" onclick="showRespTab('fetch',this)">fetch()</button>
+                </div>
+                <div class="resp-content" id="respContent">▶ 「モックレスポンス生成」をクリックしてください</div>
+                <div class="resp-actions">
+                    <button class="resp-action-btn" onclick="copyResp()">📋 コピー</button>
+                    <button class="resp-action-btn" onclick="formatBody()">✨ JSON整形</button>
+                    <button class="resp-action-btn" onclick="downloadResp()">⬇️ ダウンロード</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="seo-section">
+        <div class="seo-box">
+            <h2>APIモック・レスポンス生成ツールとは？</h2>
+            <p>フロントエンド開発でバックエンドAPIが未完成の際にダミーレスポンスを生成するツールです。HTTPメソッド・ステータスコード・ヘッダー・ボディを自由に設定できます。</p>
+            <ul>
+                <li>成功・エラー・リストなど用途別テンプレートを搭載</li>
+                <li>模擬レイテンシで実際のAPIに近い挙動をシミュレート</li>
+                <li>生成されたcURLコマンドやfetch()コードをコピー可能</li>
+                <li>すべてブラウザ内で完結・サーバー通信なし</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 ToolBox. All rights reserved. | <a href="../index.html">ホーム</a> | <a href="../privacy.html">プライバシーポリシー</a></p>
+    </footer>
+
+    <script>
+    const STATUS_TEXTS = {
+        100:'Continue',101:'Switching Protocols',200:'OK',201:'Created',202:'Accepted',204:'No Content',
+        206:'Partial Content',301:'Moved Permanently',302:'Found',304:'Not Modified',307:'Temporary Redirect',
+        308:'Permanent Redirect',400:'Bad Request',401:'Unauthorized',403:'Forbidden',404:'Not Found',
+        405:'Method Not Allowed',408:'Request Timeout',409:'Conflict',410:'Gone',422:'Unprocessable Entity',
+        429:'Too Many Requests',500:'Internal Server Error',501:'Not Implemented',502:'Bad Gateway',
+        503:'Service Unavailable',504:'Gateway Timeout'
+    };
+
+    const TEMPLATES = {
+        success: { status: 200, statusText: 'OK', method: 'GET', body: '{\n  "id": 1,\n  "name": "Alice",\n  "email": "alice@example.com",\n  "createdAt": "2026-03-26T00:00:00Z"\n}' },
+        created: { status: 201, statusText: 'Created', method: 'POST', body: '{\n  "id": 42,\n  "message": "リソースが正常に作成されました",\n  "resource": {\n    "id": 42,\n    "name": "New Item",\n    "createdAt": "2026-03-26T00:00:00Z"\n  }\n}' },
+        list: { status: 200, statusText: 'OK', method: 'GET', body: '[\n  {"id":1,"name":"Alice","email":"alice@example.com"},\n  {"id":2,"name":"Bob","email":"bob@example.com"},\n  {"id":3,"name":"Carol","email":"carol@example.com"}\n]' },
+        paginated: { status: 200, statusText: 'OK', method: 'GET', body: '{\n  "data": [\n    {"id":1,"name":"Alice"},\n    {"id":2,"name":"Bob"},\n    {"id":3,"name":"Carol"}\n  ],\n  "pagination": {\n    "total": 100,\n    "page": 1,\n    "perPage": 3,\n    "totalPages": 34\n  }\n}' },
+        error400: { status: 400, statusText: 'Bad Request', method: 'POST', body: '{\n  "error": "BadRequest",\n  "message": "リクエストパラメータが不正です",\n  "details": [\n    {"field": "email", "message": "有効なメールアドレスを入力してください"},\n    {"field": "name", "message": "名前は必須項目です"}\n  ]\n}' },
+        error401: { status: 401, statusText: 'Unauthorized', method: 'GET', body: '{\n  "error": "Unauthorized",\n  "message": "認証が必要です。有効なBearerトークンを提供してください",\n  "code": "AUTH_TOKEN_MISSING"\n}' },
+        error404: { status: 404, statusText: 'Not Found', method: 'GET', body: '{\n  "error": "NotFound",\n  "message": "指定されたリソースが見つかりません",\n  "resource": "users",\n  "id": 999\n}' },
+        error500: { status: 500, statusText: 'Internal Server Error', method: 'GET', body: '{\n  "error": "InternalServerError",\n  "message": "サーバー内部でエラーが発生しました",\n  "requestId": "550e8400-e29b-41d4-a716-446655440000",\n  "timestamp": "2026-03-26T00:00:00Z"\n}' },
+        empty: { status: 204, statusText: 'No Content', method: 'DELETE', body: '' },
+    };
+
+    let currentMethod = 'GET';
+    let currentRespTab = 'body';
+    let lastResponse = { body: '', headers: {}, curl: '', fetch: '', status: 200 };
+
+    function setMethod(m, btn) {
+        currentMethod = m;
+        document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function updateStatusText() {
+        const code = parseInt(document.getElementById('statusCode').value);
+        const text = STATUS_TEXTS[code] || '';
+        document.getElementById('statusText').value = text;
+    }
+
+    function loadTemplate(name) {
+        const tpl = TEMPLATES[name];
+        if (!tpl) return;
+        document.getElementById('statusCode').value = tpl.status;
+        document.getElementById('statusText').value = tpl.statusText;
+        document.getElementById('resBody').value = tpl.body;
+        setMethod(tpl.method, document.querySelector(`[data-m="${tpl.method}"]`));
+    }
+
+    function addReqHeader() {
+        const row = document.createElement('div');
+        row.className = 'hrow';
+        row.innerHTML = '<input placeholder="ヘッダー名"><input placeholder="値"><button class="del-btn" onclick="delRow(this)">×</button>';
+        document.getElementById('reqHeaders').appendChild(row);
+    }
+
+    function addResHeader() {
+        const row = document.createElement('div');
+        row.className = 'hrow';
+        row.innerHTML = '<input placeholder="ヘッダー名"><input placeholder="値"><button class="del-btn" onclick="delRow(this)">×</button>';
+        document.getElementById('resHeaders').appendChild(row);
+    }
+
+    function delRow(btn) { btn.parentElement.remove(); }
+
+    function getHeaders(containerId) {
+        const headers = {};
+        document.querySelectorAll(`#${containerId} .hrow`).forEach(row => {
+            const inputs = row.querySelectorAll('input');
+            const k = inputs[0].value.trim();
+            const v = inputs[1].value.trim();
+            if (k) headers[k] = v;
+        });
+        return headers;
+    }
+
+    function runMock() {
+        const delay = parseInt(document.getElementById('delay').value);
+        const btn = document.querySelector('.run-btn');
+        btn.textContent = '⏳ 処理中...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+            const status = parseInt(document.getElementById('statusCode').value);
+            const statusText = document.getElementById('statusText').value || STATUS_TEXTS[status] || '';
+            const contentType = document.getElementById('contentType').value;
+            const bodyStr = document.getElementById('resBody').value;
+            const resHeaders = getHeaders('resHeaders');
+            const reqHeaders = getHeaders('reqHeaders');
+            const endpoint = document.getElementById('endpoint').value || 'https://api.example.com/';
+            const reqBody = document.getElementById('reqBody').value;
+
+            // Build response headers
+            const allResHeaders = {
+                'Content-Type': contentType,
+                'Date': new Date().toUTCString(),
+                'X-Response-Time': `${delay}ms`,
+                ...resHeaders,
+            };
+
+            // Try to format JSON body
+            let formattedBody = bodyStr;
+            if (contentType.includes('json') && bodyStr) {
+                try { formattedBody = JSON.stringify(JSON.parse(bodyStr), null, 2); } catch(e) {}
+            }
+
+            // cURL command
+            const curlHeaders = Object.entries(reqHeaders).map(([k,v]) => `-H "${k}: ${v}"`).join(' \\\n  ');
+            let curl = `curl -X ${currentMethod} "${endpoint}"`;
+            if (curlHeaders) curl += ` \\\n  ${curlHeaders}`;
+            if (reqBody && currentMethod !== 'GET') curl += ` \\\n  -d '${reqBody.replace(/'/g,"\\'")}' `;
+            curl += `\n\n# Response: HTTP ${status} ${statusText}`;
+
+            // fetch() code
+            const fetchOpts = { method: currentMethod, headers: { 'Content-Type': 'application/json', ...reqHeaders } };
+            if (reqBody && currentMethod !== 'GET') fetchOpts.body = reqBody;
+            let fetchCode = `const response = await fetch("${endpoint}", ${JSON.stringify(fetchOpts, null, 2)});\n`;
+            fetchCode += `const data = await response.json();\nconsole.log(data);\n// Response status: ${status} ${statusText}`;
+
+            // Store response
+            lastResponse = {
+                body: formattedBody,
+                headers: allResHeaders,
+                curl,
+                fetch: fetchCode,
+                status,
+            };
+
+            // Update UI
+            const statusClass = `status-${Math.floor(status/100)}xx`;
+            document.getElementById('respStatusBadge').textContent = `${status} ${statusText}`;
+            document.getElementById('respStatusBadge').className = `status-badge ${statusClass}`;
+            document.getElementById('respLatency').textContent = `${delay}ms`;
+            const size = new Blob([formattedBody]).size;
+            document.getElementById('respSize').textContent = `${size} bytes`;
+            document.getElementById('responseTop').style.display = 'flex';
+
+            showRespTabContent();
+            btn.textContent = '▶ モックレスポンス生成';
+            btn.disabled = false;
+        }, delay);
+    }
+
+    function showRespTab(tab, btn) {
+        currentRespTab = tab;
+        document.querySelectorAll('.resp-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showRespTabContent();
+    }
+
+    function showRespTabContent() {
+        const content = document.getElementById('respContent');
+        if (currentRespTab === 'body') content.textContent = lastResponse.body || '(空のボディ)';
+        else if (currentRespTab === 'headers') {
+            content.textContent = Object.entries(lastResponse.headers).map(([k,v]) => `${k}: ${v}`).join('\n');
+        } else if (currentRespTab === 'curl') content.textContent = lastResponse.curl;
+        else if (currentRespTab === 'fetch') content.textContent = lastResponse.fetch;
+    }
+
+    function copyResp() {
+        const text = document.getElementById('respContent').textContent;
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました！'));
+    }
+
+    function formatBody() {
+        try {
+            const parsed = JSON.parse(document.getElementById('resBody').value);
+            document.getElementById('resBody').value = JSON.stringify(parsed, null, 2);
+            showToast('整形しました！');
+        } catch(e) { showToast('JSON構文エラー: ' + e.message); }
+    }
+
+    function downloadResp() {
+        const text = lastResponse.body || '';
+        const blob = new Blob([text], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'mock-response.json';
+        a.click();
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 300); }, 2000);
+    }
+    </script>
+</body>
+</html>
