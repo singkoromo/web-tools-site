@@ -214,6 +214,36 @@
 
     <div class="container">
         <h1 class="tool-title">CSV↔JSON変換</h1>
+
+        <div class="options-section">
+            <div class="options-grid">
+                <div class="option-group">
+                    <label for="csvDelimiter">区切り文字</label>
+                    <select id="csvDelimiter">
+                        <option value=",">カンマ (,)</option>
+                        <option value=";">セミコロン (;)</option>
+                        <option value="&#9;">タブ</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="hasHeader" checked>
+                        ヘッダー行あり
+                    </label>
+                </div>
+                <div class="option-group">
+                    <label for="jsonFormat">JSONフォーマット</label>
+                    <select id="jsonFormat">
+                        <option value="pretty">整形あり</option>
+                        <option value="compact">コンパクト</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>
+                        <input type="checkbox" id="prettyPrint" checked>
+                        整形出力
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -242,8 +272,8 @@
                 <div class="error" id="jsonError"></div>
             </div>
         </div>
+    </div>
 
-    
     <!-- SEO Content Section -->
     <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
         <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">

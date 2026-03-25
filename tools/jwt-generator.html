@@ -379,8 +379,8 @@
             <h1>JWT生成・デコード</h1>
 
             <div class="tabs">
-                <button class="tab-button active" onclick="switchTab('generate')">JWT生成</button>
-                <button class="tab-button" onclick="switchTab('decode')">JWT デコード</button>
+                <button class="tab-button active" onclick="switchTab('generate', this)">JWT生成</button>
+                <button class="tab-button" onclick="switchTab('decode', this)">JWT デコード</button>
             </div>
 
             <!-- Generate Tab -->
@@ -496,11 +496,11 @@
         const toast = document.getElementById('toast');
         const payloadFields = document.getElementById('payloadFields');
 
-        function switchTab(tabName) {
+        function switchTab(tabName, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+            btn.classList.add('active');
         }
 
         function showToast(message) {

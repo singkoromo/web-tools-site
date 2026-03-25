@@ -162,6 +162,21 @@
     <div class="tool-container">
         <h1>パーセント計算機</h1>
         <p style="color: #6b7280; margin-bottom: 2rem;">3つのパーセント計算モードで様々な計算ができます。</p>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode(0)">AのB%は？</button>
+            <button class="mode-tab" onclick="switchMode(1)">AはBの何%？</button>
+            <button class="mode-tab" onclick="switchMode(2)">A から B%増減</button>
+        </div>
+
+        <!-- Mode 1: AのB% -->
+        <div class="mode-content active">
+            <div class="input-group">
+                <label class="input-label">値 (A)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode1-a" placeholder="例: 200" step="0.01">
+                </div>
+            </div>
             <div class="input-group">
                 <label class="input-label">パーセント (B)</label>
                 <div class="input-wrapper">
@@ -227,8 +242,8 @@
                 <div class="result-value" id="mode3-value">0</div>
             </div>
         </div>
+    </div>
 
-    
     <!-- SEO Content Section -->
     <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
         <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">

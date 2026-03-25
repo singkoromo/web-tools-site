@@ -193,7 +193,20 @@
         </div>
     </header>
 
-    <!-- Ad Banner (Before Tool) -->
+    <main class="main-content">
+        <div class="tool-container">
+            <h1>Base64 エンコード / デコード</h1>
+            <p>テキストやファイルをBase64形式に変換・逆変換します。</p>
+            <div class="sections-grid">
+                <!-- Encode Section -->
+                <div>
+                    <div class="textarea-group">
+                        <label for="encodeInput">エンコードするテキスト</label>
+                        <div class="textarea-wrapper">
+                            <textarea id="encodeInput" class="tool-textarea" placeholder="ここにエンコードしたいテキストを入力してください..."></textarea>
+                            <span class="textarea-info" id="encodeInfo">0 文字</span>
+                        </div>
+                    </div>
                     <div class="button-group">
                         <button class="btn btn-primary" onclick="encodeToBase64()">エンコード</button>
                         <div class="file-input-wrapper">

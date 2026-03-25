@@ -241,6 +241,21 @@
         <h1>消費税計算機</h1>
         <p style="color: #6b7280; margin-bottom: 2rem;">消費税（10%・8%）を簡単に計算できます。</p>
 
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode(0)">単品計算</button>
+            <button class="mode-tab" onclick="switchMode(1)">まとめ計算</button>
+        </div>
+
+        <!-- Mode 1: 単品計算 -->
+        <div class="mode-content active">
+            <div class="input-group">
+                <label class="input-label">金額</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode1-price" placeholder="例: 1000" step="1" min="0">
+                    <span class="unit">円</span>
+                </div>
+            </div>
+
             <div class="input-group">
                 <label class="input-label">税率</label>
                 <select id="mode1-rate">
@@ -328,8 +343,8 @@
 
             <button class="btn-clear" onclick="clearMode2()" style="width: 100%; margin-top: 1rem;">すべてクリア</button>
         </div>
+    </div>
 
-    
     <!-- SEO Content Section -->
     <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
         <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">

@@ -225,6 +225,28 @@
     <div class="container">
         <h1 class="tool-title">バイト単位変換</h1>
 
+        <div class="input-section">
+            <div class="input-group">
+                <label for="inputValue">数値</label>
+                <input type="number" id="inputValue" placeholder="例: 1024" step="any" min="0">
+            </div>
+            <div class="input-group">
+                <label for="inputUnit">単位</label>
+                <select id="inputUnit">
+                    <option value="bit">Bit</option>
+                    <option value="byte" selected>Byte (B)</option>
+                    <option value="kb">KB</option>
+                    <option value="mb">MB</option>
+                    <option value="gb">GB</option>
+                    <option value="tb">TB</option>
+                </select>
+            </div>
+            <div class="toggle-group">
+                <button class="toggle-btn active" data-standard="binary" onclick="converter.setStandard('binary')">2進法 (1024)</button>
+                <button class="toggle-btn" data-standard="si" onclick="converter.setStandard('si')">SI (1000)</button>
+            </div>
+        </div>
+
         <div class="conversion-results">
             <h2 class="result-title">変換結果</h2>
             <div class="result-grid" id="results"></div>
@@ -234,8 +256,8 @@
             <h2 class="result-title">転送時間予測</h2>
             <div class="speed-grid" id="transferTimes"></div>
         </div>
+    </div>
 
-    
     <!-- SEO Content Section -->
     <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
         <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">

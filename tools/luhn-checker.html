@@ -308,8 +308,91 @@
             </div>
         </div>
 
+        <div class="input-section" style="margin-bottom: 20px;">
+            <label for="cardInput" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">カード番号を入力</label>
+            <input type="text" id="cardInput" placeholder="例: 4532 0151 1283 0366" maxlength="23">
+            <div class="button-group">
+                <button class="btn-primary" onclick="validateCard()">検証する</button>
+                <button class="btn-secondary" onclick="clearInput()">クリア</button>
+            </div>
+        </div>
+
         <div class="results" id="results"></div>
     </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        function luhnCheck(num) {
+            let sum = 0;
+            let isOdd = true;
+            for (let i = num.length - 1; i >= 0; i--) {
+                let digit = parseInt(num[i]);
+                if (isOdd) {
+                    sum += digit;
+                } else {
+                    digit *= 2;
+                    sum += digit > 9 ? digit - 9 : digit;
+                }
+                isOdd = !isOdd;
+            }
+            return sum % 10 === 0;
+        }
+
+        function detectCardBrand(num) {
+            if (/^4/.test(num)) return 'visa';
+            if (/^5[1-5]/.test(num) || /^2[2-7]/.test(num)) return 'mastercard';
+            if (/^3[47]/.test(num)) return 'amex';
+            if (/^3(?:0[0-5]|[68])/.test(num)) return 'diners';
+            if (/^35(?:2[89]|[3-8][0-9])/.test(num)) return 'jcb';
+            if (/^6(?:011|5)/.test(num)) return 'discover';
+            return null;
+        }
+
+        function getBrandInfo(brand) {
+            const brands = {
+                visa: { ja: 'Visa', icon: '💳' },
+                mastercard: { ja: 'MasterCard', icon: '💳' },
+                amex: { ja: 'American Express', icon: '💳' },
+                diners: { ja: 'Diners Club', icon: '💳' },
+                jcb: { ja: 'JCB', icon: '💳' },
+                discover: { ja: 'Discover', icon: '💳' }
+            };
+            return brands[brand] || { ja: '不明', icon: '💳' };
+        }
+
+        function formatCardNumber(num) {
+            return num.replace(/(.{4})/g, '$1 ').trim();
+        }
+
+        function validateCard() {
+            const input = document.getElementById('cardInput').value;
+            const cardNumber = input.replace(/\s+/g, '');
+            const resultsDiv = document.getElementById('results');
+
+            if (!cardNumber) {
+                resultsDiv.innerHTML = '<div class="empty-state">カード番号を入力してください</div>';
+                return;
+            }
+
+            if (!/^\d+$/.test(cardNumber)) {
+                resultsDiv.innerHTML = '<div class="empty-state">数字のみ入力してください</div>';
+                return;
+            }
+
+            const isValid = luhnCheck(cardNumber);
+            const brand = detectCardBrand(cardNumber);
+            const brandInfo = getBrandInfo(brand);
+
+            const resultBox = document.createElement('div');
+            resultBox.className = 'result-box';
+            resultBox.innerHTML = `
+                <div class="result-status">
+                    <span class="status-icon ${isValid ? 'valid' : 'invalid'}">${isValid ? '✓' : '✗'}</span>
+                    <div class="status-text">
+                        <div class="status-label">${isValid ? '有効なカード番号です' : '無効なカード番号です'}</div>
+                        <div class="status-value">Luhnチェック: ${isValid ? '成功' : '失敗'}</div>
+                    </div>
                 </div>
 
                 <div class="result-details">
@@ -358,7 +441,6 @@
             }, 2000);
         }
 
-        // Format input as user types
         document.getElementById('cardInput').addEventListener('input', (e) => {
             let value = e.target.value.replace(/\s+/g, '');
             let formatted = '';
@@ -371,7 +453,6 @@
             e.target.value = formatted;
         });
 
-        // Enter key to validate
         document.getElementById('cardInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 validateCard();

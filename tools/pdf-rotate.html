@@ -335,6 +335,12 @@
             <h1>PDFページ回転</h1>
             <p class="subtitle">各ページを自由に回転させて、PDFを最適な向きに整えます</p>
 
+            <div class="drop-zone" id="dropZone">
+                <input type="file" id="fileInput" accept=".pdf">
+                <label class="file-input-label" onclick="document.getElementById('fileInput').click()">PDFを選択</label>
+                <div class="drop-zone-text">またはここにPDFをドラッグ＆ドロップ</div>
+            </div>
+
             <div class="pages-container" id="pagesContainer">
                 <h2>ページ一覧</h2>
                 <div class="quick-actions">
@@ -536,8 +542,8 @@
                 const pages = currentPdf.getPages();
 
                 for (let i = 0; i < pages.length; i++) {
-                    const [copiedPage] = await newPdf.embedPage(pages[i]);
-                    newPdf.addPage([copiedPage.width, copiedPage.height]).drawPage(copiedPage);
+                    const [copiedPage] = await newPdf.copyPages(currentPdf, [i]);
+                    newPdf.addPage(copiedPage);
 
                     const rotation = pageRotations[i] || 0;
                     if (rotation !== 0) {

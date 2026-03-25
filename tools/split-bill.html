@@ -267,6 +267,21 @@
         <h1>割り勘計算機</h1>
         <p style="color: #6b7280; margin-bottom: 2rem;">飲食代などを複数人で割り勘します。</p>
 
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode(0)">均等割り</button>
+            <button class="mode-tab" onclick="switchMode(1)">カスタム分割</button>
+        </div>
+
+        <!-- Mode 1: 均等割り -->
+        <div class="mode-content active">
+            <div class="input-group">
+                <label class="input-label">合計金額</label>
+                <div class="input-wrapper">
+                    <input type="number" id="mode1-amount" placeholder="例: 5000" step="100" min="0">
+                    <span class="unit">円</span>
+                </div>
+            </div>
+
             <div class="input-group">
                 <label class="input-label">人数</label>
                 <div class="input-wrapper">
@@ -395,8 +410,8 @@
 
             <button class="btn-clear" onclick="clearMode2()" style="width: 100%; margin-top: 1rem;">すべてクリア</button>
         </div>
+    </div>
 
-    
     <!-- SEO Content Section -->
     <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
         <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">

@@ -211,14 +211,30 @@
     <div class="container">
         <h1 class="tool-title">進数変換</h1>
 
+        <div class="input-section">
+            <div class="input-group">
+                <label for="input">変換する数値</label>
+                <input type="text" id="input" placeholder="数値を入力（例: 255, 0xFF, 0b11111111）" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="input-group">
+                <label for="baseSelector">入力の基数</label>
+                <select id="baseSelector">
+                    <option value="10">10進数</option>
+                    <option value="2">2進数</option>
+                    <option value="8">8進数</option>
+                    <option value="16">16進数</option>
+                </select>
+            </div>
+        </div>
+
         <div class="conversion-results" id="results"></div>
 
         <div class="bit-visualization">
             <h3>ビット表現</h3>
             <div id="bitVisualization"></div>
         </div>
+    </div>
 
-    
     <!-- SEO Content Section -->
     <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
         <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
@@ -329,16 +345,16 @@
 
                 bitWidths.forEach(bw => {
                     const num = result.decimal;
-                    if (num > (1 << bw) - 1) return;
+                    if (num > (1 << bw.width) - 1) return;
 
                     const bits = [];
-                    for (let i = bw - 1; i >= 0; i--) {
+                    for (let i = bw.width - 1; i >= 0; i--) {
                         bits.push((num >> i) & 1);
                     }
 
                     const bitRow = document.createElement('div');
                     bitRow.className = 'bit-row';
-                    bitRow.innerHTML = `<div class="bit-label">${bw}ビット:</div>`;
+                    bitRow.innerHTML = `<div class="bit-label">${bw.label}:</div>`;
 
                     const bitContainer = document.createElement('div');
                     bitContainer.className = 'bit-container';
@@ -347,9 +363,9 @@
                         const bitEl = document.createElement('div');
                         bitEl.className = `bit ${bit === 1 ? 'one' : 'zero'}`;
                         bitEl.textContent = bit;
-                        bitEl.title = `ビット ${bw - 1 - idx}`;
+                        bitEl.title = `ビット ${bw.width - 1 - idx}`;
                         bitEl.addEventListener('click', () => {
-                            const newDecimal = num ^ (1 << (bw - 1 - idx));
+                            const newDecimal = num ^ (1 << (bw.width - 1 - idx));
                             document.getElementById('input').value = newDecimal.toString(parseInt(baseSelector.value));
                             updateResults();
                         });

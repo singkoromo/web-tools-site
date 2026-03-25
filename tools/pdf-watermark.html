@@ -405,6 +405,12 @@
             <h1>PDF透かし追加</h1>
             <p class="subtitle">PDFのすべてのページに透かしを追加して、機密性を表示します</p>
 
+            <div class="drop-zone" id="dropZone">
+                <input type="file" id="fileInput" accept=".pdf">
+                <label class="file-input-label" onclick="document.getElementById('fileInput').click()">PDFを選択</label>
+                <div class="drop-zone-text">またはここにPDFをドラッグ＆ドロップ</div>
+            </div>
+
             <div class="settings-container" id="settingsContainer">
                 <h2>透かしの設定</h2>
 
@@ -671,10 +677,10 @@
                 const colorHex = watermarkColor.value;
                 const colorRgb = hexToRgb(colorHex);
 
-                for (const page of pages) {
-                    const [copiedPage] = await newPdf.embedPage(page);
-                    const newPage = newPdf.addPage([copiedPage.width, copiedPage.height]);
-                    newPage.drawPage(copiedPage);
+                for (let i = 0; i < pages.length; i++) {
+                    const [copiedPage] = await newPdf.copyPages(currentPdf, [i]);
+                    newPdf.addPage(copiedPage);
+                    const newPage = newPdf.getPages()[newPdf.getPageCount() - 1];
 
                     const pageWidth = newPage.getWidth();
                     const pageHeight = newPage.getHeight();

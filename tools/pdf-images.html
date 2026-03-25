@@ -365,6 +365,12 @@
             <h1>画像→PDF変換</h1>
             <p class="subtitle">複数の画像をPDFドキュメントに変換して、プロフェッショナルな形式で保存します</p>
 
+            <div class="drop-zone" id="dropZone">
+                <input type="file" id="fileInput" accept="image/*" multiple>
+                <label class="file-input-label" onclick="document.getElementById('fileInput').click()">画像を選択</label>
+                <div class="drop-zone-text">またはここに画像をドラッグ＆ドロップ（複数可）</div>
+            </div>
+
             <div class="images-container" id="imagesContainer">
                 <h2>画像リスト</h2>
 
@@ -597,9 +603,9 @@
                     let embeddedImage;
 
                     if (img.type === 'image/jpeg') {
-                        embeddedImage = await pdf.embedJpg(img.data);
+                        embeddedImage = await pdf.embedJpg(img.data.split(',')[1]);
                     } else if (img.type === 'image/png') {
-                        embeddedImage = await pdf.embedPng(img.data);
+                        embeddedImage = await pdf.embedPng(img.data.split(',')[1]);
                     } else {
                         continue;
                     }

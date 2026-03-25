@@ -216,6 +216,23 @@
     <div class="tool-container">
         <h1>日付計算</h1>
         <p style="color: #6b7280; margin-bottom: 2rem;">日付に関する様々な計算ができます。</p>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode(0)">日付の差</button>
+            <button class="mode-tab" onclick="switchMode(1)">日付に加算・減算</button>
+            <button class="mode-tab" onclick="switchMode(2)">次の曜日</button>
+        </div>
+
+        <!-- Mode 1: 日付の差 -->
+        <div class="mode-content active">
+            <div class="input-group">
+                <label class="input-label">開始日</label>
+                <input type="date" id="mode1-date1">
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setMode1Date1Today()">今日</button>
+                    <button class="quick-btn" onclick="setMode1Date1Tomorrow()">明日</button>
+                </div>
+            </div>
             <div class="input-group">
                 <label class="input-label">終了日</label>
                 <input type="date" id="mode1-date2">
@@ -323,8 +340,8 @@
                 </div>
             </div>
         </div>
+    </div>
 
-    
     <!-- SEO Content Section -->
     <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
         <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">

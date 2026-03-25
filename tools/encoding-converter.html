@@ -214,6 +214,22 @@
     <div class="container">
         <h1 class="tool-title">文字コード変換</h1>
 
+        <div class="input-section">
+            <div class="input-group">
+                <label for="textInput">変換するテキスト</label>
+                <textarea id="textInput" placeholder="ここにテキストを入力してください..."></textarea>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div id="statsGrid"></div>
+        </div>
+
+        <div class="result-section">
+            <h2 class="result-title">エンコーディング結果</h2>
+            <div id="encodingResults"></div>
+        </div>
+
         <div class="result-section">
             <h2 class="result-title">文字情報</h2>
             <table class="char-table" id="charTable">
@@ -228,8 +244,8 @@
                 <tbody id="charTableBody"></tbody>
             </table>
         </div>
+    </div>
 
-    
     <!-- SEO Content Section -->
     <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
         <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
