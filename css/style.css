@@ -313,7 +313,7 @@ a:hover { color: var(--c-brand-dark); }
 }
 .search-box input {
   width: 100%;
-  padding: 16px 24px 16px 52px;
+  padding: 16px 24px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-full);
   font-family: inherit;
@@ -329,18 +329,6 @@ a:hover { color: var(--c-brand-dark); }
   box-shadow: 0 0 0 4px var(--ring), var(--shadow-md);
 }
 .search-box input::placeholder { color: var(--text-3); }
-.search-icon {
-  position: absolute;
-  left: 18px; top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-3);
-  width: 16px;
-  height: 16px;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 .search-count {
   text-align: center;
   font-size: .8rem;
