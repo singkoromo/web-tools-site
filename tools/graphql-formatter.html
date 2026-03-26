@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQLクエリフォーマッター | ToolBox</title>
+    <meta name="description" content="GraphQLクエリ・ミューテーション・スキーマを整形・圧縮・検証するツール。インデントを揃えてコードを読みやすくします。">
+    <meta property="og:title" content="GraphQLクエリフォーマッター | ToolBox">
+    <meta property="og:description" content="GraphQLクエリ・ミューテーション・スキーマを整形・圧縮・検証するツール。インデントを揃えてコードを読みやすくします。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/graphql-formatter.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"GraphQLクエリフォーマッター","description":"GraphQLクエリ・ミューテーション・スキーマを整形・圧縮・検証するツール。","url":"https://web-tool-site.com/tools/graphql-formatter.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { color: #555; text-decoration: none; font-weight: 500; }
+        nav a:hover { color: #4a90e2; }
+        .tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+        .tool-header { background: linear-gradient(135deg, #e040fb 0%, #7c4dff 100%); color: white; padding: 2rem; text-align: center; }
+        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .tool-header p { opacity: 0.9; }
+        .tool-content { padding: 2rem; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+        .btn-primary { background: #e040fb; color: white; }
+        .btn-primary:hover { background: #b83df0; transform: translateY(-2px); }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-purple { background: #7c4dff; color: white; }
+        .btn-purple:hover { background: #6236f5; transform: translateY(-2px); }
+        .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        textarea { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; resize: vertical; }
+        textarea:focus { outline: none; border-color: #e040fb; }
+        select { font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 6px; }
+        select:focus { outline: none; border-color: #e040fb; }
+        .form-group { margin-bottom: 1.25rem; }
+        .label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+        footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+        .footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+        @media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .split-layout { grid-template-columns: 1fr; } }
+
+        .split-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 2px solid #e040fb; color: #6a0099; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem; }
+        .stats-bar { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+        .stat-badge { background: #f3e5ff; color: #7c4dff; border-radius: 20px; padding: 0.2rem 0.75rem; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; gap: 0.3rem; }
+        .type-badge { display: inline-block; padding: 0.3rem 0.9rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; }
+        .type-query { background: #e3f2fd; color: #1565c0; }
+        .type-mutation { background: #fce4ec; color: #c62828; }
+        .type-subscription { background: #e8f5e9; color: #2e7d32; }
+        .type-schema { background: #f3e5ff; color: #7c4dff; }
+        .type-fragment { background: #fff3e0; color: #e65100; }
+        .type-unknown { background: #f5f5f5; color: #757575; }
+        .options-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; font-size: 0.9rem; }
+        .options-row label { font-weight: 600; }
+        .output-area { position: relative; }
+        .copy-btn-overlay { position: absolute; top: 0.5rem; right: 0.5rem; }
+        .char-counts { font-size: 0.8rem; color: #888; margin-top: 0.3rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav><ul><li><a href="../index.html">ホーム</a></li><li><a href="../index.html#tools">ツール一覧</a></li></ul></nav>
+        </div>
+    </header>
+    <div class="tool-page"><div class="tool-card-main">
+        <div class="tool-header">
+            <h1>GraphQL クエリフォーマッター</h1>
+            <p>GraphQLクエリ・ミューテーション・スキーマを整形・圧縮します。</p>
+        </div>
+        <div class="tool-content">
+
+            <!-- Options -->
+            <div class="options-row">
+                <label>インデント:</label>
+                <select id="indentSize">
+                    <option value="2">2スペース</option>
+                    <option value="4">4スペース</option>
+                </select>
+                <div class="btn-group" style="margin-bottom:0;">
+                    <button class="btn-sm btn-secondary" onclick="loadExample('query')">クエリ例</button>
+                    <button class="btn-sm btn-secondary" onclick="loadExample('mutation')">ミューテーション例</button>
+                    <button class="btn-sm btn-secondary" onclick="loadExample('schema')">スキーマ例</button>
+                </div>
+            </div>
+
+            <div class="split-layout">
+                <!-- Left: Input -->
+                <div>
+                    <div class="section-title">入力</div>
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="formatGQL()">整形する</button>
+                        <button class="btn-purple" onclick="minifyGQL()">圧縮する</button>
+                        <button class="btn-secondary btn-sm" onclick="clearAll()">クリア</button>
+                    </div>
+                    <textarea id="inputArea" rows="20" placeholder="GraphQLクエリ・ミューテーション・スキーマを入力..." oninput="detectType()"></textarea>
+                    <div class="char-counts" id="inputStats">文字数: 0</div>
+                </div>
+
+                <!-- Right: Output -->
+                <div>
+                    <div class="toolbar">
+                        <div class="section-title" style="margin-bottom:0;">出力</div>
+                        <button class="btn-sm btn-primary" onclick="copyOutput()">コピー</button>
+                    </div>
+
+                    <div id="typeBadge"></div>
+                    <div class="stats-bar" id="statsBar"></div>
+
+                    <div class="output-area">
+                        <textarea id="outputArea" rows="20" readonly placeholder="整形・圧縮結果がここに表示されます..."></textarea>
+                    </div>
+                    <div class="char-counts" id="outputStats">文字数: 0</div>
+                </div>
+            </div>
+
+        </div>
+    </div></div>
+    <footer class="footer"><div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a><a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a><a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a><a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div></footer>
+    <div class="toast" id="toast"></div>
+    <script>
+    function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+    function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('コピーしました')).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('コピーしました');});}
+
+    const EXAMPLES = {
+        query: `query GetUser($id: ID!) {\n  user(id: $id) {\n    id\n    name\n    email\n    posts {\n      id\n      title\n    }\n  }\n}`,
+        mutation: `mutation CreatePost($input: PostInput!) {\n  createPost(input: $input) {\n    id\n    title\n    author {\n      name\n    }\n  }\n}`,
+        schema: `type Query {\n  user(id: ID!): User\n  users: [User!]!\n  posts: [Post!]!\n}\n\ntype User {\n  id: ID!\n  name: String!\n  email: String!\n  posts: [Post!]!\n}\n\ntype Post {\n  id: ID!\n  title: String!\n  body: String!\n  author: User!\n}`
+    };
+
+    function loadExample(type) {
+        document.getElementById('inputArea').value = EXAMPLES[type] || '';
+        detectType();
+        updateInputStats();
+        showToast('例を読み込みました');
+    }
+
+    function clearAll() {
+        document.getElementById('inputArea').value = '';
+        document.getElementById('outputArea').value = '';
+        document.getElementById('typeBadge').innerHTML = '';
+        document.getElementById('statsBar').innerHTML = '';
+        document.getElementById('inputStats').textContent = '文字数: 0';
+        document.getElementById('outputStats').textContent = '文字数: 0';
+    }
+
+    function detectQueryType(src) {
+        const stripped = src.replace(/#[^\n]*/g, '').trim();
+        if (/^\s*mutation\b/i.test(stripped)) return 'mutation';
+        if (/^\s*subscription\b/i.test(stripped)) return 'subscription';
+        if (/^\s*fragment\b/i.test(stripped)) return 'fragment';
+        if (/^\s*query\b/i.test(stripped) || /^\s*\{/.test(stripped)) return 'query';
+        if (/\btype\s+\w+/i.test(stripped) || /\bscalar\s+\w+/i.test(stripped) || /\binterface\s+\w+/i.test(stripped) || /\benum\s+\w+/i.test(stripped) || /\binput\s+\w+/i.test(stripped)) return 'schema';
+        return 'unknown';
+    }
+
+    const TYPE_INFO = {
+        query: { label: 'Query（クエリ）', cls: 'type-query' },
+        mutation: { label: 'Mutation（ミューテーション）', cls: 'type-mutation' },
+        subscription: { label: 'Subscription（サブスクリプション）', cls: 'type-subscription' },
+        schema: { label: 'Schema（スキーマ定義）', cls: 'type-schema' },
+        fragment: { label: 'Fragment（フラグメント）', cls: 'type-fragment' },
+        unknown: { label: '不明', cls: 'type-unknown' }
+    };
+
+    function detectType() {
+        const src = document.getElementById('inputArea').value;
+        updateInputStats();
+        if (!src.trim()) { document.getElementById('typeBadge').innerHTML = ''; document.getElementById('statsBar').innerHTML = ''; return; }
+        const t = detectQueryType(src);
+        const info = TYPE_INFO[t] || TYPE_INFO.unknown;
+        document.getElementById('typeBadge').innerHTML = `<span class="type-badge ${info.cls}">${info.label}</span>`;
+        updateStats(src);
+    }
+
+    function updateStats(src) {
+        const fieldMatches = src.match(/\w+\s*[({]/g) || [];
+        const varMatches = src.match(/\$\w+/g) || [];
+        const uniqueVars = [...new Set(varMatches)];
+        const statsBar = document.getElementById('statsBar');
+        statsBar.innerHTML = `
+            <span class="stat-badge">フィールド数 約 ${fieldMatches.length}</span>
+            <span class="stat-badge">変数数 ${uniqueVars.length}</span>
+        `;
+    }
+
+    function updateInputStats() {
+        const len = document.getElementById('inputArea').value.length;
+        document.getElementById('inputStats').textContent = `文字数: ${len.toLocaleString()}`;
+    }
+
+    /**
+     * GraphQL formatter: character-by-character parsing
+     * Handles: strings, comments, braces/parens for indentation
+     */
+    function formatGraphQL(src, indentSize) {
+        const indent = ' '.repeat(indentSize);
+        let out = '';
+        let depth = 0;
+        let i = 0;
+        const len = src.length;
+        let inString = false;
+        let inComment = false;
+        let inBlockString = false;
+
+        while (i < len) {
+            const ch = src[i];
+
+            // Block string (triple quote)
+            if (!inString && !inComment && src.slice(i, i+3) === '"""') {
+                if (inBlockString) {
+                    out += '"""';
+                    inBlockString = false;
+                    i += 3;
+                } else {
+                    out += '"""';
+                    inBlockString = true;
+                    i += 3;
+                }
+                continue;
+            }
+
+            if (inBlockString) {
+                out += ch;
+                i++;
+                continue;
+            }
+
+            // Regular string
+            if (ch === '"' && !inComment) {
+                inString = !inString;
+                out += ch;
+                i++;
+                continue;
+            }
+
+            if (inString) {
+                if (ch === '\\') { out += ch + (src[i+1] || ''); i += 2; continue; }
+                out += ch;
+                i++;
+                continue;
+            }
+
+            // Comment
+            if (ch === '#' && !inString) {
+                inComment = true;
+                out += ch;
+                i++;
+                continue;
+            }
+
+            if (inComment) {
+                if (ch === '\n') {
+                    inComment = false;
+                    out += '\n' + indent.repeat(depth);
+                } else {
+                    out += ch;
+                }
+                i++;
+                continue;
+            }
+
+            // Skip whitespace/newlines (we'll add our own)
+            if (ch === ' ' || ch === '\t' || ch === '\r' || ch === '\n') {
+                // Add a space if previous non-space char could use one
+                const last = out.trimEnd().slice(-1);
+                if (last && last !== '{' && last !== '(' && last !== '\n' && !out.endsWith('\n' + indent.repeat(depth))) {
+                    // We'll handle spacing via context below
+                }
+                i++;
+                continue;
+            }
+
+            if (ch === '{') {
+                // Remove trailing spaces before brace
+                out = out.trimEnd();
+                out += ' {\n';
+                depth++;
+                out += indent.repeat(depth);
+                i++;
+                continue;
+            }
+
+            if (ch === '}') {
+                out = out.trimEnd();
+                out += '\n';
+                depth = Math.max(0, depth - 1);
+                out += indent.repeat(depth) + '}';
+                i++;
+                // Peek: if next non-space is not }, add newline
+                let j = i;
+                while (j < len && (src[j] === ' ' || src[j] === '\t' || src[j] === '\r' || src[j] === '\n')) j++;
+                if (j < len && src[j] !== '}' && src[j] !== ')') {
+                    out += '\n' + (depth > 0 ? indent.repeat(depth) : '');
+                }
+                continue;
+            }
+
+            if (ch === '(') {
+                out += '(';
+                i++;
+                continue;
+            }
+
+            if (ch === ')') {
+                out += ')';
+                i++;
+                continue;
+            }
+
+            if (ch === ',') {
+                // In field lists, newline instead of comma
+                out = out.trimEnd();
+                out += '\n' + indent.repeat(depth);
+                i++;
+                continue;
+            }
+
+            if (ch === ':') {
+                out += ': ';
+                i++;
+                // skip following space
+                while (i < len && src[i] === ' ') i++;
+                continue;
+            }
+
+            // Regular character
+            out += ch;
+            i++;
+        }
+
+        // Clean up: collapse multiple blank lines
+        return out.replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    function minifyGraphQL(src) {
+        let out = '';
+        let i = 0;
+        const len = src.length;
+        let inString = false;
+        let inComment = false;
+        let inBlockString = false;
+
+        while (i < len) {
+            const ch = src[i];
+
+            if (!inString && !inComment && src.slice(i, i+3) === '"""') {
+                if (inBlockString) { out += '"""'; inBlockString = false; i += 3; }
+                else { out += '"""'; inBlockString = true; i += 3; }
+                continue;
+            }
+            if (inBlockString) { out += ch; i++; continue; }
+
+            if (ch === '"' && !inComment) { inString = !inString; out += ch; i++; continue; }
+            if (inString) {
+                if (ch === '\\') { out += ch + (src[i+1] || ''); i += 2; continue; }
+                out += ch; i++; continue;
+            }
+
+            if (ch === '#' && !inString) { inComment = true; i++; continue; }
+            if (inComment) { if (ch === '\n') inComment = false; i++; continue; }
+
+            if (ch === '\n' || ch === '\r' || ch === '\t') {
+                if (out.length && out[out.length-1] !== ' ') out += ' ';
+                i++; continue;
+            }
+            if (ch === ' ') {
+                if (out.length && out[out.length-1] !== ' ' && out[out.length-1] !== '{' && out[out.length-1] !== '(' && out[out.length-1] !== ',') out += ' ';
+                i++; continue;
+            }
+            if (ch === ',') {
+                // Remove comma, ensure space
+                if (out.length && out[out.length-1] !== ' ') out += ' ';
+                i++; continue;
+            }
+
+            out += ch; i++;
+        }
+
+        return out.replace(/\s+/g, ' ').replace(/\{ /g, '{').replace(/ \}/g, '}').trim();
+    }
+
+    function formatGQL() {
+        const src = document.getElementById('inputArea').value;
+        if (!src.trim()) { showToast('入力がありません'); return; }
+        const indentSize = parseInt(document.getElementById('indentSize').value, 10);
+        try {
+            const result = formatGraphQL(src, indentSize);
+            document.getElementById('outputArea').value = result;
+            document.getElementById('outputStats').textContent = `文字数: ${result.length.toLocaleString()} (入力: ${src.length.toLocaleString()})`;
+            detectType();
+        } catch(e) {
+            showToast('整形エラー: ' + e.message);
+        }
+    }
+
+    function minifyGQL() {
+        const src = document.getElementById('inputArea').value;
+        if (!src.trim()) { showToast('入力がありません'); return; }
+        try {
+            const result = minifyGraphQL(src);
+            document.getElementById('outputArea').value = result;
+            document.getElementById('outputStats').textContent = `文字数: ${result.length.toLocaleString()} (入力: ${src.length.toLocaleString()}, ${Math.round((1 - result.length/src.length)*100)}% 削減)`;
+        } catch(e) {
+            showToast('圧縮エラー: ' + e.message);
+        }
+    }
+
+    function copyOutput() {
+        const out = document.getElementById('outputArea').value;
+        if (!out) { showToast('出力がありません'); return; }
+        copyText(out);
+    }
+
+    document.getElementById('inputArea').addEventListener('input', function() {
+        updateInputStats();
+        detectType();
+    });
+    </script>
+</body>
+</html>

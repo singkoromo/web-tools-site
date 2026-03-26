@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVGオプティマイザー | ToolBox</title>
+    <meta name="description" content="SVGコードの最適化・圧縮ツール。不要なコメント、メタデータ、空白を除去してファイルサイズを削減します。">
+    <meta property="og:title" content="SVGオプティマイザー | ToolBox">
+    <meta property="og:description" content="SVGコードの最適化・圧縮ツール。不要なコメント、メタデータ、空白を除去してファイルサイズを削減します。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="SVGオプティマイザー | ToolBox">
+    <link rel="canonical" href="https://web-tool-site.com/tools/svg-optimizer.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"SVGオプティマイザー","description":"SVGコードの最適化・圧縮ツール。不要なコメント、メタデータ、空白を除去してファイルサイズを削減します。","url":"https://web-tool-site.com/tools/svg-optimizer.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { color: #555; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        nav a:hover { color: #4a90e2; }
+        .tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+        .tool-header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; text-align: center; }
+        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .tool-header p { font-size: 1.1rem; opacity: 0.9; }
+        .tool-content { padding: 2rem; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+        .btn-primary { background: #4a90e2; color: white; }
+        .btn-primary:hover { background: #357abd; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74,144,226,0.4); }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #219a52; }
+        textarea, input[type="text"], input[type="number"], select { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        textarea:focus, input:focus, select:focus { outline: none; border-color: #4a90e2; box-shadow: 0 0 0 3px rgba(74,144,226,0.1); }
+        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .result-box { background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; white-space: pre-wrap; word-break: break-all; min-height: 60px; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; display: none; }
+        .label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+        .form-group { margin-bottom: 1.5rem; }
+        .alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+        .alert-danger { background: #fee; border: 1px solid #fcc; color: #c33; }
+        .alert-success { background: #efe; border: 1px solid #cfc; color: #363; }
+        footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+        .footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+        .footer-inner .footer-links a:hover { color: white; }
+        @media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } nav ul { gap: 1rem; } .tool-header h1 { font-size: 1.5rem; } }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
+        .option-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer; }
+        .option-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: #f093fb; cursor: pointer; }
+        .stats-bar { display: flex; gap: 1.5rem; flex-wrap: wrap; background: #f8f9fa; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #eee; }
+        .stat-item { text-align: center; }
+        .stat-item .stat-val { font-size: 1.4rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #2c3e50; }
+        .stat-item .stat-lbl { font-size: 0.8rem; color: #888; }
+        .stat-item.reduction .stat-val { color: #27ae60; }
+        .preview-box { border: 2px dashed #ddd; border-radius: 8px; padding: 1rem; min-height: 120px; display: flex; align-items: center; justify-content: center; background: #fafafa; overflow: hidden; }
+        .preview-box svg { max-width: 100%; max-height: 200px; }
+        .copy-btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #4a90e2; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; margin-left: 0.5rem; }
+        .copy-btn-small:hover { background: #357abd; }
+        .action-row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav><ul><li><a href="../index.html">ホーム</a></li><li><a href="../index.html#tools">ツール一覧</a></li></ul></nav>
+        </div>
+    </header>
+    <div class="tool-page">
+        <div class="tool-card-main">
+            <div class="tool-header">
+                <h1>SVGオプティマイザー</h1>
+                <p>SVGコードを最適化・圧縮してファイルサイズを削減</p>
+            </div>
+            <div class="tool-content">
+
+                <div class="form-group">
+                    <span class="label">最適化オプション</span>
+                    <div class="options-grid">
+                        <label class="option-item"><input type="checkbox" id="optComments" checked> コメント除去</label>
+                        <label class="option-item"><input type="checkbox" id="optMetadata" checked> メタデータ除去</label>
+                        <label class="option-item"><input type="checkbox" id="optWhitespace" checked> 空白圧縮</label>
+                        <label class="option-item"><input type="checkbox" id="optAttrs" checked> 不要属性除去（inkscape/sodipodi）</label>
+                        <label class="option-item"><input type="checkbox" id="optViewBox" checked> viewBox正規化</label>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div class="form-group">
+                        <span class="label">入力SVG</span>
+                        <textarea id="svgInput" rows="14" placeholder="SVGコードをここに貼り付けてください..."></textarea>
+                        <div class="btn-group" style="margin-top:0.75rem;">
+                            <button class="btn-primary" onclick="optimizeSVG()">最適化する</button>
+                            <button class="btn-secondary" onclick="clearAll()">クリア</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <span class="label">最適化後SVG</span>
+                        <textarea id="svgOutput" rows="14" readonly placeholder="最適化結果がここに表示されます..."></textarea>
+                        <div class="action-row">
+                            <button class="btn-success" onclick="copyText(document.getElementById('svgOutput').value)">コピー</button>
+                            <button class="btn-secondary" onclick="downloadSVG()">ダウンロード</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="statsBar" class="stats-bar" style="display:none;">
+                    <div class="stat-item">
+                        <div class="stat-val" id="origSize">-</div>
+                        <div class="stat-lbl">元のサイズ</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val" id="optSize">-</div>
+                        <div class="stat-lbl">最適化後サイズ</div>
+                    </div>
+                    <div class="stat-item reduction">
+                        <div class="stat-val" id="reduction">-</div>
+                        <div class="stat-lbl">削減率</div>
+                    </div>
+                </div>
+
+                <div id="alertBox"></div>
+
+                <div class="form-group">
+                    <span class="label">プレビュー（最適化後）</span>
+                    <div class="preview-box" id="previewBox">
+                        <span style="color:#bbb;font-size:0.9rem;">SVGを最適化するとここにプレビューが表示されます</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../about.html">このサイトについて</a>
+                <a href="../contact.html">お問い合わせ</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+                <a href="../terms.html">利用規約</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+    <script>
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2000);
+    }
+    function copyText(text) {
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました')).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('コピーしました');
+        });
+    }
+
+    function showAlert(msg, type) {
+        const box = document.getElementById('alertBox');
+        box.innerHTML = '<div class="alert alert-' + type + '">' + msg + '</div>';
+        setTimeout(() => { box.innerHTML = ''; }, 4000);
+    }
+
+    function formatBytes(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        return (bytes / 1024).toFixed(2) + ' KB';
+    }
+
+    function optimizeSVG() {
+        const input = document.getElementById('svgInput').value.trim();
+        if (!input) { showAlert('SVGコードを入力してください。', 'danger'); return; }
+        if (!input.includes('<svg') && !input.includes('<SVG')) { showAlert('有効なSVGコードではありません。', 'danger'); return; }
+
+        let result = input;
+        const optComments  = document.getElementById('optComments').checked;
+        const optMetadata  = document.getElementById('optMetadata').checked;
+        const optWhitespace = document.getElementById('optWhitespace').checked;
+        const optAttrs     = document.getElementById('optAttrs').checked;
+        const optViewBox   = document.getElementById('optViewBox').checked;
+
+        // Remove XML comments
+        if (optComments) {
+            result = result.replace(/<!--[\s\S]*?-->/g, '');
+        }
+
+        // Remove metadata elements
+        if (optMetadata) {
+            result = result.replace(/<metadata[\s\S]*?<\/metadata>/gi, '');
+            result = result.replace(/<desc[\s\S]*?<\/desc>/gi, '');
+            result = result.replace(/<title[\s\S]*?<\/title>/gi, '');
+        }
+
+        // Remove editor-specific namespaces and attributes
+        if (optAttrs) {
+            // Remove inkscape: and sodipodi: attributes
+            result = result.replace(/\s+inkscape:[a-z\-:]+="[^"]*"/g, '');
+            result = result.replace(/\s+sodipodi:[a-z\-:]+="[^"]*"/g, '');
+            // Remove inkscape/sodipodi namespace declarations
+            result = result.replace(/\s+xmlns:inkscape="[^"]*"/g, '');
+            result = result.replace(/\s+xmlns:sodipodi="[^"]*"/g, '');
+            result = result.replace(/\s+xmlns:dc="[^"]*"/g, '');
+            result = result.replace(/\s+xmlns:cc="[^"]*"/g, '');
+            result = result.replace(/\s+xmlns:rdf="[^"]*"/g, '');
+            // Remove sodipodi elements
+            result = result.replace(/<sodipodi:[^>]*\/>/g, '');
+            result = result.replace(/<sodipodi:[\s\S]*?<\/sodipodi:[^>]*>/g, '');
+        }
+
+        // Normalize viewBox - remove extra spaces inside viewBox value
+        if (optViewBox) {
+            result = result.replace(/viewBox="([^"]*)"/g, (match, p1) => {
+                const normalized = p1.trim().replace(/\s+/g, ' ');
+                return 'viewBox="' + normalized + '"';
+            });
+        }
+
+        // Collapse whitespace
+        if (optWhitespace) {
+            // Collapse multiple spaces/tabs into one
+            result = result.replace(/[ \t]+/g, ' ');
+            // Collapse multiple newlines
+            result = result.replace(/\n\s*\n/g, '\n');
+            // Remove whitespace between tags
+            result = result.replace(/>\s+</g, '><');
+            result = result.trim();
+        }
+
+        const origBytes = new TextEncoder().encode(input).length;
+        const optBytes  = new TextEncoder().encode(result).length;
+        const saved = origBytes - optBytes;
+        const pct = origBytes > 0 ? ((saved / origBytes) * 100).toFixed(1) : '0.0';
+
+        document.getElementById('svgOutput').value = result;
+
+        document.getElementById('origSize').textContent = formatBytes(origBytes);
+        document.getElementById('optSize').textContent  = formatBytes(optBytes);
+        document.getElementById('reduction').textContent = (saved >= 0 ? '-' : '+') + Math.abs(pct) + '%';
+        document.getElementById('statsBar').style.display = 'flex';
+
+        // SVG preview
+        const preview = document.getElementById('previewBox');
+        try {
+            preview.innerHTML = result;
+        } catch(e) {
+            preview.innerHTML = '<span style="color:#c33;">プレビューを表示できません</span>';
+        }
+
+        showAlert('最適化完了！ ' + formatBytes(saved >= 0 ? saved : 0) + ' 削減しました。', 'success');
+    }
+
+    function clearAll() {
+        document.getElementById('svgInput').value = '';
+        document.getElementById('svgOutput').value = '';
+        document.getElementById('statsBar').style.display = 'none';
+        document.getElementById('alertBox').innerHTML = '';
+        document.getElementById('previewBox').innerHTML = '<span style="color:#bbb;font-size:0.9rem;">SVGを最適化するとここにプレビューが表示されます</span>';
+    }
+
+    function downloadSVG() {
+        const content = document.getElementById('svgOutput').value;
+        if (!content) { showAlert('最適化されたSVGがありません。', 'danger'); return; }
+        const blob = new Blob([content], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'optimized.svg';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    </script>
+</body>
+</html>

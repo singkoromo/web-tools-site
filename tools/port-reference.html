@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCPポート番号リファレンス | ToolBox</title>
+    <meta name="description" content="よく使われるTCP/UDPポート番号の一覧。ポート番号やサービス名で検索可能。">
+    <meta property="og:title" content="TCPポート番号リファレンス | ToolBox">
+    <meta property="og:description" content="よく使われるTCP/UDPポート番号の一覧。ポート番号やサービス名で検索可能。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="TCPポート番号リファレンス | ToolBox">
+    <link rel="canonical" href="https://web-tool-site.com/tools/port-reference.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"TCPポート番号リファレンス","description":"よく使われるTCP/UDPポート番号の一覧。ポート番号やサービス名で検索可能。","url":"https://web-tool-site.com/tools/port-reference.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { color: #555; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        nav a:hover { color: #4a90e2; }
+        .tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+        .tool-header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 2rem; text-align: center; }
+        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .tool-header p { font-size: 1.1rem; opacity: 0.9; }
+        .tool-content { padding: 2rem; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+        .btn-primary { background: #11998e; color: white; }
+        .btn-primary:hover { background: #0e8075; transform: translateY(-2px); }
+        textarea, input[type="text"], input[type="number"], select { font-family: 'Inter', sans-serif; font-size: 0.95rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        textarea:focus, input:focus, select:focus { outline: none; border-color: #11998e; box-shadow: 0 0 0 3px rgba(17,153,142,0.1); }
+        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; display: none; }
+        .label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+        .form-group { margin-bottom: 1.5rem; }
+        footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+        .footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+        .footer-inner .footer-links a:hover { color: white; }
+        @media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } nav ul { gap: 1rem; } .tool-header h1 { font-size: 1.5rem; } }
+
+        .controls-bar { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
+        .controls-bar input[type="text"] { flex: 1; min-width: 200px; }
+        .filter-btn { padding: 0.4rem 1rem; border: 2px solid #11998e; background: white; color: #11998e; border-radius: 20px; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: #11998e; color: white; }
+        .proto-btn { padding: 0.4rem 0.9rem; border: 2px solid #2c3e50; background: white; color: #2c3e50; border-radius: 20px; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
+        .proto-btn.active, .proto-btn:hover { background: #2c3e50; color: white; }
+        .port-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .port-table th { background: #e8f8f5; color: #11998e; font-weight: 700; padding: 0.7rem 1rem; text-align: left; border-bottom: 2px solid #11998e; position: sticky; top: 0; }
+        .port-table td { padding: 0.6rem 1rem; border-bottom: 1px solid #eee; vertical-align: top; }
+        .port-table tr:hover td { background: #f0fdf9; }
+        .port-table tr:nth-child(even) td { background: #f9fffe; }
+        .port-table tr:nth-child(even):hover td { background: #e8f8f5; }
+        .port-num { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #11998e; font-size: 0.95rem; }
+        .proto-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.78rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .proto-tcp { background: #dbeafe; color: #1d4ed8; }
+        .proto-udp { background: #fef3c7; color: #92400e; }
+        .proto-both { background: #e0e7ff; color: #3730a3; }
+        .svc-name { font-weight: 600; color: #2c3e50; }
+        .range-badge { display: inline-block; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.75rem; color: #64748b; margin-left: 0.4rem; }
+        .well-known .range-badge { background: #fef9c3; border-color: #fbbf24; color: #92400e; }
+        .registered .range-badge { background: #e0f2fe; border-color: #38bdf8; color: #0369a1; }
+        .dynamic .range-badge { background: #f0fdf4; border-color: #86efac; color: #166534; }
+        .table-wrap { overflow-x: auto; max-height: 600px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; }
+        .result-count { color: #888; font-size: 0.88rem; margin-bottom: 0.75rem; }
+        .no-results { text-align: center; padding: 3rem; color: #aaa; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav><ul><li><a href="../index.html">ホーム</a></li><li><a href="../index.html#tools">ツール一覧</a></li></ul></nav>
+        </div>
+    </header>
+    <div class="tool-page">
+        <div class="tool-card-main">
+            <div class="tool-header">
+                <h1>TCPポート番号リファレンス</h1>
+                <p>よく使われるTCP/UDPポート番号の一覧・検索</p>
+            </div>
+            <div class="tool-content">
+
+                <div class="controls-bar">
+                    <input type="text" id="searchInput" placeholder="ポート番号またはサービス名で検索..." oninput="renderTable()">
+                </div>
+
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+                    <span style="font-size:0.85rem;font-weight:600;color:#555;align-self:center;">範囲:</span>
+                    <button class="filter-btn active" data-range="all" onclick="setRange(this,'all')">全て</button>
+                    <button class="filter-btn" data-range="well" onclick="setRange(this,'well')">Well-Known (0–1023)</button>
+                    <button class="filter-btn" data-range="reg" onclick="setRange(this,'reg')">Registered (1024–49151)</button>
+                    <button class="filter-btn" data-range="dyn" onclick="setRange(this,'dyn')">Dynamic (49152+)</button>
+                </div>
+
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+                    <span style="font-size:0.85rem;font-weight:600;color:#555;align-self:center;">プロトコル:</span>
+                    <button class="proto-btn active" data-proto="all" onclick="setProto(this,'all')">全て</button>
+                    <button class="proto-btn" data-proto="TCP" onclick="setProto(this,'TCP')">TCP</button>
+                    <button class="proto-btn" data-proto="UDP" onclick="setProto(this,'UDP')">UDP</button>
+                    <button class="proto-btn" data-proto="TCP/UDP" onclick="setProto(this,'TCP/UDP')">TCP/UDP</button>
+                </div>
+
+                <div class="result-count" id="resultCount"></div>
+
+                <div class="table-wrap">
+                    <table class="port-table">
+                        <thead>
+                            <tr>
+                                <th>ポート番号</th>
+                                <th>プロトコル</th>
+                                <th>サービス名</th>
+                                <th>説明</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portTableBody"></tbody>
+                    </table>
+                    <div class="no-results" id="noResults" style="display:none;">該当するポートが見つかりませんでした</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../about.html">このサイトについて</a>
+                <a href="../contact.html">お問い合わせ</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+                <a href="../terms.html">利用規約</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
+    <div class="toast" id="toast"></div>
+    <script>
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2000);
+    }
+
+    // Port data: [port, protocol, service, description]
+    const PORT_DATA = [
+        [20,    'TCP',     'FTP-DATA',       'FTPデータ転送'],
+        [21,    'TCP',     'FTP',            'FTPコントロール（ファイル転送プロトコル）'],
+        [22,    'TCP',     'SSH',            'Secure Shell — 暗号化リモートログイン・SCP・SFTP'],
+        [23,    'TCP',     'Telnet',         'Telnet — 暗号化なしリモートログイン（非推奨）'],
+        [25,    'TCP',     'SMTP',           'Simple Mail Transfer Protocol — メール送信'],
+        [53,    'TCP/UDP', 'DNS',            'Domain Name System — ドメイン名解決'],
+        [67,    'UDP',     'DHCP-Server',    'DHCP サーバー — IPアドレス自動割り当て'],
+        [68,    'UDP',     'DHCP-Client',    'DHCP クライアント'],
+        [80,    'TCP',     'HTTP',           'Hypertext Transfer Protocol — Webトラフィック'],
+        [88,    'TCP/UDP', 'Kerberos',       'Kerberosネットワーク認証プロトコル'],
+        [110,   'TCP',     'POP3',           'Post Office Protocol v3 — メール受信'],
+        [111,   'TCP/UDP', 'RPCBind',        'Remote Procedure Call ポートマッパー'],
+        [123,   'UDP',     'NTP',            'Network Time Protocol — 時刻同期'],
+        [143,   'TCP',     'IMAP',           'Internet Message Access Protocol — メール管理'],
+        [161,   'UDP',     'SNMP',           'Simple Network Management Protocol — ネットワーク監視'],
+        [162,   'UDP',     'SNMP-Trap',      'SNMPトラップ受信'],
+        [179,   'TCP',     'BGP',            'Border Gateway Protocol — インターネットルーティング'],
+        [389,   'TCP/UDP', 'LDAP',           'Lightweight Directory Access Protocol — ディレクトリサービス'],
+        [443,   'TCP',     'HTTPS',          'HTTP Secure — TLS/SSL暗号化Webトラフィック'],
+        [445,   'TCP',     'SMB',            'Server Message Block — Windowsファイル共有'],
+        [465,   'TCP',     'SMTPS',          'SMTP over TLS — 暗号化メール送信（旧方式）'],
+        [514,   'UDP',     'Syslog',         'システムログ転送プロトコル'],
+        [587,   'TCP',     'SMTP-Submit',    'SMTP Submission — メールクライアント送信（推奨）'],
+        [636,   'TCP',     'LDAPS',          'LDAP over TLS/SSL — 暗号化ディレクトリアクセス'],
+        [873,   'TCP',     'Rsync',          'Rsync ファイル同期サービス'],
+        [993,   'TCP',     'IMAPS',          'IMAP over TLS/SSL — 暗号化メール管理'],
+        [995,   'TCP',     'POP3S',          'POP3 over TLS/SSL — 暗号化メール受信'],
+        [1433,  'TCP',     'MSSQL',          'Microsoft SQL Server データベース'],
+        [1521,  'TCP',     'Oracle-DB',      'Oracle Database リスナー'],
+        [2181,  'TCP',     'ZooKeeper',      'Apache ZooKeeper — 分散コーディネーション'],
+        [2375,  'TCP',     'Docker',         'Docker デーモン API（非TLS）'],
+        [2376,  'TCP',     'Docker-TLS',     'Docker デーモン API（TLS）'],
+        [2379,  'TCP',     'etcd-client',    'etcd クライアント通信'],
+        [2380,  'TCP',     'etcd-peer',      'etcd ピア間通信'],
+        [3000,  'TCP',     'Node.js-Dev',    'Node.js 開発サーバー（慣例ポート）'],
+        [3306,  'TCP',     'MySQL',          'MySQL / MariaDB データベース'],
+        [3389,  'TCP',     'RDP',            'Remote Desktop Protocol — Windowsリモートデスクトップ'],
+        [4000,  'TCP',     'Dev-Server',     '開発サーバー汎用ポート（各種フレームワーク）'],
+        [4369,  'TCP',     'Erlang-EPM',     'Erlang Port Mapper Daemon（RabbitMQ等）'],
+        [5000,  'TCP',     'Flask-Dev',      'Flask 開発サーバー（Python）'],
+        [5060,  'TCP/UDP', 'SIP',            'Session Initiation Protocol — VoIP / IP電話'],
+        [5432,  'TCP',     'PostgreSQL',     'PostgreSQL データベース'],
+        [5601,  'TCP',     'Kibana',         'Kibana — Elasticsearchデータ可視化'],
+        [5672,  'TCP',     'RabbitMQ',       'RabbitMQ AMQP メッセージブローカー'],
+        [5900,  'TCP',     'VNC',            'Virtual Network Computing — リモートデスクトップ'],
+        [5984,  'TCP',     'CouchDB',        'Apache CouchDB REST API'],
+        [6000,  'TCP',     'X11',            'X Window System ディスプレイ 0'],
+        [6001,  'TCP',     'X11-1',          'X Window System ディスプレイ 1'],
+        [6379,  'TCP',     'Redis',          'Redis インメモリデータストア'],
+        [6443,  'TCP',     'K8s-API',        'Kubernetes API サーバー'],
+        [7474,  'TCP',     'Neo4j',          'Neo4j グラフデータベース HTTP API'],
+        [8000,  'TCP',     'Django-Dev',     'Django 開発サーバー（Python）'],
+        [8080,  'TCP',     'HTTP-Alt',       'HTTP代替ポート — プロキシ・開発サーバー'],
+        [8443,  'TCP',     'HTTPS-Alt',      'HTTPS代替ポート'],
+        [8888,  'TCP',     'Jupyter',        'Jupyter Notebook / JupyterLab'],
+        [9000,  'TCP',     'PHP-FPM',        'PHP-FPM / SonarQube'],
+        [9042,  'TCP',     'Cassandra',      'Apache Cassandra CQL ネイティブトランスポート'],
+        [9092,  'TCP',     'Kafka',          'Apache Kafka ブローカー'],
+        [9200,  'TCP',     'Elasticsearch',  'Elasticsearch REST API'],
+        [10250, 'TCP',     'Kubelet',        'Kubernetes Kubelet API'],
+        [11211, 'TCP/UDP', 'Memcached',      'Memcached 分散キャッシュシステム'],
+        [15672, 'TCP',     'RabbitMQ-Mgmt',  'RabbitMQ 管理Web UI'],
+        [27017, 'TCP',     'MongoDB',        'MongoDB データベースサーバー'],
+    ];
+
+    let currentRange = 'all';
+    let currentProto = 'all';
+
+    function setRange(btn, val) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRange = val;
+        renderTable();
+    }
+
+    function setProto(btn, val) {
+        document.querySelectorAll('.proto-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentProto = val;
+        renderTable();
+    }
+
+    function getPortRange(port) {
+        if (port <= 1023) return 'well';
+        if (port <= 49151) return 'reg';
+        return 'dyn';
+    }
+
+    function getRangeLabel(port) {
+        if (port <= 1023) return '<span class="range-badge">Well-Known</span>';
+        if (port <= 49151) return '<span class="range-badge">Registered</span>';
+        return '<span class="range-badge">Dynamic</span>';
+    }
+
+    function getProtoClass(proto) {
+        if (proto === 'TCP') return 'proto-tcp';
+        if (proto === 'UDP') return 'proto-udp';
+        return 'proto-both';
+    }
+
+    function renderTable() {
+        const search = document.getElementById('searchInput').value.trim().toLowerCase();
+        const tbody = document.getElementById('portTableBody');
+        const noRes = document.getElementById('noResults');
+
+        const filtered = PORT_DATA.filter(([port, proto, svc, desc]) => {
+            // Range filter
+            if (currentRange !== 'all' && getPortRange(port) !== currentRange) return false;
+            // Protocol filter
+            if (currentProto !== 'all') {
+                if (currentProto === 'TCP/UDP') {
+                    if (proto !== 'TCP/UDP') return false;
+                } else {
+                    if (!proto.includes(currentProto)) return false;
+                }
+            }
+            // Search filter
+            if (search) {
+                const portStr = String(port);
+                const svcLow  = svc.toLowerCase();
+                const descLow = desc.toLowerCase();
+                if (!portStr.includes(search) && !svcLow.includes(search) && !descLow.includes(search)) return false;
+            }
+            return true;
+        });
+
+        document.getElementById('resultCount').textContent = filtered.length + ' 件のポートが見つかりました';
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '';
+            noRes.style.display = 'block';
+            return;
+        }
+        noRes.style.display = 'none';
+
+        tbody.innerHTML = filtered.map(([port, proto, svc, desc]) => {
+            const rangeClass = getPortRange(port);
+            const protoClass = getProtoClass(proto);
+            return `<tr class="${rangeClass}">
+                <td><span class="port-num">${port}</span>${getRangeLabel(port)}</td>
+                <td><span class="proto-badge ${protoClass}">${proto}</span></td>
+                <td class="svc-name">${svc}</td>
+                <td>${desc}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    renderTable();
+    </script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS変数ジェネレーター | ToolBox</title>
+    <meta name="description" content="CSSカスタムプロパティ（CSS変数）のボイラープレートを生成。カラーパレット、スペーシング、タイポグラフィの変数セットを自動生成します。">
+    <meta property="og:title" content="CSS変数ジェネレーター | ToolBox">
+    <meta property="og:description" content="CSSカスタムプロパティ（CSS変数）のボイラープレートを生成。カラーパレット、スペーシング、タイポグラフィの変数セットを自動生成します。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/css-variables.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"CSS変数ジェネレーター","url":"https://web-tool-site.com/tools/css-variables.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav a { color: #555; text-decoration: none; font-weight: 500; }
+.tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+.tool-header { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #2c3e50; padding: 2rem; text-align: center; }
+.tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.tool-header p { opacity: 0.8; }
+.tool-content { padding: 2rem; }
+button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.btn-primary { background: #4a90e2; color: white; }
+.btn-primary:hover { background: #357abd; transform: translateY(-2px); }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #5a6268; transform: translateY(-2px); }
+.btn-success { background: #27ae60; color: white; }
+.btn-success:hover { background: #219a52; transform: translateY(-2px); }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+input[type="text"], input[type="number"], input[type="color"], select { font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+input[type="text"], input[type="number"], select { width: 100%; }
+input[type="color"] { padding: 0.3rem; height: 42px; width: 60px; cursor: pointer; }
+input:focus, select:focus { outline: none; border-color: #4a90e2; }
+.form-group { margin-bottom: 1.5rem; }
+.label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+.result-box { background: #1e1e1e; border: 1px solid #444; border-radius: 6px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; white-space: pre-wrap; word-break: break-all; color: #d4d4d4; min-height: 200px; max-height: 500px; overflow-y: auto; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.section-title { font-size: 1.1rem; font-weight: 700; color: #2c3e50; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #a8edea; }
+.section-divider { border: none; border-top: 1px solid #eee; margin: 1.5rem 0; }
+.color-input-row { display: flex; align-items: center; gap: 0.75rem; }
+.color-input-row input[type="text"] { flex: 1; font-family: 'JetBrains Mono', monospace; }
+.palette-row { display: flex; gap: 4px; margin-top: 0.75rem; border-radius: 8px; overflow: hidden; }
+.palette-swatch { flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; cursor: pointer; transition: transform 0.2s; }
+.palette-swatch:hover { transform: scaleY(1.1); }
+.preview-section { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.5rem; }
+.preview-colors { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.preview-color-chip { width: 40px; height: 40px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; }
+.preview-typo { margin-bottom: 1rem; }
+.preview-spacing { display: flex; align-items: flex-end; gap: 0.5rem; margin-bottom: 1rem; }
+.spacing-bar { background: #a8edea; border-radius: 2px; min-width: 10px; display: flex; align-items: flex-end; justify-content: center; }
+.spacing-label { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; color: #666; text-align: center; margin-top: 4px; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+.footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+.output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.output-header .label { margin-bottom: 0; }
+@media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .grid-2 { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: 1fr; } nav ul { gap: 1rem; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <a href="../index.html" class="logo">🧰 ToolBox</a>
+        <nav><ul>
+            <li><a href="../index.html">ホーム</a></li>
+            <li><a href="../index.html#tools">ツール一覧</a></li>
+            <li><a href="../about.html">About</a></li>
+        </ul></nav>
+    </div>
+</header>
+
+<main class="tool-page">
+    <div class="tool-card-main">
+        <div class="tool-header">
+            <h1>🎨 CSS変数ジェネレーター</h1>
+            <p>カラーパレット・タイポグラフィ・スペーシングのCSS変数を自動生成します</p>
+        </div>
+        <div class="tool-content">
+
+            <div class="grid-2">
+                <!-- Left: Settings -->
+                <div>
+                    <!-- Colors -->
+                    <div class="section-title">🎨 カラーパレット</div>
+                    <div class="form-group">
+                        <label class="label">プライマリカラー</label>
+                        <div class="color-input-row">
+                            <input type="color" id="primaryColor" value="#4a90e2" oninput="syncColorHex(this, 'primaryHex')">
+                            <input type="text" id="primaryHex" value="#4a90e2" placeholder="#4a90e2" oninput="syncColorPicker(this, 'primaryColor')">
+                        </div>
+                        <div class="palette-row" id="primaryPalette"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">セカンダリカラー</label>
+                        <div class="color-input-row">
+                            <input type="color" id="secondaryColor" value="#27ae60" oninput="syncColorHex(this, 'secondaryHex')">
+                            <input type="text" id="secondaryHex" value="#27ae60" placeholder="#27ae60" oninput="syncColorPicker(this, 'secondaryColor')">
+                        </div>
+                        <div class="palette-row" id="secondaryPalette"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">アクセントカラー</label>
+                        <div class="color-input-row">
+                            <input type="color" id="accentColor" value="#e74c3c" oninput="syncColorHex(this, 'accentHex')">
+                            <input type="text" id="accentHex" value="#e74c3c" placeholder="#e74c3c" oninput="syncColorPicker(this, 'accentColor')">
+                        </div>
+                        <div class="palette-row" id="accentPalette"></div>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Typography -->
+                    <div class="section-title">📝 タイポグラフィ</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="label">ベースフォントサイズ</label>
+                            <select id="baseFontSize">
+                                <option value="14">14px</option>
+                                <option value="15">15px</option>
+                                <option value="16" selected>16px</option>
+                                <option value="18">18px</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">スケール比率</label>
+                            <select id="scaleRatio">
+                                <option value="1.25">1.25 - Minor Third</option>
+                                <option value="1.333" selected>1.333 - Perfect Fourth</option>
+                                <option value="1.5">1.5 - Major Sixth</option>
+                                <option value="1.414">1.414 - Augmented Fourth</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Spacing -->
+                    <div class="section-title">📐 スペーシング</div>
+                    <div class="form-group">
+                        <label class="label">ベースユニット</label>
+                        <select id="baseUnit">
+                            <option value="4">4px（小刻み）</option>
+                            <option value="8" selected>8px（標準）</option>
+                        </select>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Options -->
+                    <div class="section-title">⚙️ オプション</div>
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                            <input type="checkbox" id="includeDark" checked>
+                            <span>ダークモード変数を含める (@media prefers-color-scheme: dark)</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                            <input type="checkbox" id="includeShadows" checked>
+                            <span>シャドウプリセットを含める</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                            <input type="checkbox" id="includeRadius" checked>
+                            <span>ボーダーラジウスプリセットを含める</span>
+                        </label>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="generate()">⚙️ 生成する</button>
+                        <button class="btn-secondary" onclick="resetAll()">リセット</button>
+                    </div>
+                </div>
+
+                <!-- Right: Preview -->
+                <div>
+                    <div class="section-title">👁️ プレビュー</div>
+                    <div class="preview-section">
+                        <div style="margin-bottom:0.75rem;">
+                            <div style="font-size:0.8rem;font-weight:600;color:#666;margin-bottom:0.5rem;">プライマリ シェード</div>
+                            <div class="palette-row" id="previewPrimary" style="border-radius:6px;overflow:hidden;height:32px;"></div>
+                        </div>
+                        <div style="margin-bottom:0.75rem;">
+                            <div style="font-size:0.8rem;font-weight:600;color:#666;margin-bottom:0.5rem;">セカンダリ シェード</div>
+                            <div class="palette-row" id="previewSecondary" style="border-radius:6px;overflow:hidden;height:32px;"></div>
+                        </div>
+                        <div style="margin-bottom:1rem;">
+                            <div style="font-size:0.8rem;font-weight:600;color:#666;margin-bottom:0.5rem;">アクセント シェード</div>
+                            <div class="palette-row" id="previewAccent" style="border-radius:6px;overflow:hidden;height:32px;"></div>
+                        </div>
+                        <hr style="border:none;border-top:1px solid #ddd;margin:1rem 0;">
+                        <div style="margin-bottom:1rem;">
+                            <div style="font-size:0.8rem;font-weight:600;color:#666;margin-bottom:0.5rem;">タイポグラフィスケール</div>
+                            <div id="previewTypo"></div>
+                        </div>
+                        <hr style="border:none;border-top:1px solid #ddd;margin:1rem 0;">
+                        <div>
+                            <div style="font-size:0.8rem;font-weight:600;color:#666;margin-bottom:0.5rem;">スペーシングスケール</div>
+                            <div id="previewSpacing" style="display:flex;align-items:flex-end;gap:4px;"></div>
+                        </div>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <div class="output-header">
+                        <span class="label">生成された CSS 変数</span>
+                        <div style="display:flex;gap:0.5rem;">
+                            <button class="btn-secondary" style="padding:0.4rem 0.8rem;font-size:0.85rem;" onclick="copyCSS()">📋 コピー</button>
+                            <button class="btn-success" style="padding:0.4rem 0.8rem;font-size:0.85rem;" onclick="downloadCSS()">⬇️ ダウンロード</button>
+                        </div>
+                    </div>
+                    <div class="result-box" id="cssOutput">/* 「生成する」ボタンをクリックしてください */</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+    <footer class="footer"><div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a><a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a><a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a><a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div></footer>
+    <div class="toast" id="toast"></div>
+    <script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('コピーしました')).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('コピーしました');});}
+
+// --- Color Utilities ---
+function hexToHsl(hex) {
+    hex = hex.replace('#','');
+    if (hex.length === 3) hex = hex.split('').map(c=>c+c).join('');
+    const r = parseInt(hex.substr(0,2),16)/255;
+    const g = parseInt(hex.substr(2,2),16)/255;
+    const b = parseInt(hex.substr(4,2),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h, s, l = (max+min)/2;
+    if (max===min) { h=s=0; } else {
+        const d = max-min;
+        s = l>0.5 ? d/(2-max-min) : d/(max+min);
+        switch(max) {
+            case r: h=(g-b)/d+(g<b?6:0); break;
+            case g: h=(b-r)/d+2; break;
+            case b: h=(r-g)/d+4; break;
+        }
+        h/=6;
+    }
+    return [Math.round(h*360), Math.round(s*100), Math.round(l*100)];
+}
+
+function hslToHex(h, s, l) {
+    s /= 100; l /= 100;
+    const a = s * Math.min(l, 1-l);
+    const f = n => {
+        const k = (n+h/30) % 12;
+        const color = l - a * Math.max(Math.min(k-3, 9-k, 1), -1);
+        return Math.round(255*color).toString(16).padStart(2,'0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function generateShades(hex) {
+    try {
+        const [h, s] = hexToHsl(hex);
+        const lightnesses = [97, 94, 87, 78, 65, 50, 38, 28, 16];
+        const satAdjust = [40, 55, 70, 80, 90, s, Math.min(s+5,100), Math.min(s+8,100), Math.min(s+10,100)];
+        return lightnesses.map((l, i) => ({ l, hex: hslToHex(h, satAdjust[i], l) }));
+    } catch(e) {
+        return Array(9).fill({l:50,hex:'#888888'});
+    }
+}
+
+function renderPalette(containerId, shades) {
+    const labels = ['50','100','200','300','400','500','600','700','800','900'];
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = shades.map((s,i) => {
+        const textColor = s.l > 55 ? '#333' : '#fff';
+        return `<div class="palette-swatch" style="background:${s.hex};color:${textColor};" title="${labels[i]}: ${s.hex}">${labels[i]}</div>`;
+    }).join('');
+}
+
+function renderPreviewPalette(containerId, shades) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = shades.map(s => `<div style="flex:1;background:${s.hex};height:100%;"></div>`).join('');
+}
+
+function syncColorHex(picker, hexId) {
+    document.getElementById(hexId).value = picker.value;
+    updatePreviews();
+}
+
+function syncColorPicker(hexInput, pickerId) {
+    const val = hexInput.value.trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+        document.getElementById(pickerId).value = val;
+        updatePreviews();
+    }
+}
+
+function updatePreviews() {
+    const colors = {
+        primary: document.getElementById('primaryHex').value,
+        secondary: document.getElementById('secondaryHex').value,
+        accent: document.getElementById('accentHex').value
+    };
+    ['primary','secondary','accent'].forEach(name => {
+        try {
+            const shades = generateShades(colors[name]);
+            renderPalette(name+'Palette', shades);
+            renderPreviewPalette('preview'+name.charAt(0).toUpperCase()+name.slice(1), shades);
+        } catch(e) {}
+    });
+    updateTypoPreview();
+    updateSpacingPreview();
+}
+
+function updateTypoPreview() {
+    const base = parseInt(document.getElementById('baseFontSize').value);
+    const ratio = parseFloat(document.getElementById('scaleRatio').value);
+    const sizes = [];
+    for (let i = 5; i >= -1; i--) {
+        sizes.push({ label: i >= 0 ? `h${6-i}` : 'sm', size: (base * Math.pow(ratio, i)/16).toFixed(3) });
+    }
+    const el = document.getElementById('previewTypo');
+    el.innerHTML = sizes.map(s => `<div style="font-size:${s.size}rem;line-height:1.3;color:#333;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">${s.label} — ${s.size}rem</div>`).join('');
+}
+
+function updateSpacingPreview() {
+    const base = parseInt(document.getElementById('baseUnit').value);
+    const steps = [
+        {name:'xs', mult: 0.5},
+        {name:'sm', mult: 1},
+        {name:'md', mult: 2},
+        {name:'lg', mult: 3},
+        {name:'xl', mult: 4},
+        {name:'2xl', mult: 6},
+        {name:'3xl', mult: 8}
+    ];
+    const el = document.getElementById('previewSpacing');
+    el.innerHTML = steps.map(s => {
+        const px = base * s.mult;
+        return `<div style="text-align:center;"><div style="background:#a8edea;border-radius:2px;width:${Math.min(px*2,60)}px;height:${Math.min(px*2,80)}px;min-height:8px;margin:0 auto;"></div><div style="font-size:0.65rem;font-family:JetBrains Mono,monospace;color:#666;margin-top:4px;">${s.name}<br>${px}px</div></div>`;
+    }).join('');
+}
+
+function generate() {
+    const primary = document.getElementById('primaryHex').value;
+    const secondary = document.getElementById('secondaryHex').value;
+    const accent = document.getElementById('accentHex').value;
+    const base = parseInt(document.getElementById('baseFontSize').value);
+    const ratio = parseFloat(document.getElementById('scaleRatio').value);
+    const unit = parseInt(document.getElementById('baseUnit').value);
+    const includeDark = document.getElementById('includeDark').checked;
+    const includeShadows = document.getElementById('includeShadows').checked;
+    const includeRadius = document.getElementById('includeRadius').checked;
+
+    const shadeNames = ['50','100','200','300','400','500','600','700','800','900'];
+
+    function generateColorVars(name, hex) {
+        try {
+            const shades = generateShades(hex);
+            return shades.map((s,i) => `  --color-${name}-${shadeNames[i]}: ${s.hex};`).join('\n');
+        } catch(e) { return `  /* invalid color */`; }
+    }
+
+    // Typography
+    const typoVars = [];
+    const sizes = ['xs','sm','base','lg','xl','2xl','3xl','4xl'];
+    for (let i = -2; i <= 5; i++) {
+        const rem = (base * Math.pow(ratio, i) / 16).toFixed(3);
+        typoVars.push(`  --font-size-${sizes[i+2]}: ${rem}rem;`);
+    }
+
+    // Heading sizes
+    const headingVars = [];
+    for (let h = 1; h <= 6; h++) {
+        const pow = 6 - h;
+        const rem = (base * Math.pow(ratio, pow) / 16).toFixed(3);
+        headingVars.push(`  --font-size-h${h}: ${rem}rem;`);
+    }
+
+    // Spacing
+    const spacingDefs = [
+        {name:'xs', mult:0.5}, {name:'sm', mult:1}, {name:'md', mult:2},
+        {name:'lg', mult:3}, {name:'xl', mult:4}, {name:'2xl', mult:6}, {name:'3xl', mult:8}
+    ];
+    const spacingVars = spacingDefs.map(s => {
+        const rem = (unit * s.mult / 16).toFixed(4).replace(/\.?0+$/,'');
+        return `  --spacing-${s.name}: ${rem}rem;   /* ${unit * s.mult}px */`;
+    });
+
+    // Radius
+    const radiusVars = [
+        '  --radius-none: 0;',
+        '  --radius-sm: 0.25rem;',
+        '  --radius-md: 0.375rem;',
+        '  --radius-lg: 0.5rem;',
+        '  --radius-xl: 0.75rem;',
+        '  --radius-2xl: 1rem;',
+        '  --radius-full: 9999px;',
+    ];
+
+    // Shadows
+    const shadowVars = [
+        '  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);',
+        '  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);',
+        '  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);',
+        '  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);',
+        '  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);',
+        '  --shadow-none: none;',
+    ];
+
+    // Dark mode overrides
+    const darkVars = [];
+    try {
+        const primaryShades = generateShades(primary);
+        darkVars.push(
+            `  --color-primary-50: ${primaryShades[8].hex};`,
+            `  --color-primary-100: ${primaryShades[7].hex};`,
+            `  --color-primary-900: ${primaryShades[0].hex};`,
+        );
+    } catch(e) {}
+
+    let css = `/* ================================================\n   CSS カスタムプロパティ（CSS変数）\n   Generated by ToolBox CSS Variable Generator\n================================================ */\n\n`;
+    css += `:root {\n`;
+    css += `  /* ===== カラーパレット ===== */\n\n`;
+    css += `  /* Primary */\n${generateColorVars('primary', primary)}\n\n`;
+    css += `  /* Secondary */\n${generateColorVars('secondary', secondary)}\n\n`;
+    css += `  /* Accent */\n${generateColorVars('accent', accent)}\n\n`;
+    css += `  /* ニュートラル */\n`;
+    css += `  --color-gray-50: #f9fafb;\n  --color-gray-100: #f3f4f6;\n  --color-gray-200: #e5e7eb;\n  --color-gray-300: #d1d5db;\n  --color-gray-400: #9ca3af;\n  --color-gray-500: #6b7280;\n  --color-gray-600: #4b5563;\n  --color-gray-700: #374151;\n  --color-gray-800: #1f2937;\n  --color-gray-900: #111827;\n\n`;
+    css += `  /* セマンティックカラー */\n`;
+    css += `  --color-success: #16a34a;\n  --color-warning: #d97706;\n  --color-error: #dc2626;\n  --color-info: #2563eb;\n\n`;
+    css += `  /* 背景・テキスト */\n`;
+    css += `  --color-bg: #ffffff;\n  --color-bg-secondary: #f9fafb;\n  --color-text: #111827;\n  --color-text-secondary: #6b7280;\n  --color-border: #e5e7eb;\n\n`;
+    css += `  /* ===== タイポグラフィ ===== */\n\n`;
+    css += `  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;\n  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;\n  --font-family-serif: Georgia, 'Times New Roman', serif;\n\n`;
+    css += `  /* フォントサイズ */\n${typoVars.join('\n')}\n\n`;
+    css += `  /* 見出しサイズ */\n${headingVars.join('\n')}\n\n`;
+    css += `  /* フォントウェイト */\n`;
+    css += `  --font-weight-light: 300;\n  --font-weight-regular: 400;\n  --font-weight-medium: 500;\n  --font-weight-semibold: 600;\n  --font-weight-bold: 700;\n\n`;
+    css += `  /* 行間 */\n`;
+    css += `  --line-height-tight: 1.25;\n  --line-height-snug: 1.375;\n  --line-height-normal: 1.5;\n  --line-height-relaxed: 1.625;\n  --line-height-loose: 2;\n\n`;
+    css += `  /* ===== スペーシング ===== */\n\n${spacingVars.join('\n')}\n\n`;
+    if (includeRadius) {
+        css += `  /* ===== ボーダーラジウス ===== */\n\n${radiusVars.join('\n')}\n\n`;
+    }
+    if (includeShadows) {
+        css += `  /* ===== シャドウ ===== */\n\n${shadowVars.join('\n')}\n\n`;
+    }
+    css += `  /* ===== トランジション ===== */\n\n`;
+    css += `  --transition-fast: 150ms ease;\n  --transition-normal: 250ms ease;\n  --transition-slow: 400ms ease;\n\n`;
+    css += `  /* ===== Z-Index ===== */\n\n`;
+    css += `  --z-dropdown: 100;\n  --z-sticky: 200;\n  --z-overlay: 300;\n  --z-modal: 400;\n  --z-toast: 500;\n`;
+    css += `}\n`;
+
+    if (includeDark) {
+        css += `\n/* ===== ダークモード ===== */\n@media (prefers-color-scheme: dark) {\n  :root {\n`;
+        css += `    --color-bg: #0f172a;\n    --color-bg-secondary: #1e293b;\n    --color-text: #f1f5f9;\n    --color-text-secondary: #94a3b8;\n    --color-border: #334155;\n\n`;
+        css += `    /* プライマリカラー（反転） */\n`;
+        css += darkVars.join('\n');
+        css += `\n  }\n}\n`;
+        css += `\n/* data-theme 属性による切り替えも対応 */\n[data-theme="dark"] {\n`;
+        css += `  --color-bg: #0f172a;\n  --color-bg-secondary: #1e293b;\n  --color-text: #f1f5f9;\n  --color-text-secondary: #94a3b8;\n  --color-border: #334155;\n}\n`;
+    }
+
+    document.getElementById('cssOutput').textContent = css;
+    updatePreviews();
+    showToast('CSS変数を生成しました');
+}
+
+function copyCSS() {
+    copyText(document.getElementById('cssOutput').textContent);
+}
+
+function downloadCSS() {
+    const css = document.getElementById('cssOutput').textContent;
+    const blob = new Blob([css], { type: 'text/css' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'variables.css';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('ダウンロードしました');
+}
+
+function resetAll() {
+    document.getElementById('primaryHex').value = '#4a90e2';
+    document.getElementById('primaryColor').value = '#4a90e2';
+    document.getElementById('secondaryHex').value = '#27ae60';
+    document.getElementById('secondaryColor').value = '#27ae60';
+    document.getElementById('accentHex').value = '#e74c3c';
+    document.getElementById('accentColor').value = '#e74c3c';
+    document.getElementById('baseFontSize').value = '16';
+    document.getElementById('scaleRatio').value = '1.333';
+    document.getElementById('baseUnit').value = '8';
+    document.getElementById('includeDark').checked = true;
+    document.getElementById('includeShadows').checked = true;
+    document.getElementById('includeRadius').checked = true;
+    generate();
+}
+
+// Event listeners
+['baseFontSize','scaleRatio','baseUnit'].forEach(id => {
+    document.getElementById(id).addEventListener('change', updatePreviews);
+});
+
+// Initial render
+updatePreviews();
+generate();
+    </script>
+</body>
+</html>
