@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="px⇔rem変換ツール。ベースフォントサイズを指定してpxとremを相互変換。一括変換・変換テーブルも表示。">
+<meta name="keywords" content="px,rem,変換,CSS,フォントサイズ,単位変換,レスポンシブ">
+<meta name="author" content="ToolBox">
+<title>px ⇔ rem 変換ツール | ToolBox</title>
+<meta property="og:title" content="px ⇔ rem 変換ツール | ToolBox">
+<meta property="og:description" content="ベースフォントサイズを指定してpxとremを相互変換。一括変換・変換テーブル付き。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://web-tool-site.com/tools/px-rem-converter.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="px ⇔ rem 変換ツール | ToolBox">
+<meta name="twitter:description" content="px⇔rem変換。ベースフォントサイズ指定可能。">
+<link rel="canonical" href="https://web-tool-site.com/tools/px-rem-converter.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "px ⇔ rem 変換ツール",
+  "description": "ベースフォントサイズを指定してpxとremを相互変換します。",
+  "url": "https://web-tool-site.com/tools/px-rem-converter.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0"}
+}
+</script>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .tool-container { display:flex; flex-direction:column; gap:1.5rem; max-width:900px; margin:0 auto; }
+  .base-setting { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; background:#f8f9fa; padding:1rem 1.25rem; border-radius:0.5rem; border:1px solid #e0e0e0; }
+  .base-setting label { font-weight:600; font-size:0.9rem; color:#555; }
+  .base-setting input[type="number"] { width:5rem; padding:0.4rem 0.6rem; border:2px solid #007bff; border-radius:0.4rem; font-size:1rem; font-family:'JetBrains Mono',monospace; text-align:center; }
+  .base-setting input:focus { outline:none; box-shadow:0 0 0 3px rgba(0,123,255,0.15); }
+  .base-setting .hint { font-size:0.8rem; color:#888; }
+  .converters { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+  @media(max-width:640px) { .converters { grid-template-columns:1fr; } }
+  .converter-card { background:#fff; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.25rem; }
+  .converter-card h3 { margin:0 0 1rem 0; font-size:1rem; color:#333; }
+  .conv-input-row { display:flex; align-items:center; gap:0.5rem; }
+  .conv-input { flex:1; padding:0.75rem 1rem; border:2px solid #ddd; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:1.1rem; transition:border-color 0.2s; }
+  .conv-input:focus { outline:none; border-color:#007bff; }
+  .conv-unit { font-size:1rem; color:#888; font-weight:600; width:2.5rem; }
+  .conv-result { margin-top:0.75rem; padding:0.75rem; background:#e8f4fd; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:1.1rem; color:#0056b3; font-weight:600; cursor:pointer; }
+  .conv-result:hover { background:#d0e8f9; }
+  .conv-result .result-unit { font-size:0.85rem; color:#888; font-weight:400; margin-left:0.25rem; }
+  .batch-section { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.25rem; }
+  .batch-section h3 { margin:0 0 0.75rem 0; font-size:1rem; color:#333; }
+  .batch-row { display:flex; gap:0.75rem; flex-wrap:wrap; }
+  .batch-input { flex:1; min-width:200px; padding:0.75rem; border:1px solid #ddd; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.9rem; min-height:80px; resize:vertical; }
+  .batch-input:focus { outline:none; border-color:#007bff; }
+  .batch-output { flex:1; min-width:200px; padding:0.75rem; border:1px solid #ddd; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.9rem; min-height:80px; background:#f0f4f8; resize:vertical; }
+  .btn { padding:0.6rem 1.1rem; border:none; border-radius:0.5rem; font-size:0.875rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .btn-primary { background:#007bff; color:#fff; }
+  .btn-primary:hover { background:#0056b3; }
+  .btn-secondary { background:#6c757d; color:#fff; }
+  .ref-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+  .ref-table th { background:#f0f4f8; padding:0.5rem 0.75rem; text-align:center; font-weight:700; color:#555; }
+  .ref-table td { padding:0.4rem 0.75rem; text-align:center; border-bottom:1px solid #f0f0f0; font-family:'JetBrains Mono',monospace; }
+  .ref-table tr:hover td { background:#f8f9fa; }
+  .ref-table .highlight td { background:#fff3cd; font-weight:600; }
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#333; color:#fff; padding:0.75rem 1.25rem; border-radius:0.5rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:999; }
+  .toast.show { opacity:1; }
+
+  @media (prefers-color-scheme: dark) {
+    .base-setting { background:#1e2433; border-color:#333; }
+    .base-setting label { color:#aaa; }
+    .converter-card { background:#1e2433; border-color:#333; }
+    .converter-card h3 { color:#e0e0e0; }
+    .conv-input { background:#252d3d; border-color:#444; color:#e0e0e0; }
+    .conv-result { background:#1a3a5a; color:#7bb3f0; }
+    .conv-result:hover { background:#1a4a6a; }
+    .batch-section { background:#1e2433; border-color:#333; }
+    .batch-section h3 { color:#e0e0e0; }
+    .batch-input { background:#252d3d; border-color:#444; color:#e0e0e0; }
+    .batch-output { background:#1a2030; border-color:#333; color:#a8d5b4; }
+    .ref-table th { background:#252d3d; color:#aaa; }
+    .ref-table td { border-color:#2a2a3a; color:#e0e0e0; }
+    .ref-table tr:hover td { background:#252d3d; }
+    .ref-table .highlight td { background:#3a3a10; }
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-content">
+    <div class="logo">ToolBox</div>
+    <nav class="nav">
+      <a href="../index.html" class="nav-link">ホーム</a>
+      <a href="../index.html#tools" class="nav-link">ツール一覧</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="tool-container">
+    <h1>px ⇔ rem 変換ツール</h1>
+    <p>CSSのpxとrem単位を相互変換します。ベースフォントサイズを自由に設定できます。</p>
+
+    <!-- Base font size setting -->
+    <div class="base-setting">
+      <label>ベースフォントサイズ:</label>
+      <input type="number" id="baseSize" value="16" min="1" max="100" step="0.5" oninput="onBaseChange()">
+      <span style="font-size:1rem;color:#555;">px</span>
+      <span class="hint">（ブラウザデフォルト: 16px = 1rem）</span>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+        <button class="btn btn-secondary" style="padding:0.3rem 0.6rem;font-size:0.78rem;" onclick="setBase(16)">16px</button>
+        <button class="btn btn-secondary" style="padding:0.3rem 0.6rem;font-size:0.78rem;" onclick="setBase(14)">14px</button>
+        <button class="btn btn-secondary" style="padding:0.3rem 0.6rem;font-size:0.78rem;" onclick="setBase(10)">10px（計算楽）</button>
+      </div>
+    </div>
+
+    <!-- Converters -->
+    <div class="converters">
+      <div class="converter-card">
+        <h3>px → rem</h3>
+        <div class="conv-input-row">
+          <input type="number" id="pxInput" class="conv-input" value="16" step="0.5" oninput="pxToRem()">
+          <span class="conv-unit">px</span>
+        </div>
+        <div class="conv-result" id="remResult" onclick="copyResult('remResult')">1 <span class="result-unit">rem</span></div>
+        <p style="font-size:0.75rem;color:#888;margin-top:0.4rem;">クリックでコピー</p>
+      </div>
+      <div class="converter-card">
+        <h3>rem → px</h3>
+        <div class="conv-input-row">
+          <input type="number" id="remInput" class="conv-input" value="1" step="0.0625" oninput="remToPx()">
+          <span class="conv-unit">rem</span>
+        </div>
+        <div class="conv-result" id="pxResult" onclick="copyResult('pxResult')">16 <span class="result-unit">px</span></div>
+        <p style="font-size:0.75rem;color:#888;margin-top:0.4rem;">クリックでコピー</p>
+      </div>
+    </div>
+
+    <!-- Batch conversion -->
+    <div class="batch-section">
+      <h3>一括変換（CSSのpx値を一括でremに変換）</h3>
+      <div class="batch-row">
+        <textarea id="batchInput" class="batch-input" placeholder="font-size: 16px;&#10;padding: 8px 16px;&#10;margin: 24px 0;&#10;border-radius: 4px;" oninput="batchConvert()"></textarea>
+        <textarea id="batchOutput" class="batch-output" readonly placeholder="変換結果がここに表示されます..."></textarea>
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button class="btn btn-primary" style="font-size:0.8rem;padding:0.4rem 0.8rem;" onclick="copyBatch()">結果をコピー</button>
+        <button class="btn btn-secondary" style="font-size:0.8rem;padding:0.4rem 0.8rem;" onclick="clearBatch()">クリア</button>
+      </div>
+    </div>
+
+    <!-- Reference table -->
+    <div>
+      <h3 style="font-size:1rem;margin-bottom:0.75rem;color:#333;">変換テーブル（ベース: <span id="baseDisplay">16</span>px）</h3>
+      <div style="overflow-x:auto;">
+        <table class="ref-table" id="refTable"></table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+  <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+    <h2 style="font-size:1.2rem;margin-bottom:12px;">px ⇔ rem 変換ツールとは？</h2>
+    <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">CSSのpx（ピクセル）とrem（ルートem）単位を相互変換するツールです。レスポンシブデザインやアクセシビリティ対応でrem単位を使う際に活用できます。</p>
+    <h3 style="font-size:1rem;margin-bottom:8px;">remとは？</h3>
+    <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+      <li>remはルート要素（html）のフォントサイズを基準とした相対単位</li>
+      <li>デフォルトは1rem = 16px（ブラウザ標準）</li>
+      <li>ユーザーのフォントサイズ設定に応じてスケールするためアクセシブル</li>
+      <li>ベース10px設定（html { font-size: 62.5% }）で計算が楽になる</li>
+    </ul>
+    <p style="font-size:13px;color:#888;margin-top:16px;">すべてブラウザ上で動作します。入力データがサーバーに送信されることはありません。</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+      <a href="../about.html">このサイトについて</a>
+      <a href="../contact.html">お問い合わせ</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../terms.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function getBase() { return parseFloat(document.getElementById('baseSize').value) || 16; }
+
+function setBase(v) { document.getElementById('baseSize').value = v; onBaseChange(); }
+
+function onBaseChange() {
+  pxToRem(); remToPx(); buildTable(); batchConvert();
+  document.getElementById('baseDisplay').textContent = getBase();
+}
+
+function round(n, d = 4) { return parseFloat(n.toFixed(d)); }
+
+function pxToRem() {
+  const px = parseFloat(document.getElementById('pxInput').value);
+  const base = getBase();
+  if (isNaN(px)) { document.getElementById('remResult').innerHTML = '— <span class="result-unit">rem</span>'; return; }
+  const rem = round(px / base);
+  document.getElementById('remResult').innerHTML = `${rem} <span class="result-unit">rem</span>`;
+}
+
+function remToPx() {
+  const rem = parseFloat(document.getElementById('remInput').value);
+  const base = getBase();
+  if (isNaN(rem)) { document.getElementById('pxResult').innerHTML = '— <span class="result-unit">px</span>'; return; }
+  const px = round(rem * base);
+  document.getElementById('pxResult').innerHTML = `${px} <span class="result-unit">px</span>`;
+}
+
+function copyResult(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent.trim();
+  navigator.clipboard.writeText(text).then(() => showToast('コピーしました: ' + text));
+}
+
+function batchConvert() {
+  const input = document.getElementById('batchInput').value;
+  const base = getBase();
+  const output = input.replace(/(\d*\.?\d+)px/g, (match, n) => {
+    const px = parseFloat(n);
+    const rem = round(px / base);
+    return `${rem}rem`;
+  });
+  document.getElementById('batchOutput').value = output;
+}
+
+function copyBatch() {
+  const text = document.getElementById('batchOutput').value;
+  if (!text) { showToast('変換結果がありません'); return; }
+  navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+}
+
+function clearBatch() {
+  document.getElementById('batchInput').value = '';
+  document.getElementById('batchOutput').value = '';
+}
+
+const COMMON_PX = [4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 96, 128];
+
+function buildTable() {
+  const base = getBase();
+  const table = document.getElementById('refTable');
+  let html = '<thead><tr><th>px</th><th>rem</th><th>em (参考)</th></tr></thead><tbody>';
+  COMMON_PX.forEach(px => {
+    const rem = round(px / base);
+    const highlight = px === base ? ' class="highlight"' : '';
+    html += `<tr${highlight}><td>${px}px</td><td>${rem}rem</td><td>${rem}em</td></tr>`;
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+// init
+pxToRem();
+remToPx();
+buildTable();
+</script>
+</body>
+</html>

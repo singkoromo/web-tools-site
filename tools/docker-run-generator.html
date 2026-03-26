@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Docker Runコマンドジェネレーター。フォームでオプションを指定するとdocker runコマンドを自動生成します。">
+<meta name="keywords" content="docker,run,コマンド,ジェネレーター,コンテナ,ポート,ボリューム,環境変数">
+<meta name="author" content="ToolBox">
+<title>Docker Runコマンドジェネレーター | ToolBox</title>
+<meta property="og:title" content="Docker Runコマンドジェネレーター | ToolBox">
+<meta property="og:description" content="フォームでオプション指定→docker runコマンドを自動生成。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://web-tool-site.com/tools/docker-run-generator.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker Runコマンドジェネレーター | ToolBox">
+<meta name="twitter:description" content="フォームでオプション指定→docker runコマンドを自動生成。">
+<link rel="canonical" href="https://web-tool-site.com/tools/docker-run-generator.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Docker Runコマンドジェネレーター",
+  "description": "フォームでオプションを指定するとdocker runコマンドを自動生成します。",
+  "url": "https://web-tool-site.com/tools/docker-run-generator.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0"}
+}
+</script>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .tool-container { display:flex; flex-direction:column; gap:1.5rem; max-width:900px; margin:0 auto; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+  @media(max-width:640px) { .form-grid { grid-template-columns:1fr; } }
+  .form-section { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.25rem; }
+  .form-section h3 { margin:0 0 1rem 0; font-size:0.95rem; color:#333; display:flex; align-items:center; gap:0.5rem; }
+  .form-group { display:flex; flex-direction:column; gap:0.3rem; margin-bottom:0.75rem; }
+  .form-group:last-child { margin-bottom:0; }
+  .form-group label { font-size:0.82rem; font-weight:600; color:#555; }
+  .form-group input, .form-group select { padding:0.5rem 0.75rem; border:1px solid #ddd; border-radius:0.4rem; font-size:0.9rem; font-family:'Inter',sans-serif; }
+  .form-group input:focus, .form-group select:focus { outline:none; border-color:#007bff; box-shadow:0 0 0 2px rgba(0,123,255,0.1); }
+  .dynamic-list { display:flex; flex-direction:column; gap:0.4rem; }
+  .dynamic-item { display:flex; gap:0.4rem; align-items:center; }
+  .dynamic-item input { flex:1; padding:0.45rem 0.6rem; border:1px solid #ddd; border-radius:0.4rem; font-size:0.85rem; font-family:'JetBrains Mono',monospace; }
+  .dynamic-item input:focus { outline:none; border-color:#007bff; }
+  .btn-icon { width:1.8rem; height:1.8rem; border:none; border-radius:0.35rem; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .btn-add { background:#e8f4fd; color:#007bff; }
+  .btn-add:hover { background:#007bff; color:#fff; }
+  .btn-remove { background:#fde8e8; color:#dc3545; }
+  .btn-remove:hover { background:#dc3545; color:#fff; }
+  .add-row { margin-top:0.3rem; }
+  .checkbox-group { display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .checkbox-label { display:flex; align-items:center; gap:0.3rem; font-size:0.82rem; color:#444; cursor:pointer; }
+  .checkbox-label input[type="checkbox"] { accent-color:#007bff; }
+  .output-section { background:#1e2433; border-radius:0.75rem; padding:1.25rem; }
+  .output-section h3 { margin:0 0 0.75rem 0; color:#e0e0e0; font-size:0.95rem; }
+  .command-display { background:#0d1117; border-radius:0.5rem; padding:1rem; font-family:'JetBrains Mono',monospace; font-size:0.85rem; color:#e6edf3; white-space:pre-wrap; word-break:break-all; min-height:4rem; }
+  .command-display .flag { color:#7bb3f0; }
+  .command-display .value { color:#a8d5b4; }
+  .command-display .image { color:#ffa657; font-weight:600; }
+  .btn-group { display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem; }
+  .btn { padding:0.6rem 1.2rem; border:none; border-radius:0.5rem; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .btn-primary { background:#007bff; color:#fff; }
+  .btn-primary:hover { background:#0056b3; }
+  .btn-success { background:#28a745; color:#fff; }
+  .btn-success:hover { background:#218838; }
+  .btn-secondary { background:#6c757d; color:#fff; }
+  .btn-secondary:hover { background:#545b62; }
+  .preset-row { display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .preset-btn { padding:0.35rem 0.75rem; border:1px solid #007bff; border-radius:1rem; background:#fff; color:#007bff; font-size:0.8rem; cursor:pointer; }
+  .preset-btn:hover { background:#007bff; color:#fff; }
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#333; color:#fff; padding:0.75rem 1.25rem; border-radius:0.5rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:999; }
+  .toast.show { opacity:1; }
+
+  @media (prefers-color-scheme: dark) {
+    .form-section { background:#1e2433; border-color:#333; }
+    .form-section h3 { color:#e0e0e0; }
+    .form-group label { color:#aaa; }
+    .form-group input, .form-group select { background:#252d3d; border-color:#444; color:#e0e0e0; }
+    .dynamic-item input { background:#252d3d; border-color:#444; color:#e0e0e0; }
+    .checkbox-label { color:#ccc; }
+    .preset-btn { background:#1e2433; border-color:#555; color:#7bb3f0; }
+    .preset-btn:hover { background:#007bff; color:#fff; }
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-content">
+    <div class="logo">ToolBox</div>
+    <nav class="nav">
+      <a href="../index.html" class="nav-link">ホーム</a>
+      <a href="../index.html#tools" class="nav-link">ツール一覧</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="tool-container">
+    <h1>Docker Run コマンドジェネレーター</h1>
+    <p>フォームでオプションを指定すると <code>docker run</code> コマンドを自動生成します。</p>
+
+    <div>
+      <p style="font-size:0.85rem;color:#666;margin-bottom:0.5rem;">プリセット:</p>
+      <div class="preset-row">
+        <button class="preset-btn" onclick="loadPreset('nginx')">Nginx</button>
+        <button class="preset-btn" onclick="loadPreset('mysql')">MySQL</button>
+        <button class="preset-btn" onclick="loadPreset('redis')">Redis</button>
+        <button class="preset-btn" onclick="loadPreset('postgres')">PostgreSQL</button>
+        <button class="preset-btn" onclick="loadPreset('node')">Node.js App</button>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <!-- 基本設定 -->
+      <div class="form-section">
+        <h3>🐳 基本設定</h3>
+        <div class="form-group">
+          <label>イメージ名 *</label>
+          <input type="text" id="imageName" placeholder="nginx:latest" oninput="generate()">
+        </div>
+        <div class="form-group">
+          <label>コンテナ名</label>
+          <input type="text" id="containerName" placeholder="my-container" oninput="generate()">
+        </div>
+        <div class="form-group">
+          <label>実行モード</label>
+          <select id="runMode" onchange="generate()">
+            <option value="-d">デタッチ (-d) バックグラウンド実行</option>
+            <option value="-it">インタラクティブ (-it)</option>
+            <option value="">フォアグラウンド</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>再起動ポリシー</label>
+          <select id="restartPolicy" onchange="generate()">
+            <option value="">なし</option>
+            <option value="always">always</option>
+            <option value="unless-stopped">unless-stopped</option>
+            <option value="on-failure">on-failure</option>
+            <option value="no">no</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>ネットワーク</label>
+          <input type="text" id="network" placeholder="bridge / host / my-network" oninput="generate()">
+        </div>
+        <div class="checkbox-group">
+          <label class="checkbox-label"><input type="checkbox" id="chkRm" onchange="generate()"> --rm (終了後削除)</label>
+          <label class="checkbox-label"><input type="checkbox" id="chkPrivileged" onchange="generate()"> --privileged</label>
+        </div>
+      </div>
+
+      <!-- リソース設定 -->
+      <div class="form-section">
+        <h3>⚙️ リソース設定</h3>
+        <div class="form-group">
+          <label>CPU制限 (例: 1.5)</label>
+          <input type="text" id="cpuLimit" placeholder="1.5" oninput="generate()">
+        </div>
+        <div class="form-group">
+          <label>メモリ制限 (例: 512m, 2g)</label>
+          <input type="text" id="memLimit" placeholder="512m" oninput="generate()">
+        </div>
+        <div class="form-group">
+          <label>作業ディレクトリ</label>
+          <input type="text" id="workdir" placeholder="/app" oninput="generate()">
+        </div>
+        <div class="form-group">
+          <label>エントリーポイント</label>
+          <input type="text" id="entrypoint" placeholder="/bin/sh" oninput="generate()">
+        </div>
+        <div class="form-group">
+          <label>実行コマンド</label>
+          <input type="text" id="command" placeholder="node server.js" oninput="generate()">
+        </div>
+      </div>
+
+      <!-- ポートマッピング -->
+      <div class="form-section">
+        <h3>🔌 ポートマッピング</h3>
+        <div id="portsList" class="dynamic-list"></div>
+        <div class="add-row">
+          <button class="btn-icon btn-add" onclick="addPort()" title="追加">＋</button>
+        </div>
+      </div>
+
+      <!-- 環境変数 -->
+      <div class="form-section">
+        <h3>🌿 環境変数</h3>
+        <div id="envList" class="dynamic-list"></div>
+        <div class="add-row">
+          <button class="btn-icon btn-add" onclick="addEnv()" title="追加">＋</button>
+        </div>
+      </div>
+
+      <!-- ボリューム -->
+      <div class="form-section">
+        <h3>💾 ボリューム</h3>
+        <div id="volList" class="dynamic-list"></div>
+        <div class="add-row">
+          <button class="btn-icon btn-add" onclick="addVol()" title="追加">＋</button>
+        </div>
+      </div>
+
+      <!-- ラベル -->
+      <div class="form-section">
+        <h3>🏷️ ラベル</h3>
+        <div id="labelList" class="dynamic-list"></div>
+        <div class="add-row">
+          <button class="btn-icon btn-add" onclick="addLabel()" title="追加">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 出力 -->
+    <div class="output-section">
+      <h3>生成されたコマンド</h3>
+      <div id="commandOutput" class="command-display">docker run [オプションを入力してください]</div>
+      <div class="btn-group">
+        <button class="btn btn-success" onclick="copyCommand()">コピー</button>
+        <button class="btn btn-secondary" onclick="resetAll()">リセット</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+  <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+    <h2 style="font-size:1.2rem;margin-bottom:12px;">Docker Runコマンドジェネレーターとは？</h2>
+    <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">docker runの複雑なオプションをGUIで設定してコマンドを自動生成するツールです。ポートマッピング・環境変数・ボリュームマウントなど多彩なオプションに対応しています。</p>
+    <p style="font-size:13px;color:#888;margin-top:16px;">すべてブラウザ上で動作します。入力データがサーバーに送信されることはありません。</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+      <a href="../about.html">このサイトについて</a>
+      <a href="../contact.html">お問い合わせ</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../terms.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// --- Dynamic list helpers ---
+function makeDynamicRow(listId, placeholder1, placeholder2, removeId) {
+  const row = document.createElement('div');
+  row.className = 'dynamic-item';
+  row.innerHTML = `<input type="text" placeholder="${placeholder1}" oninput="generate()">` +
+    (placeholder2 ? `<input type="text" placeholder="${placeholder2}" oninput="generate()">` : '') +
+    `<button class="btn-icon btn-remove" onclick="this.parentElement.remove();generate()" title="削除">✕</button>`;
+  document.getElementById(listId).appendChild(row);
+  generate();
+}
+function addPort()  { makeDynamicRow('portsList',  'ホスト:8080', 'コンテナ:80'); }
+function addEnv()   { makeDynamicRow('envList',    'KEY', 'VALUE'); }
+function addVol()   { makeDynamicRow('volList',    '/host/path', '/container/path'); }
+function addLabel() { makeDynamicRow('labelList',  'key', 'value'); }
+
+function getListValues(listId) {
+  return Array.from(document.getElementById(listId).querySelectorAll('.dynamic-item')).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return inputs.length === 2
+      ? { a: inputs[0].value.trim(), b: inputs[1].value.trim() }
+      : { a: inputs[0].value.trim(), b: '' };
+  }).filter(v => v.a);
+}
+
+function generate() {
+  const image = document.getElementById('imageName').value.trim();
+  const name  = document.getElementById('containerName').value.trim();
+  const mode  = document.getElementById('runMode').value;
+  const restart = document.getElementById('restartPolicy').value;
+  const network = document.getElementById('network').value.trim();
+  const rm    = document.getElementById('chkRm').checked;
+  const priv  = document.getElementById('chkPrivileged').checked;
+  const cpu   = document.getElementById('cpuLimit').value.trim();
+  const mem   = document.getElementById('memLimit').value.trim();
+  const wd    = document.getElementById('workdir').value.trim();
+  const ep    = document.getElementById('entrypoint').value.trim();
+  const cmd   = document.getElementById('command').value.trim();
+
+  const ports  = getListValues('portsList');
+  const envs   = getListValues('envList');
+  const vols   = getListValues('volList');
+  const labels = getListValues('labelList');
+
+  const args = ['docker run'];
+  if (mode) args.push(mode);
+  if (rm) args.push('--rm');
+  if (priv) args.push('--privileged');
+  if (name) args.push(`--name ${name}`);
+  if (restart) args.push(`--restart ${restart}`);
+  if (network) args.push(`--network ${network}`);
+  if (cpu) args.push(`--cpus="${cpu}"`);
+  if (mem) args.push(`-m ${mem}`);
+  if (wd) args.push(`-w ${wd}`);
+  if (ep) args.push(`--entrypoint ${ep}`);
+  ports.forEach(p => { if (p.a && p.b) args.push(`-p ${p.a}:${p.b}`); else if (p.a) args.push(`-p ${p.a}`); });
+  envs.forEach(e => { if (e.a && e.b) args.push(`-e ${e.a}=${e.b}`); else if (e.a) args.push(`-e ${e.a}`); });
+  vols.forEach(v => { if (v.a && v.b) args.push(`-v ${v.a}:${v.b}`); else if (v.a) args.push(`-v ${v.a}`); });
+  labels.forEach(l => { if (l.a && l.b) args.push(`-l ${l.a}=${l.b}`); else if (l.a) args.push(`-l ${l.a}`); });
+  if (image) args.push(image);
+  if (cmd) args.push(cmd);
+
+  const command = args.join(' \\\n  ');
+  document.getElementById('commandOutput').textContent = image ? command : 'docker run [オプションを入力してください]';
+}
+
+function copyCommand() {
+  const text = document.getElementById('commandOutput').textContent;
+  if (text.includes('[オプションを')) { showToast('先にイメージ名を入力してください'); return; }
+  navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+}
+
+function resetAll() {
+  ['imageName','containerName','network','cpuLimit','memLimit','workdir','entrypoint','command'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('runMode').value = '-d';
+  document.getElementById('restartPolicy').value = '';
+  document.getElementById('chkRm').checked = false;
+  document.getElementById('chkPrivileged').checked = false;
+  ['portsList','envList','volList','labelList'].forEach(id => { document.getElementById(id).innerHTML = ''; });
+  generate();
+}
+
+const PRESETS = {
+  nginx: { image:'nginx:latest', name:'nginx', ports:[['8080','80']], vols:[], envs:[] },
+  mysql: { image:'mysql:8.0', name:'mysql', ports:[['3306','3306']], vols:[['/data/mysql','/var/lib/mysql']], envs:[['MYSQL_ROOT_PASSWORD','password'],['MYSQL_DATABASE','mydb']] },
+  redis: { image:'redis:7-alpine', name:'redis', ports:[['6379','6379']], vols:[], envs:[] },
+  postgres: { image:'postgres:15', name:'postgres', ports:[['5432','5432']], vols:[['/data/pg','/var/lib/postgresql/data']], envs:[['POSTGRES_PASSWORD','password'],['POSTGRES_DB','mydb']] },
+  node: { image:'node:18-alpine', name:'app', ports:[['3000','3000']], vols:[['./','/app']], envs:[['NODE_ENV','production']], wd:'/app', cmd:'node server.js' }
+};
+
+function loadPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+  resetAll();
+  document.getElementById('imageName').value = p.image;
+  document.getElementById('containerName').value = p.name;
+  if (p.wd) document.getElementById('workdir').value = p.wd;
+  if (p.cmd) document.getElementById('command').value = p.cmd;
+  p.ports.forEach(([a,b]) => { addPort(); const rows = document.querySelectorAll('#portsList .dynamic-item'); const r = rows[rows.length-1]; r.querySelectorAll('input')[0].value=a; r.querySelectorAll('input')[1].value=b; });
+  p.envs.forEach(([a,b]) => { addEnv(); const rows = document.querySelectorAll('#envList .dynamic-item'); const r = rows[rows.length-1]; r.querySelectorAll('input')[0].value=a; r.querySelectorAll('input')[1].value=b; });
+  p.vols.forEach(([a,b]) => { addVol(); const rows = document.querySelectorAll('#volList .dynamic-item'); const r = rows[rows.length-1]; r.querySelectorAll('input')[0].value=a; r.querySelectorAll('input')[1].value=b; });
+  generate();
+}
+
+// init
+generate();
+</script>
+</body>
+</html>
