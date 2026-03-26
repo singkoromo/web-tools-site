@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVGオプティマイザー | ToolBox</title>
+    <meta name="description" content="SVGコードの不要な属性・コメント・空白を削除して最適化・軽量化するツール。ブラウザ上で完結するSVG圧縮ツール。">
+    <meta name="keywords" content="SVG, 最適化, 圧縮, 軽量化, ベクター, optimizer">
+
+    <!-- OGP -->
+    <meta property="og:title" content="SVGオプティマイザー | ToolBox">
+    <meta property="og:description" content="SVGコードの不要な属性・コメント・空白を削除して最適化・軽量化するツール。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/svg-optimizer.html">
+    <meta property="og:site_name" content="ToolBox">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="SVGオプティマイザー | ToolBox">
+    <meta name="twitter:description" content="SVGコードの不要な属性・コメント・空白を削除して最適化・軽量化するツール。">
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "SVGオプティマイザー",
+        "description": "SVGコードの不要な属性・コメント・空白を削除して最適化・軽量化するツール",
+        "url": "https://web-tool-site.com/tools/svg-optimizer.html",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0" }
+    }
+    </script>
+
+    <!-- GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JPE0M70GR8');
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #16a34a;
+            --primary-light: #22c55e;
+            --primary-dark: #15803d;
+            --primary-bg: #f0fdf4;
+            --primary-border: #bbf7d0;
+            --success: #10b981;
+            --error: #ef4444;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --bg: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #22c55e;
+                --primary-light: #4ade80;
+                --primary-dark: #16a34a;
+                --primary-bg: #052e16;
+                --primary-border: #14532d;
+                --text: #f3f4f6;
+                --text-muted: #9ca3af;
+                --bg: #111827;
+                --bg-secondary: #1f2937;
+                --border: #374151;
+                --shadow: 0 1px 3px rgba(0,0,0,0.4);
+                --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        .header { background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
+        .logo svg { width: 22px; height: 22px; }
+        .nav { display: flex; gap: 1.5rem; }
+        .nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .nav a:hover { color: var(--primary); }
+
+        .tool-page { max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem; }
+        h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+        .tool-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+        .tool-container { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow); }
+        .card-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; }
+
+        textarea {
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border);
+            border-radius: var(--radius); font-size: 0.8rem; background: var(--bg-secondary);
+            color: var(--text); font-family: 'JetBrains Mono', monospace; resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,163,74,0.15); }
+
+        /* Options grid */
+        .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+        .option-item { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.6rem 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; }
+        .option-item:hover { border-color: var(--primary); background: var(--primary-bg); }
+        .option-item input[type="checkbox"] { margin-top: 0.15rem; accent-color: var(--primary); width: 15px; height: 15px; flex-shrink: 0; }
+        .option-label { font-size: 0.85rem; color: var(--text); }
+        .option-desc { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+        /* Stats bar */
+        .stats-bar { display: flex; gap: 1rem; flex-wrap: wrap; padding: 1rem; background: var(--primary-bg); border: 1px solid var(--primary-border); border-radius: var(--radius); margin-bottom: 1rem; }
+        .stat-item { text-align: center; flex: 1; min-width: 100px; }
+        .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--primary); font-family: 'JetBrains Mono', monospace; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* Two-column editor layout */
+        .editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 700px) { .editor-grid { grid-template-columns: 1fr; } }
+        .editor-panel {}
+        .editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+        .editor-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+
+        /* Preview */
+        .preview-box { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; display: flex; align-items: center; justify-content: center; min-height: 200px; overflow: hidden; }
+        .preview-box svg { max-width: 100%; max-height: 300px; }
+        .preview-empty { color: var(--text-muted); font-size: 0.875rem; }
+
+        /* Reduction badge */
+        .reduction-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.75rem; background: #d1fae5; color: #065f46; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+        @media (prefers-color-scheme: dark) { .reduction-badge { background: #064e3b; color: #6ee7b7; } }
+
+        .seo-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .seo-section h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .seo-section p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem; }
+
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border); margin-top: 4rem; padding: 2rem 1.5rem; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 2rem; margin-bottom: 1rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer-inner p { color: var(--text-muted); font-size: 0.8rem; }
+
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--text); color: var(--bg); padding: 0.75rem 1.5rem; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; z-index: 1000; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 600px) { .nav { display: none; } .stats-bar { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-container">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg>
+            ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="tool-page">
+    <h1>🌿 SVGオプティマイザー</h1>
+    <p class="tool-subtitle">SVGコードを解析・最適化して、ファイルサイズを削減します。</p>
+
+    <div class="tool-container">
+
+        <!-- Options -->
+        <div class="card">
+            <div class="card-title">最適化オプション</div>
+            <div class="options-grid">
+                <label class="option-item">
+                    <input type="checkbox" id="opt-comments" checked>
+                    <div>
+                        <div class="option-label">コメント削除</div>
+                        <div class="option-desc">&lt;!-- ... --&gt; を削除</div>
+                    </div>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" id="opt-whitespace" checked>
+                    <div>
+                        <div class="option-label">空白・改行の圧縮</div>
+                        <div class="option-desc">不要な空白をまとめる</div>
+                    </div>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" id="opt-editor-attrs" checked>
+                    <div>
+                        <div class="option-label">エディター属性の削除</div>
+                        <div class="option-desc">sodipodi:, inkscape:, data-name</div>
+                    </div>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" id="opt-metadata" checked>
+                    <div>
+                        <div class="option-label">メタデータ削除</div>
+                        <div class="option-desc">&lt;metadata&gt;, &lt;desc&gt; を削除</div>
+                    </div>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" id="opt-defaults" checked>
+                    <div>
+                        <div class="option-label">デフォルト属性削除</div>
+                        <div class="option-desc">fill="black", opacity="1" 等</div>
+                    </div>
+                </label>
+                <label class="option-item">
+                    <input type="checkbox" id="opt-precision" checked>
+                    <div>
+                        <div class="option-label">数値精度を下げる</div>
+                        <div class="option-desc">小数点以下2桁に丸める</div>
+                    </div>
+                </label>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="optimize()">最適化する</button>
+                <button class="btn btn-secondary" onclick="loadSample()">サンプルSVGを読み込む</button>
+                <button class="btn btn-secondary" onclick="clearAll()">クリア</button>
+            </div>
+        </div>
+
+        <!-- Editor -->
+        <div class="card">
+            <div class="editor-grid">
+                <div class="editor-panel">
+                    <div class="editor-header">
+                        <span class="editor-label">入力 SVG</span>
+                        <span id="inputSize" style="font-size:0.78rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;"></span>
+                    </div>
+                    <textarea id="svgInput" rows="14" placeholder="SVGコードをここに貼り付けてください..." oninput="onInputChange()"></textarea>
+                </div>
+                <div class="editor-panel">
+                    <div class="editor-header">
+                        <span class="editor-label">最適化後 SVG</span>
+                        <span id="outputSize" style="font-size:0.78rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;"></span>
+                    </div>
+                    <textarea id="svgOutput" rows="14" placeholder="最適化されたSVGがここに表示されます..." readonly></textarea>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-bar" id="statsBar" style="display:none; margin-top:1rem;">
+                <div class="stat-item">
+                    <div class="stat-value" id="statBefore">-</div>
+                    <div class="stat-label">最適化前 (bytes)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statAfter">-</div>
+                    <div class="stat-label">最適化後 (bytes)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statSaved">-</div>
+                    <div class="stat-label">削減 (bytes)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statPercent">-</div>
+                    <div class="stat-label">削減率</div>
+                </div>
+            </div>
+
+            <div class="btn-group" style="margin-top:1rem;">
+                <button class="btn btn-secondary" onclick="copyOutput()">コピー</button>
+                <button class="btn btn-secondary" onclick="downloadOutput()">ダウンロード</button>
+            </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="card">
+            <div class="card-title">プレビュー</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;font-weight:500;">最適化前</div>
+                    <div class="preview-box" id="previewBefore"><span class="preview-empty">SVGを入力するとプレビューが表示されます</span></div>
+                </div>
+                <div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;font-weight:500;">最適化後</div>
+                    <div class="preview-box" id="previewAfter"><span class="preview-empty">最適化後のプレビュー</span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="seo-section">
+        <h2>SVGオプティマイザーについて</h2>
+        <p>このツールはSVGファイルを解析し、Inkscapeなどのエディターが追加する不要なメタデータ、コメント、デフォルト属性を削除することでファイルサイズを削減します。Web上で使用するSVGの最適化に最適です。</p>
+        <p>DOMParser/XMLSerializerによるSVG解析と正規表現ベースの後処理を組み合わせて、ブラウザ上で完全に動作します。サーバーへのアップロードは不要で、プライバシーが保護されます。</p>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a>
+            <a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a>
+            <a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const SAMPLE_SVG = `<?xml version="1.0" encoding="UTF-8"?>
+<!-- SVG Sample File - Created with Inkscape -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="200" height="200" viewBox="0 0 200 200"
+     version="1.1" id="svg-root">
+  <metadata>
+    <dc:creator>Example Creator</dc:creator>
+    <dc:date>2024-01-01</dc:date>
+  </metadata>
+  <desc>A sample SVG for demonstration</desc>
+  <!-- Background circle -->
+  <circle cx="100.00000" cy="100.00000" r="90.00000"
+          fill="#4ade80" stroke="#16a34a" stroke-width="4.00000"
+          opacity="1" fill-opacity="1"/>
+  <!-- Star shape -->
+  <polygon points="100,20 120.123456789,70 175,70 130,100 150,155 100,120 50,155 70,100 25,70 79.876543211,70"
+           fill="#ffffff" opacity="1" fill-rule="nonzero"/>
+  <g id="text-group" fill="black" opacity="1">
+    <text x="100.00000" y="185.00000" text-anchor="middle"
+          font-size="14.000000" fill="#1f2937">Sample SVG</text>
+  </g>
+</svg>`;
+
+    function loadSample() {
+        document.getElementById('svgInput').value = SAMPLE_SVG;
+        onInputChange();
+    }
+
+    function clearAll() {
+        document.getElementById('svgInput').value = '';
+        document.getElementById('svgOutput').value = '';
+        document.getElementById('statsBar').style.display = 'none';
+        document.getElementById('inputSize').textContent = '';
+        document.getElementById('outputSize').textContent = '';
+        document.getElementById('previewBefore').innerHTML = '<span class="preview-empty">SVGを入力するとプレビューが表示されます</span>';
+        document.getElementById('previewAfter').innerHTML = '<span class="preview-empty">最適化後のプレビュー</span>';
+    }
+
+    function onInputChange() {
+        const input = document.getElementById('svgInput').value;
+        const bytes = new TextEncoder().encode(input).length;
+        document.getElementById('inputSize').textContent = bytes > 0 ? formatBytes(bytes) : '';
+        if (input.trim().toLowerCase().startsWith('<svg') || input.trim().startsWith('<?xml')) {
+            updatePreview('previewBefore', input);
+        }
+    }
+
+    function updatePreview(id, svgCode) {
+        const container = document.getElementById(id);
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgCode, 'image/svg+xml');
+            const svgEl = doc.querySelector('svg');
+            if (svgEl) {
+                svgEl.setAttribute('style', 'max-width:100%;max-height:280px;');
+                container.innerHTML = svgEl.outerHTML;
+            } else {
+                container.innerHTML = '<span class="preview-empty" style="color:var(--error);">無効なSVGです</span>';
+            }
+        } catch(e) {
+            container.innerHTML = '<span class="preview-empty" style="color:var(--error);">プレビューエラー</span>';
+        }
+    }
+
+    function formatBytes(b) {
+        if (b < 1024) return b + ' B';
+        return (b / 1024).toFixed(1) + ' KB';
+    }
+
+    function optimize() {
+        const input = document.getElementById('svgInput').value.trim();
+        if (!input) { showToast('SVGコードを入力してください'); return; }
+
+        const opts = {
+            comments: document.getElementById('opt-comments').checked,
+            whitespace: document.getElementById('opt-whitespace').checked,
+            editorAttrs: document.getElementById('opt-editor-attrs').checked,
+            metadata: document.getElementById('opt-metadata').checked,
+            defaults: document.getElementById('opt-defaults').checked,
+            precision: document.getElementById('opt-precision').checked,
+        };
+
+        let result = input;
+
+        // Remove XML declaration
+        result = result.replace(/<\?xml[^?]*\?>\s*/gi, '');
+
+        // Remove comments
+        if (opts.comments) {
+            result = result.replace(/<!--[\s\S]*?-->/g, '');
+        }
+
+        // Parse and manipulate DOM
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(result, 'image/svg+xml');
+            const svgEl = doc.querySelector('svg');
+            if (!svgEl) throw new Error('SVG要素が見つかりません');
+
+            // Remove metadata elements
+            if (opts.metadata) {
+                doc.querySelectorAll('metadata, desc').forEach(el => el.remove());
+                // Remove title inside defs
+                doc.querySelectorAll('defs title').forEach(el => el.remove());
+            }
+
+            // Remove editor-specific attributes and namespaces
+            if (opts.editorAttrs) {
+                const walk = (el) => {
+                    const attrsToRemove = [];
+                    for (const attr of el.attributes) {
+                        const name = attr.name;
+                        if (name.startsWith('sodipodi:') || name.startsWith('inkscape:') ||
+                            name === 'data-name' || name === 'xmlns:xlink' ||
+                            name === 'xmlns:dc' || name === 'xmlns:cc' || name === 'xmlns:rdf' ||
+                            name === 'xml:space') {
+                            attrsToRemove.push(name);
+                        }
+                    }
+                    attrsToRemove.forEach(a => el.removeAttribute(a));
+                    // Remove id from g elements
+                    if (el.tagName.toLowerCase() === 'g' && el.getAttribute('id')) {
+                        el.removeAttribute('id');
+                    }
+                    for (const child of el.children) walk(child);
+                };
+                walk(svgEl);
+                // Remove sodipodi/inkscape namespaced elements
+                doc.querySelectorAll('[*|type]').forEach(el => {
+                    if (el.namespaceURI && el.namespaceURI.includes('sodipodi')) el.remove();
+                });
+            }
+
+            // Remove default attribute values
+            if (opts.defaults) {
+                const defaultAttrs = {
+                    'fill': 'black',
+                    'opacity': '1',
+                    'fill-opacity': '1',
+                    'stroke-opacity': '1',
+                    'fill-rule': 'nonzero',
+                    'stroke': 'none',
+                    'stroke-width': '1',
+                    'stroke-linecap': 'butt',
+                    'stroke-linejoin': 'miter',
+                    'display': 'inline',
+                    'visibility': 'visible',
+                    'overflow': 'visible',
+                };
+                const walk2 = (el) => {
+                    for (const [attr, defVal] of Object.entries(defaultAttrs)) {
+                        if (el.getAttribute(attr) === defVal) el.removeAttribute(attr);
+                    }
+                    for (const child of el.children) walk2(child);
+                };
+                walk2(svgEl);
+            }
+
+            const serializer = new XMLSerializer();
+            result = serializer.serializeToString(doc.documentElement || svgEl);
+
+            // Remove xmlns:xlink if no xlink usage remains
+            if (!result.includes('xlink:href') && !result.includes('xlink:actuate')) {
+                result = result.replace(/\s*xmlns:xlink="[^"]*"/g, '');
+            }
+
+        } catch(e) {
+            showToast('解析エラー: ' + e.message);
+            return;
+        }
+
+        // Reduce numeric precision
+        if (opts.precision) {
+            result = result.replace(/(\d+\.\d{3,})/g, (match) => {
+                return parseFloat(parseFloat(match).toFixed(2)).toString();
+            });
+        }
+
+        // Minify whitespace
+        if (opts.whitespace) {
+            result = result.replace(/\s+/g, ' ');
+            result = result.replace(/>\s+</g, '><');
+            result = result.replace(/\s*=\s*/g, '=');
+            result = result.replace(/\s+\/>/g, '/>');
+            result = result.trim();
+        }
+
+        // Show results
+        document.getElementById('svgOutput').value = result;
+
+        const beforeBytes = new TextEncoder().encode(document.getElementById('svgInput').value).length;
+        const afterBytes = new TextEncoder().encode(result).length;
+        const saved = beforeBytes - afterBytes;
+        const pct = beforeBytes > 0 ? ((saved / beforeBytes) * 100).toFixed(1) : 0;
+
+        document.getElementById('inputSize').textContent = formatBytes(beforeBytes);
+        document.getElementById('outputSize').textContent = formatBytes(afterBytes);
+
+        document.getElementById('statBefore').textContent = beforeBytes.toLocaleString();
+        document.getElementById('statAfter').textContent = afterBytes.toLocaleString();
+        document.getElementById('statSaved').textContent = saved > 0 ? '-' + saved.toLocaleString() : saved.toLocaleString();
+        document.getElementById('statPercent').textContent = pct + '%';
+        document.getElementById('statsBar').style.display = 'flex';
+
+        updatePreview('previewAfter', result);
+
+        showToast(`最適化完了！ ${pct}% 削減しました`);
+    }
+
+    function copyOutput() {
+        const out = document.getElementById('svgOutput').value;
+        if (!out) { showToast('まず最適化を実行してください'); return; }
+        navigator.clipboard.writeText(out).then(() => showToast('コピーしました！'));
+    }
+
+    function downloadOutput() {
+        const out = document.getElementById('svgOutput').value;
+        if (!out) { showToast('まず最適化を実行してください'); return; }
+        const blob = new Blob([out], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'optimized.svg';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+</script>
+
+</body>
+</html>

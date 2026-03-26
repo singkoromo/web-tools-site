@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Apache HTTP ServerのVirtualHost設定を生成するツール。HTTP/HTTPS・SSL・Proxy設定・セキュリティヘッダーに対応した.conf設定ファイルを生成できます。">
+<meta name="keywords" content="Apache, VirtualHost, 設定, HTTP, HTTPS, SSL, .conf, Webサーバー">
+<meta name="author" content="ToolBox">
+<title>Apache VirtualHost設定ジェネレーター | ToolBox</title>
+<meta property="og:title" content="Apache VirtualHost設定ジェネレーター | ToolBox">
+<meta property="og:description" content="Apache HTTP ServerのVirtualHost設定を生成するツール。HTTP/HTTPS・SSL・Proxy設定に対応。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://web-tool-site.com/tools/apache-vhost-generator.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Apache VirtualHost設定ジェネレーター | ToolBox">
+<meta name="twitter:description" content="Apache VirtualHost設定を生成。HTTP/HTTPS・SSL・Proxyに対応。">
+<link rel="canonical" href="https://web-tool-site.com/tools/apache-vhost-generator.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Apache VirtualHost設定ジェネレーター",
+  "description": "Apache HTTP ServerのVirtualHost設定を生成するツール。HTTP/HTTPS・SSL・Proxy設定・セキュリティヘッダーに対応した.conf設定ファイルを生成できます。",
+  "url": "https://web-tool-site.com/tools/apache-vhost-generator.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0"}
+}
+</script>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .tool-container { display:flex; flex-direction:column; gap:1.25rem; max-width:1000px; margin:0 auto; }
+  .card { background:#fff; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.25rem; }
+  .section-title { font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#c0392b; margin:0 0 0.75rem 0; }
+
+  /* Grid layouts */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.9rem; }
+  @media(max-width:640px) { .grid-2, .grid-3 { grid-template-columns:1fr; } }
+
+  /* Fields */
+  .field { display:flex; flex-direction:column; gap:0.3rem; }
+  .field label { font-size:0.82rem; font-weight:600; color:#444; }
+  .field input[type="text"], .field input[type="number"], .field select {
+    padding:0.55rem 0.8rem; border:1px solid #ccc; border-radius:0.45rem; font-size:0.88rem; font-family:'Inter',sans-serif; background:#fff;
+  }
+  .field input:focus, .field select:focus { outline:none; border-color:#c0392b; box-shadow:0 0 0 3px rgba(192,57,43,0.1); }
+
+  /* Toggle switch */
+  .toggle-group { display:flex; align-items:center; gap:0.6rem; padding:0.4rem 0; }
+  .switch { position:relative; display:inline-block; width:38px; height:20px; flex-shrink:0; }
+  .switch input { opacity:0; width:0; height:0; }
+  .slider { position:absolute; cursor:pointer; inset:0; background:#ccc; border-radius:20px; transition:0.25s; }
+  .slider:before { position:absolute; content:""; height:14px; width:14px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.25s; }
+  input:checked + .slider { background:#c0392b; }
+  input:checked + .slider:before { transform:translateX(18px); }
+  .toggle-label { font-size:0.85rem; color:#444; }
+  .sub-section { border-left:3px solid #e0e0e0; padding-left:1rem; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.75rem; }
+  .sub-section.hidden { display:none; }
+
+  /* Checkboxes */
+  .cb-group { display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .cb-item { display:flex; align-items:center; gap:0.3rem; font-size:0.85rem; color:#444; }
+  .cb-item input { accent-color:#c0392b; }
+
+  /* Tabs */
+  .tabs { display:flex; gap:0; border-bottom:2px solid #e0e0e0; margin-bottom:1rem; flex-wrap:wrap; }
+  .tab { padding:0.55rem 1rem; cursor:pointer; font-size:0.88rem; font-weight:600; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+  .tab.active { color:#c0392b; border-bottom-color:#c0392b; }
+  .tab:hover:not(.active) { color:#555; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  /* Code output */
+  .code-block { position:relative; }
+  .code-area { width:100%; min-height:280px; padding:1rem; background:#1e1e1e; color:#d4d4d4; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.8rem; border:none; resize:vertical; line-height:1.65; box-sizing:border-box; }
+  .copy-btn { position:absolute; top:0.5rem; right:0.5rem; padding:0.3rem 0.7rem; background:#c0392b; color:#fff; border:none; border-radius:0.35rem; font-size:0.78rem; font-weight:600; cursor:pointer; transition:background 0.2s; }
+  .copy-btn:hover { background:#922b21; }
+  .output-actions { display:flex; gap:0.5rem; margin-bottom:0.5rem; flex-wrap:wrap; }
+
+  /* Buttons */
+  .btn { padding:0.55rem 1.1rem; border:none; border-radius:0.5rem; font-size:0.88rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .btn-primary { background:#c0392b; color:#fff; }
+  .btn-primary:hover { background:#922b21; }
+  .btn-secondary { background:#6c757d; color:#fff; }
+  .btn-secondary:hover { background:#545b62; }
+  .btn-outline { background:transparent; border:1px solid #c0392b; color:#c0392b; font-size:0.82rem; padding:0.35rem 0.8rem; }
+  .btn-outline:hover { background:#c0392b; color:#fff; }
+
+  /* Presets */
+  .preset-row { display:flex; gap:0.5rem; flex-wrap:wrap; }
+
+  /* SEO */
+  .seo-section { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.5rem; margin-top:1rem; }
+  .seo-section h2 { font-size:1.1rem; font-weight:700; margin:0 0 0.5rem 0; color:#333; }
+  .seo-section p { font-size:0.9rem; color:#555; line-height:1.7; margin:0 0 0.5rem 0; }
+
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#333; color:#fff; padding:0.75rem 1.25rem; border-radius:0.5rem; opacity:0; pointer-events:none; transition:opacity 0.3s; font-size:0.9rem; z-index:9999; }
+  .toast.show { opacity:1; }
+
+  @media (prefers-color-scheme: dark) {
+    .card { background:#1e1a1a; border-color:#3d2b2b; }
+    .section-title { color:#f87171; }
+    .field label { color:#d1d5db; }
+    .field input, .field select { background:#111010; border-color:#4b3030; color:#e5e7eb; }
+    .toggle-label { color:#d1d5db; }
+    .cb-item { color:#d1d5db; }
+    .sub-section { border-color:#4b3030; }
+    .tabs { border-color:#4b3030; }
+    .tab { color:#6b7280; }
+    .tab.active { color:#f87171; border-bottom-color:#f87171; }
+    .seo-section { background:#1e1a1a; border-color:#3d2b2b; }
+    .seo-section h2 { color:#e5e7eb; }
+    .seo-section p { color:#9ca3af; }
+    .slider { background:#4b5563; }
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-container">
+    <a href="../index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+      </svg>
+      ToolBox
+    </a>
+    <nav class="nav">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+  <div class="tool-header">
+    <h1 class="tool-title">Apache VirtualHost設定ジェネレーター</h1>
+    <p class="tool-description">Apache HTTP ServerのVirtualHost設定を生成するツール。HTTP/HTTPS・SSL・Proxy・セキュリティヘッダー設定に対応した.confファイルを生成します。</p>
+  </div>
+
+  <div class="tool-container">
+
+    <!-- Presets -->
+    <div class="card">
+      <div class="section-title">プリセット</div>
+      <div class="preset-row">
+        <button class="btn btn-outline" onclick="loadPreset('static')">静的サイト</button>
+        <button class="btn btn-outline" onclick="loadPreset('php')">PHP アプリ</button>
+        <button class="btn btn-outline" onclick="loadPreset('proxy')">リバースプロキシ</button>
+        <button class="btn btn-outline" onclick="loadPreset('wordpress')">WordPress</button>
+      </div>
+    </div>
+
+    <!-- Basic Settings -->
+    <div class="card">
+      <div class="section-title">基本設定</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>サーバー名 (ServerName)</label>
+          <input type="text" id="serverName" value="example.com" oninput="generate()" placeholder="example.com">
+        </div>
+        <div class="field">
+          <label>サーバーエイリアス (ServerAlias)</label>
+          <input type="text" id="serverAlias" value="www.example.com" oninput="generate()" placeholder="www.example.com">
+        </div>
+        <div class="field">
+          <label>ドキュメントルート (DocumentRoot)</label>
+          <input type="text" id="docRoot" value="/var/www/html" oninput="generate()" placeholder="/var/www/html">
+        </div>
+        <div class="field">
+          <label>サーバー管理者 (ServerAdmin)</label>
+          <input type="text" id="serverAdmin" value="webmaster@example.com" oninput="generate()" placeholder="webmaster@example.com">
+        </div>
+        <div class="field">
+          <label>HTTPポート</label>
+          <input type="number" id="httpPort" value="80" oninput="generate()" min="1" max="65535">
+        </div>
+        <div class="field">
+          <label>HTTPSポート</label>
+          <input type="number" id="httpsPort" value="443" oninput="generate()" min="1" max="65535">
+        </div>
+      </div>
+    </div>
+
+    <!-- SSL Settings -->
+    <div class="card">
+      <div class="section-title">SSL/HTTPS設定</div>
+      <div class="toggle-group">
+        <label class="switch"><input type="checkbox" id="enableSSL" onchange="toggleSection('sslSection',this.checked);generate()"><span class="slider"></span></label>
+        <span class="toggle-label">SSL/HTTPSを有効にする</span>
+      </div>
+      <div class="sub-section hidden" id="sslSection">
+        <div class="grid-2">
+          <div class="field">
+            <label>証明書ファイル (SSLCertificateFile)</label>
+            <input type="text" id="sslCert" value="/etc/ssl/certs/example.com.crt" oninput="generate()">
+          </div>
+          <div class="field">
+            <label>秘密鍵ファイル (SSLCertificateKeyFile)</label>
+            <input type="text" id="sslKey" value="/etc/ssl/private/example.com.key" oninput="generate()">
+          </div>
+          <div class="field">
+            <label>中間証明書 (SSLCertificateChainFile) ※任意</label>
+            <input type="text" id="sslChain" value="" oninput="generate()" placeholder="/etc/ssl/certs/chain.pem">
+          </div>
+          <div class="field">
+            <label>SSLプロトコル</label>
+            <select id="sslProtocol" onchange="generate()">
+              <option value="TLSv1.2 TLSv1.3" selected>TLSv1.2 + TLSv1.3 (推奨)</option>
+              <option value="TLSv1.3">TLSv1.3 のみ</option>
+              <option value="all -SSLv3 -TLSv1 -TLSv1.1">TLSv1.0以上 (-SSLv3 -TLSv1 -TLSv1.1)</option>
+            </select>
+          </div>
+        </div>
+        <div class="toggle-group">
+          <label class="switch"><input type="checkbox" id="forceHttps" checked onchange="generate()"><span class="slider"></span></label>
+          <span class="toggle-label">HTTPからHTTPSへ301リダイレクト</span>
+        </div>
+        <div class="toggle-group">
+          <label class="switch"><input type="checkbox" id="hsts" onchange="generate()"><span class="slider"></span></label>
+          <span class="toggle-label">HSTS ヘッダーを追加 (Strict-Transport-Security)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Directory Settings -->
+    <div class="card">
+      <div class="section-title">ディレクトリ設定</div>
+      <div class="grid-3">
+        <div class="field">
+          <label>AllowOverride</label>
+          <select id="allowOverride" onchange="generate()">
+            <option value="None">None</option>
+            <option value="FileInfo">FileInfo</option>
+            <option value="AuthConfig">AuthConfig</option>
+            <option value="All" selected>All</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Require</label>
+          <select id="require" onchange="generate()">
+            <option value="all granted" selected>all granted (全許可)</option>
+            <option value="ip 192.168.1.0/24">IP制限 (例: 192.168.1.0/24)</option>
+            <option value="all denied">all denied (全拒否)</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:0.75rem;">
+        <div class="field"><label>Options</label></div>
+        <div class="cb-group" style="margin-top:0.3rem;">
+          <label class="cb-item"><input type="checkbox" id="optIndexes" onchange="generate()"> Indexes</label>
+          <label class="cb-item"><input type="checkbox" id="optFollowLinks" checked onchange="generate()"> FollowSymLinks</label>
+          <label class="cb-item"><input type="checkbox" id="optMultiViews" onchange="generate()"> MultiViews</label>
+          <label class="cb-item"><input type="checkbox" id="optExecCGI" onchange="generate()"> ExecCGI</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proxy Settings -->
+    <div class="card">
+      <div class="section-title">プロキシ設定</div>
+      <div class="toggle-group">
+        <label class="switch"><input type="checkbox" id="enableProxy" onchange="toggleSection('proxySection',this.checked);generate()"><span class="slider"></span></label>
+        <span class="toggle-label">リバースプロキシを有効にする</span>
+      </div>
+      <div class="sub-section hidden" id="proxySection">
+        <div class="grid-2">
+          <div class="field">
+            <label>バックエンドURL (ProxyPass)</label>
+            <input type="text" id="proxyBackend" value="http://localhost:3000" oninput="generate()" placeholder="http://localhost:3000">
+          </div>
+          <div class="field">
+            <label>プロキシパス (省略時は /)</label>
+            <input type="text" id="proxyPath" value="/" oninput="generate()" placeholder="/">
+          </div>
+        </div>
+        <div class="toggle-group">
+          <label class="switch"><input type="checkbox" id="wsProxy" onchange="generate()"><span class="slider"></span></label>
+          <span class="toggle-label">WebSocketプロキシを有効にする (RewriteRule ws)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logging -->
+    <div class="card">
+      <div class="section-title">ログ設定</div>
+      <div class="grid-3">
+        <div class="field">
+          <label>アクセスログパス</label>
+          <input type="text" id="accessLog" value="/var/log/apache2/access.log" oninput="generate()">
+        </div>
+        <div class="field">
+          <label>エラーログパス</label>
+          <input type="text" id="errorLog" value="/var/log/apache2/error.log" oninput="generate()">
+        </div>
+        <div class="field">
+          <label>ログレベル</label>
+          <select id="logLevel" onchange="generate()">
+            <option value="warn" selected>warn</option>
+            <option value="error">error</option>
+            <option value="info">info</option>
+            <option value="debug">debug</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Extra Options -->
+    <div class="card">
+      <div class="section-title">追加オプション</div>
+      <div class="cb-group">
+        <label class="cb-item"><input type="checkbox" id="gzip" onchange="generate()"> Gzip圧縮 (mod_deflate)</label>
+        <label class="cb-item"><input type="checkbox" id="cacheHeaders" onchange="generate()"> キャッシュヘッダー</label>
+        <label class="cb-item"><input type="checkbox" id="errorDocs" onchange="generate()"> カスタムエラーページ (404, 500)</label>
+        <label class="cb-item"><input type="checkbox" id="secHeaders" onchange="generate()"> セキュリティヘッダー</label>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="card">
+      <div class="section-title">生成された設定</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('http')">HTTP設定</div>
+        <div class="tab" id="httpsTab" onclick="switchTab('https')" style="display:none;">HTTPS設定</div>
+      </div>
+      <div class="tab-content active" id="tab-http">
+        <div class="output-actions">
+          <button class="btn btn-primary" onclick="copyConf('http')">コピー</button>
+          <button class="btn btn-secondary" onclick="downloadConf('http')">ダウンロード (.conf)</button>
+        </div>
+        <div class="code-block">
+          <textarea class="code-area" id="code-http" readonly></textarea>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-https">
+        <div class="output-actions">
+          <button class="btn btn-primary" onclick="copyConf('https')">コピー</button>
+          <button class="btn btn-secondary" onclick="downloadConf('https')">ダウンロード (.conf)</button>
+        </div>
+        <div class="code-block">
+          <textarea class="code-area" id="code-https" readonly></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div class="seo-section">
+      <h2>Apache VirtualHost設定ジェネレーターについて</h2>
+      <p>Apache HTTP ServerのVirtualHost設定(.conf)をGUIで生成するツールです。HTTP・HTTPS(SSL/TLS)・リバースプロキシ・セキュリティヘッダー・Gzip圧縮など多彩な設定に対応しています。</p>
+      <p>静的サイト・PHPアプリ・リバースプロキシ・WordPressの4種類のプリセットを用意しています。生成した設定は/etc/apache2/sites-available/に保存し、a2ensiteコマンドで有効化してください。</p>
+      <p>SSL証明書の取得にはLet's Encrypt (Certbot)の利用を推奨します。証明書取得後、自動的に設定ファイルが更新される場合があります。</p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+      <a href="../about.html">このサイトについて</a>
+      <a href="../contact.html">お問い合わせ</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../terms.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentTab = 'http';
+
+function v(id) { return document.getElementById(id).value; }
+function cb(id) { return document.getElementById(id).checked; }
+
+function toggleSection(id, show) {
+  document.getElementById(id).classList.toggle('hidden', !show);
+}
+
+function switchTab(name) {
+  currentTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab')[name === 'http' ? 0 : 1].classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function getOptions() {
+  const opts = [];
+  if (cb('optIndexes')) opts.push('Indexes');
+  if (cb('optFollowLinks')) opts.push('FollowSymLinks');
+  if (cb('optMultiViews')) opts.push('MultiViews');
+  if (cb('optExecCGI')) opts.push('ExecCGI');
+  return opts.length > 0 ? opts.join(' ') : 'None';
+}
+
+function generateHttp() {
+  const lines = [];
+  const serverName = v('serverName') || 'example.com';
+  const serverAlias = v('serverAlias');
+  const docRoot = v('docRoot') || '/var/www/html';
+  const admin = v('serverAdmin') || 'webmaster@example.com';
+  const port = v('httpPort') || '80';
+  const enableSSL = cb('enableSSL');
+  const forceHttps = enableSSL && cb('forceHttps');
+
+  lines.push(`<VirtualHost *:${port}>`);
+  lines.push(`    ServerName ${serverName}`);
+  if (serverAlias) lines.push(`    ServerAlias ${serverAlias}`);
+  lines.push(`    ServerAdmin ${admin}`);
+
+  if (forceHttps) {
+    lines.push(``);
+    lines.push(`    # HTTPからHTTPSへリダイレクト`);
+    lines.push(`    RewriteEngine On`);
+    lines.push(`    RewriteCond %{HTTPS} off`);
+    lines.push(`    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]`);
+  } else {
+    lines.push(`    DocumentRoot ${docRoot}`);
+    lines.push(``);
+    addDirectoryBlock(lines, docRoot);
+    addLogging(lines);
+    addProxy(lines);
+    addExtras(lines);
+  }
+
+  lines.push(`</VirtualHost>`);
+  return lines.join('\n');
+}
+
+function generateHttps() {
+  const lines = [];
+  const serverName = v('serverName') || 'example.com';
+  const serverAlias = v('serverAlias');
+  const docRoot = v('docRoot') || '/var/www/html';
+  const admin = v('serverAdmin') || 'webmaster@example.com';
+  const httpsPort = v('httpsPort') || '443';
+  const sslCert = v('sslCert');
+  const sslKey = v('sslKey');
+  const sslChain = v('sslChain');
+  const sslProtocol = v('sslProtocol');
+
+  lines.push(`<VirtualHost *:${httpsPort}>`);
+  lines.push(`    ServerName ${serverName}`);
+  if (serverAlias) lines.push(`    ServerAlias ${serverAlias}`);
+  lines.push(`    ServerAdmin ${admin}`);
+  lines.push(`    DocumentRoot ${docRoot}`);
+  lines.push(``);
+  lines.push(`    # SSL設定`);
+  lines.push(`    SSLEngine on`);
+  lines.push(`    SSLProtocol ${sslProtocol}`);
+  lines.push(`    SSLCipherSuite ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384`);
+  lines.push(`    SSLHonorCipherOrder off`);
+  lines.push(`    SSLSessionTickets off`);
+  lines.push(`    SSLCertificateFile ${sslCert}`);
+  lines.push(`    SSLCertificateKeyFile ${sslKey}`);
+  if (sslChain) lines.push(`    SSLCertificateChainFile ${sslChain}`);
+
+  if (cb('hsts')) {
+    lines.push(``);
+    lines.push(`    # HSTS (1年間, サブドメイン含む)`);
+    lines.push(`    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"`);
+  }
+
+  lines.push(``);
+  addDirectoryBlock(lines, docRoot);
+  addLogging(lines);
+  addProxy(lines);
+  addExtras(lines);
+
+  lines.push(`</VirtualHost>`);
+  return lines.join('\n');
+}
+
+function addDirectoryBlock(lines, docRoot) {
+  const allowOverride = v('allowOverride');
+  const require = v('require');
+  const options = getOptions();
+
+  lines.push(`    <Directory ${docRoot}>`);
+  lines.push(`        Options ${options}`);
+  lines.push(`        AllowOverride ${allowOverride}`);
+  lines.push(`        Require ${require}`);
+  lines.push(`    </Directory>`);
+  lines.push(``);
+}
+
+function addLogging(lines) {
+  const accessLog = v('accessLog');
+  const errorLog = v('errorLog');
+  const logLevel = v('logLevel');
+
+  lines.push(`    # ログ設定`);
+  lines.push(`    ErrorLog ${errorLog}`);
+  lines.push(`    CustomLog ${accessLog} combined`);
+  lines.push(`    LogLevel ${logLevel}`);
+}
+
+function addProxy(lines) {
+  if (!cb('enableProxy')) return;
+  const backend = v('proxyBackend') || 'http://localhost:3000';
+  const path = v('proxyPath') || '/';
+  const cleanPath = path.startsWith('/') ? path : '/' + path;
+
+  lines.push(``);
+  lines.push(`    # リバースプロキシ設定`);
+  lines.push(`    ProxyPreserveHost On`);
+  lines.push(`    ProxyPass "${cleanPath}" "${backend}${cleanPath === '/' ? '' : ''}"`);
+  lines.push(`    ProxyPassReverse "${cleanPath}" "${backend}${cleanPath === '/' ? '' : ''}"`);
+
+  if (cb('wsProxy')) {
+    lines.push(``);
+    lines.push(`    # WebSocketプロキシ`);
+    lines.push(`    RewriteEngine On`);
+    lines.push(`    RewriteCond %{HTTP:Upgrade} websocket [NC]`);
+    lines.push(`    RewriteCond %{HTTP:Connection} upgrade [NC]`);
+    const wsBackend = backend.replace(/^http/, 'ws');
+    lines.push(`    RewriteRule ^${cleanPath === '/' ? '' : cleanPath}(.*)$ ${wsBackend}/$1 [P,L]`);
+  }
+}
+
+function addExtras(lines) {
+  const hasExtra = cb('gzip') || cb('cacheHeaders') || cb('errorDocs') || cb('secHeaders');
+  if (!hasExtra) return;
+  lines.push(``);
+
+  if (cb('gzip')) {
+    lines.push(`    # Gzip圧縮 (mod_deflate)`);
+    lines.push(`    <IfModule mod_deflate.c>`);
+    lines.push(`        AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css`);
+    lines.push(`        AddOutputFilterByType DEFLATE application/javascript application/json application/xml`);
+    lines.push(`        AddOutputFilterByType DEFLATE image/svg+xml`);
+    lines.push(`    </IfModule>`);
+    lines.push(``);
+  }
+
+  if (cb('cacheHeaders')) {
+    lines.push(`    # キャッシュヘッダー`);
+    lines.push(`    <FilesMatch "\\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf)$">`);
+    lines.push(`        Header set Cache-Control "max-age=31536000, public"`);
+    lines.push(`    </FilesMatch>`);
+    lines.push(`    <FilesMatch "\\.(html|htm)$">`);
+    lines.push(`        Header set Cache-Control "no-cache, must-revalidate"`);
+    lines.push(`    </FilesMatch>`);
+    lines.push(``);
+  }
+
+  if (cb('errorDocs')) {
+    lines.push(`    # カスタムエラーページ`);
+    lines.push(`    ErrorDocument 404 /404.html`);
+    lines.push(`    ErrorDocument 500 /500.html`);
+    lines.push(`    ErrorDocument 403 /403.html`);
+    lines.push(``);
+  }
+
+  if (cb('secHeaders')) {
+    lines.push(`    # セキュリティヘッダー`);
+    lines.push(`    Header always set X-Frame-Options "SAMEORIGIN"`);
+    lines.push(`    Header always set X-Content-Type-Options "nosniff"`);
+    lines.push(`    Header always set X-XSS-Protection "1; mode=block"`);
+    lines.push(`    Header always set Referrer-Policy "strict-origin-when-cross-origin"`);
+    lines.push(`    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"`);
+    lines.push(`    ServerTokens Prod`);
+    lines.push(`    ServerSignature Off`);
+  }
+}
+
+function generate() {
+  // HTTP
+  document.getElementById('code-http').value = generateHttp();
+
+  // HTTPS
+  const enableSSL = cb('enableSSL');
+  const httpsTab = document.getElementById('httpsTab');
+  if (enableSSL) {
+    httpsTab.style.display = '';
+    document.getElementById('code-https').value = generateHttps();
+  } else {
+    httpsTab.style.display = 'none';
+    if (currentTab === 'https') switchTab('http');
+  }
+}
+
+function copyConf(type) {
+  const text = document.getElementById('code-' + type).value;
+  navigator.clipboard.writeText(text).then(() => showToast('コピーしました')).catch(() => {
+    const el = document.getElementById('code-' + type);
+    el.select(); document.execCommand('copy'); showToast('コピーしました');
+  });
+}
+
+function downloadConf(type) {
+  const text = document.getElementById('code-' + type).value;
+  const name = (v('serverName') || 'example.com').replace(/[^a-z0-9.-]/gi,'_');
+  const blob = new Blob([text], { type:'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${name}-${type}.conf`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('ダウンロードしました');
+}
+
+function loadPreset(type) {
+  const set = (id, val) => { document.getElementById(id).value = val; };
+  const check = (id, v) => { document.getElementById(id).checked = v; };
+
+  // Reset toggles
+  check('enableSSL', false); check('forceHttps', true); check('hsts', false);
+  check('enableProxy', false); check('wsProxy', false);
+  check('gzip', false); check('cacheHeaders', false); check('errorDocs', false); check('secHeaders', false);
+  check('optIndexes', false); check('optFollowLinks', true); check('optMultiViews', false); check('optExecCGI', false);
+  toggleSection('sslSection', false); toggleSection('proxySection', false);
+
+  if (type === 'static') {
+    set('serverName', 'example.com');
+    set('serverAlias', 'www.example.com');
+    set('docRoot', '/var/www/html');
+    set('allowOverride', 'None');
+    check('gzip', true); check('cacheHeaders', true); check('secHeaders', true);
+  } else if (type === 'php') {
+    set('serverName', 'example.com');
+    set('serverAlias', 'www.example.com');
+    set('docRoot', '/var/www/example.com/public');
+    set('allowOverride', 'All');
+    check('enableSSL', true); check('forceHttps', true); check('hsts', true);
+    check('gzip', true); check('secHeaders', true); check('errorDocs', true);
+    toggleSection('sslSection', true);
+    set('sslCert', '/etc/letsencrypt/live/example.com/fullchain.pem');
+    set('sslKey', '/etc/letsencrypt/live/example.com/privkey.pem');
+  } else if (type === 'proxy') {
+    set('serverName', 'api.example.com');
+    set('serverAlias', '');
+    set('docRoot', '/var/www/html');
+    set('allowOverride', 'None');
+    check('enableSSL', true); check('forceHttps', true);
+    check('enableProxy', true);
+    set('proxyBackend', 'http://localhost:3000');
+    set('proxyPath', '/');
+    check('secHeaders', true); check('gzip', true);
+    toggleSection('sslSection', true); toggleSection('proxySection', true);
+    set('sslCert', '/etc/letsencrypt/live/api.example.com/fullchain.pem');
+    set('sslKey', '/etc/letsencrypt/live/api.example.com/privkey.pem');
+  } else if (type === 'wordpress') {
+    set('serverName', 'myblog.com');
+    set('serverAlias', 'www.myblog.com');
+    set('docRoot', '/var/www/wordpress');
+    set('allowOverride', 'All');
+    check('enableSSL', true); check('forceHttps', true); check('hsts', true);
+    check('gzip', true); check('cacheHeaders', true); check('secHeaders', true); check('errorDocs', true);
+    toggleSection('sslSection', true);
+    set('sslCert', '/etc/letsencrypt/live/myblog.com/fullchain.pem');
+    set('sslKey', '/etc/letsencrypt/live/myblog.com/privkey.pem');
+  }
+
+  generate();
+  showToast(`${type === 'static' ? '静的サイト' : type === 'php' ? 'PHP アプリ' : type === 'proxy' ? 'リバースプロキシ' : 'WordPress'} プリセットを読み込みました`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Initialize
+generate();
+</script>
+</body>
+</html>

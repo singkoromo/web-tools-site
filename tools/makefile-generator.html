@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="プロジェクトのMakefileをGUIで作成するツール。ターゲット・変数・依存関係を設定してMakefileを生成・ダウンロードできます。">
+<meta name="keywords" content="Makefile, make, ビルド, CI/CD, 自動化, タスク, GNU make">
+<meta name="author" content="ToolBox">
+<title>Makefileジェネレーター | ToolBox</title>
+<meta property="og:title" content="Makefileジェネレーター | ToolBox">
+<meta property="og:description" content="プロジェクトのMakefileをGUIで作成するツール。ターゲット・変数・依存関係を設定して生成。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://web-tool-site.com/tools/makefile-generator.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Makefileジェネレーター | ToolBox">
+<meta name="twitter:description" content="MakefileをGUIで作成。ターゲット・変数・依存関係を設定して生成。">
+<link rel="canonical" href="https://web-tool-site.com/tools/makefile-generator.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Makefileジェネレーター",
+  "description": "プロジェクトのMakefileをGUIで作成するツール。ターゲット・変数・依存関係を設定してMakefileを生成・ダウンロードできます。",
+  "url": "https://web-tool-site.com/tools/makefile-generator.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0"}
+}
+</script>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .tool-container { display:flex; flex-direction:column; gap:1.25rem; max-width:1000px; margin:0 auto; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+  @media(max-width:720px){ .two-col { grid-template-columns:1fr; } }
+  .card { background:#fff; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.25rem; }
+  .section-title { font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0d8a6b; margin:0 0 0.75rem 0; }
+
+  /* Buttons */
+  .btn { padding:0.55rem 1.1rem; border:none; border-radius:0.5rem; font-size:0.88rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .btn-primary { background:#0d8a6b; color:#fff; }
+  .btn-primary:hover { background:#096e54; }
+  .btn-secondary { background:#6c757d; color:#fff; }
+  .btn-secondary:hover { background:#545b62; }
+  .btn-danger { background:#dc3545; color:#fff; font-size:0.78rem; padding:0.3rem 0.6rem; }
+  .btn-danger:hover { background:#b02a37; }
+  .btn-sm { padding:0.3rem 0.65rem; font-size:0.78rem; }
+  .btn-outline { background:transparent; border:1px solid #0d8a6b; color:#0d8a6b; }
+  .btn-outline:hover { background:#0d8a6b; color:#fff; }
+
+  /* Variables */
+  .var-list { display:flex; flex-direction:column; gap:0.5rem; }
+  .var-row { display:flex; gap:0.5rem; align-items:center; }
+  .var-row input { flex:1; padding:0.5rem 0.7rem; border:1px solid #ccc; border-radius:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+  .var-row input:focus { outline:none; border-color:#0d8a6b; box-shadow:0 0 0 2px rgba(13,138,107,0.12); }
+  .var-sep { font-weight:700; color:#0d8a6b; font-family:'JetBrains Mono',monospace; }
+  .preset-row { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem; }
+  .preset-tag { padding:0.25rem 0.6rem; background:#e8f5f1; border:1px solid #0d8a6b; border-radius:1rem; font-size:0.75rem; color:#0d8a6b; cursor:pointer; font-family:'JetBrains Mono',monospace; transition:all 0.2s; }
+  .preset-tag:hover { background:#0d8a6b; color:#fff; }
+
+  /* Targets */
+  .target-list { display:flex; flex-direction:column; gap:0.75rem; }
+  .target-card { border:1px solid #ddd; border-radius:0.6rem; padding:0.9rem; background:#fafafa; }
+  .target-card-header { display:flex; gap:0.5rem; align-items:center; margin-bottom:0.6rem; flex-wrap:wrap; }
+  .target-card-header input[type="text"] { flex:1; min-width:100px; padding:0.45rem 0.65rem; border:1px solid #ccc; border-radius:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.85rem; font-weight:600; }
+  .target-card-header input:focus { outline:none; border-color:#0d8a6b; }
+  .phony-badge { font-size:0.72rem; padding:0.2rem 0.5rem; background:#d4edda; color:#155724; border-radius:0.25rem; font-weight:600; }
+  .field-label { font-size:0.78rem; color:#666; margin-bottom:0.25rem; }
+  .target-card textarea { width:100%; padding:0.5rem 0.65rem; border:1px solid #ccc; border-radius:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.8rem; resize:vertical; min-height:60px; box-sizing:border-box; }
+  .target-card textarea:focus { outline:none; border-color:#0d8a6b; }
+  .target-card input[type="text"].dep-input { width:100%; padding:0.45rem 0.65rem; border:1px solid #ccc; border-radius:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.8rem; box-sizing:border-box; }
+  .target-card input[type="text"].dep-input:focus { outline:none; border-color:#0d8a6b; }
+  .target-inner-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; }
+  @media(max-width:500px){ .target-inner-grid { grid-template-columns:1fr; } }
+  .order-btns { display:flex; flex-direction:column; gap:2px; }
+  .order-btn { padding:0.2rem 0.5rem; border:1px solid #ccc; background:#fff; border-radius:0.3rem; cursor:pointer; font-size:0.75rem; color:#555; transition:all 0.15s; }
+  .order-btn:hover { background:#0d8a6b; color:#fff; border-color:#0d8a6b; }
+
+  /* Presets dropdown */
+  .preset-examples { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem; }
+
+  /* Output */
+  .code-block { position:relative; }
+  .code-area { width:100%; min-height:300px; padding:1rem; background:#1e1e1e; color:#d4d4d4; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.82rem; border:none; resize:vertical; line-height:1.6; box-sizing:border-box; }
+  .output-actions { display:flex; gap:0.5rem; margin-bottom:0.5rem; flex-wrap:wrap; }
+
+  /* SEO */
+  .seo-section { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.5rem; margin-top:1rem; }
+  .seo-section h2 { font-size:1.1rem; font-weight:700; margin:0 0 0.5rem 0; color:#333; }
+  .seo-section p { font-size:0.9rem; color:#555; line-height:1.7; margin:0 0 0.5rem 0; }
+
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#333; color:#fff; padding:0.75rem 1.25rem; border-radius:0.5rem; opacity:0; pointer-events:none; transition:opacity 0.3s; font-size:0.9rem; z-index:9999; }
+  .toast.show { opacity:1; }
+
+  @media (prefers-color-scheme: dark) {
+    .card { background:#1a2332; border-color:#2d3748; }
+    .section-title { color:#34d399; }
+    .var-row input, .target-card-header input, .target-card textarea, .target-card .dep-input { background:#0d1624; border-color:#374151; color:#e5e7eb; }
+    .target-card { background:#111827; border-color:#374151; }
+    .preset-tag { background:#0d2a22; border-color:#34d399; color:#34d399; }
+    .preset-tag:hover { background:#34d399; color:#0d1117; }
+    .field-label { color:#9ca3af; }
+    .phony-badge { background:#064e3b; color:#6ee7b7; }
+    .order-btn { background:#1a2332; border-color:#374151; color:#9ca3af; }
+    .seo-section { background:#1a2332; border-color:#2d3748; }
+    .seo-section h2 { color:#e5e7eb; }
+    .seo-section p { color:#9ca3af; }
+    .var-sep { color:#34d399; }
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-container">
+    <a href="../index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+      </svg>
+      ToolBox
+    </a>
+    <nav class="nav">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+  <div class="tool-header">
+    <h1 class="tool-title">Makefileジェネレーター</h1>
+    <p class="tool-description">プロジェクトのMakefileをGUIで作成するツール。ターゲット・変数・依存関係を設定して生成・ダウンロードできます。</p>
+  </div>
+
+  <div class="tool-container">
+
+    <!-- Preset examples -->
+    <div class="card">
+      <div class="section-title">プリセット例を読み込む</div>
+      <div class="preset-examples">
+        <button class="btn btn-outline btn-sm" onclick="loadPreset('nodejs')">Node.js プロジェクト</button>
+        <button class="btn btn-outline btn-sm" onclick="loadPreset('go')">Go プロジェクト</button>
+        <button class="btn btn-outline btn-sm" onclick="loadPreset('python')">Python プロジェクト</button>
+        <button class="btn btn-outline btn-sm" onclick="loadPreset('c')">C プロジェクト</button>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Variables -->
+      <div class="card">
+        <div class="section-title">変数</div>
+        <div class="var-list" id="varList"></div>
+        <button class="btn btn-outline btn-sm" style="margin-top:0.6rem;" onclick="addVar('','')">+ 変数を追加</button>
+        <div class="preset-row">
+          <span style="font-size:0.75rem;color:#888;">プリセット:</span>
+          <span class="preset-tag" onclick="addVar('CC','gcc')">CC=gcc</span>
+          <span class="preset-tag" onclick="addVar('CXX','g++')">CXX=g++</span>
+          <span class="preset-tag" onclick="addVar('CFLAGS','-Wall -O2')">CFLAGS</span>
+          <span class="preset-tag" onclick="addVar('BINARY','myapp')">BINARY</span>
+          <span class="preset-tag" onclick="addVar('VERSION','1.0.0')">VERSION</span>
+        </div>
+      </div>
+
+      <!-- Target presets -->
+      <div class="card">
+        <div class="section-title">ターゲットのクイック追加</div>
+        <div class="preset-row">
+          <span class="preset-tag" onclick="addTargetPreset('build','','echo Build complete',true,'ビルド')">build</span>
+          <span class="preset-tag" onclick="addTargetPreset('clean','','rm -rf dist',true,'クリーン')">clean</span>
+          <span class="preset-tag" onclick="addTargetPreset('test','','echo Running tests',true,'テスト実行')">test</span>
+          <span class="preset-tag" onclick="addTargetPreset('install','','echo Installing',true,'インストール')">install</span>
+          <span class="preset-tag" onclick="addTargetPreset('run','build','echo Running',true,'実行')">run</span>
+          <span class="preset-tag" onclick="addTargetPreset('lint','','echo Linting',true,'Lint')">lint</span>
+          <span class="preset-tag" onclick="addTargetPreset('help','','@echo Usage: make [target]',true,'ヘルプ表示')">help</span>
+          <span class="preset-tag" onclick="addTargetPreset('all','build test','',true,'全ビルド')">all</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Targets -->
+    <div class="card">
+      <div class="section-title">ターゲット</div>
+      <div class="target-list" id="targetList"></div>
+      <button class="btn btn-outline btn-sm" style="margin-top:0.75rem;" onclick="addTarget()">+ ターゲットを追加</button>
+    </div>
+
+    <!-- Output -->
+    <div class="card">
+      <div class="section-title">生成されたMakefile</div>
+      <div class="output-actions">
+        <button class="btn btn-primary" onclick="copyMakefile()">コピー</button>
+        <button class="btn btn-secondary" onclick="downloadMakefile()">Makefileとしてダウンロード</button>
+      </div>
+      <div class="code-block">
+        <textarea class="code-area" id="makefileOutput" readonly></textarea>
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div class="seo-section">
+      <h2>Makefileジェネレーターについて</h2>
+      <p>GNU makeで使用するMakefileをGUIで作成できるツールです。変数定義・ターゲット・依存関係・コマンドを設定すると、.PHONY宣言やhelpターゲットを含む完全なMakefileを生成します。</p>
+      <p>Node.js・Go・Python・Cプロジェクトのプリセットも用意しています。生成したMakefileはそのままダウンロードしてプロジェクトに追加できます。</p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+      <a href="../about.html">このサイトについて</a>
+      <a href="../contact.html">お問い合わせ</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../terms.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// State
+let variables = [];
+let targets = [];
+
+// ---- Variable management ----
+function addVar(name, value) {
+  variables.push({ name, value });
+  renderVars();
+  generate();
+}
+
+function removeVar(i) {
+  variables.splice(i, 1);
+  renderVars();
+  generate();
+}
+
+function renderVars() {
+  const list = document.getElementById('varList');
+  list.innerHTML = '';
+  variables.forEach((v, i) => {
+    const row = document.createElement('div');
+    row.className = 'var-row';
+    row.innerHTML = `
+      <input type="text" value="${esc(v.name)}" placeholder="変数名" oninput="variables[${i}].name=this.value;generate()">
+      <span class="var-sep">=</span>
+      <input type="text" value="${esc(v.value)}" placeholder="値" oninput="variables[${i}].value=this.value;generate()">
+      <button class="btn btn-danger" onclick="removeVar(${i})">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+// ---- Target management ----
+function addTarget(name='', deps='', cmds='', phony=true, desc='') {
+  targets.push({ name, deps, cmds, phony, desc });
+  renderTargets();
+  generate();
+}
+
+function addTargetPreset(name, deps, cmds, phony, desc) {
+  targets.push({ name, deps, cmds, phony, desc });
+  renderTargets();
+  generate();
+}
+
+function removeTarget(i) {
+  targets.splice(i, 1);
+  renderTargets();
+  generate();
+}
+
+function moveTarget(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= targets.length) return;
+  [targets[i], targets[j]] = [targets[j], targets[i]];
+  renderTargets();
+  generate();
+}
+
+function renderTargets() {
+  const list = document.getElementById('targetList');
+  list.innerHTML = '';
+  if (targets.length === 0) {
+    list.innerHTML = '<div style="color:#999;font-size:0.85rem;">ターゲットがありません。追加ボタンまたはクイック追加をご利用ください。</div>';
+    return;
+  }
+  targets.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'target-card';
+    card.innerHTML = `
+      <div class="target-card-header">
+        <div class="order-btns">
+          <button class="order-btn" onclick="moveTarget(${i},-1)" title="上へ">▲</button>
+          <button class="order-btn" onclick="moveTarget(${i},1)" title="下へ">▼</button>
+        </div>
+        <input type="text" value="${esc(t.name)}" placeholder="ターゲット名 (例: build)" oninput="targets[${i}].name=this.value;generate()" style="font-weight:700;">
+        <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.82rem;cursor:pointer;">
+          <input type="checkbox" ${t.phony?'checked':''} onchange="targets[${i}].phony=this.checked;generate()" style="accent-color:#0d8a6b;">
+          .PHONY
+        </label>
+        ${t.phony ? '<span class="phony-badge">PHONY</span>' : ''}
+        <button class="btn btn-danger" onclick="removeTarget(${i})">削除</button>
+      </div>
+      <div class="target-inner-grid">
+        <div>
+          <div class="field-label">依存関係（スペース区切り）</div>
+          <input type="text" class="dep-input" value="${esc(t.deps)}" placeholder="dep1 dep2" oninput="targets[${i}].deps=this.value;generate()">
+        </div>
+        <div>
+          <div class="field-label">説明（helpターゲット用）</div>
+          <input type="text" class="dep-input" value="${esc(t.desc)}" placeholder="このターゲットの説明" oninput="targets[${i}].desc=this.value;generate()">
+        </div>
+      </div>
+      <div style="margin-top:0.5rem;">
+        <div class="field-label">コマンド（1行につき1コマンド、タブは自動付与）</div>
+        <textarea oninput="targets[${i}].cmds=this.value;generate()" placeholder="echo hello&#10;npm install">${esc(t.cmds)}</textarea>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function esc(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ---- Generate Makefile ----
+function generate() {
+  const lines = [];
+
+  // Header comment
+  lines.push('# Makefile - generated by ToolBox Makefile Generator');
+  lines.push('# https://web-tool-site.com/tools/makefile-generator.html');
+  lines.push('');
+
+  // .PHONY
+  const phonies = targets.filter(t => t.phony && t.name.trim()).map(t => t.name.trim());
+  if (phonies.length > 0) {
+    lines.push('.PHONY: ' + phonies.join(' '));
+    lines.push('');
+  }
+
+  // Variables
+  if (variables.length > 0) {
+    variables.forEach(v => {
+      if (v.name.trim()) lines.push(`${v.name.trim()} = ${v.value}`);
+    });
+    lines.push('');
+  }
+
+  // Default target (first target)
+  if (targets.length > 0 && targets[0].name.trim()) {
+    lines.push(`.DEFAULT_GOAL := ${targets[0].name.trim()}`);
+    lines.push('');
+  }
+
+  // Targets
+  targets.forEach(t => {
+    const name = t.name.trim();
+    if (!name) return;
+    if (t.desc) lines.push(`## ${t.desc}`);
+    const deps = t.deps.trim();
+    lines.push(deps ? `${name}: ${deps}` : `${name}:`);
+    const cmds = t.cmds.split('\n').map(c => c.trim()).filter(c => c);
+    cmds.forEach(c => lines.push(`\t${c}`));
+    lines.push('');
+  });
+
+  // Auto help target if not already defined
+  const hasHelp = targets.some(t => t.name.trim() === 'help');
+  if (!hasHelp && targets.some(t => t.desc)) {
+    lines.push('## ヘルプを表示');
+    lines.push('help:');
+    lines.push('\t@echo "使用可能なターゲット:"');
+    targets.forEach(t => {
+      if (t.name.trim() && t.desc) {
+        lines.push(`\t@echo "  ${t.name.trim().padEnd(16)} - ${t.desc}"`);
+      }
+    });
+    lines.push('');
+  }
+
+  document.getElementById('makefileOutput').value = lines.join('\n');
+}
+
+// ---- Copy / Download ----
+function copyMakefile() {
+  const text = document.getElementById('makefileOutput').value;
+  navigator.clipboard.writeText(text).then(() => showToast('コピーしました')).catch(() => {
+    const el = document.getElementById('makefileOutput');
+    el.select(); document.execCommand('copy'); showToast('コピーしました');
+  });
+}
+
+function downloadMakefile() {
+  const text = document.getElementById('makefileOutput').value;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Makefile';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('ダウンロードしました');
+}
+
+// ---- Presets ----
+function loadPreset(type) {
+  variables = [];
+  targets = [];
+  if (type === 'nodejs') {
+    variables = [
+      { name:'NODE_ENV', value:'development' },
+      { name:'PORT', value:'3000' }
+    ];
+    targets = [
+      { name:'install', deps:'', cmds:'npm install', phony:true, desc:'依存パッケージをインストール' },
+      { name:'start', deps:'', cmds:'node server.js', phony:true, desc:'サーバーを起動' },
+      { name:'dev', deps:'', cmds:'NODE_ENV=development node server.js', phony:true, desc:'開発モードで起動' },
+      { name:'test', deps:'', cmds:'npm test', phony:true, desc:'テストを実行' },
+      { name:'lint', deps:'', cmds:'npm run lint', phony:true, desc:'Lintを実行' },
+      { name:'build', deps:'', cmds:'npm run build', phony:true, desc:'プロダクションビルド' },
+      { name:'clean', deps:'', cmds:'rm -rf node_modules dist .cache', phony:true, desc:'ビルド成果物を削除' }
+    ];
+  } else if (type === 'go') {
+    variables = [
+      { name:'BINARY', value:'myapp' },
+      { name:'VERSION', value:'1.0.0' },
+      { name:'BUILD_FLAGS', value:'-ldflags="-s -w"' }
+    ];
+    targets = [
+      { name:'build', deps:'', cmds:'go build $(BUILD_FLAGS) -o $(BINARY) .', phony:true, desc:'バイナリをビルド' },
+      { name:'run', deps:'', cmds:'go run .', phony:true, desc:'アプリを実行' },
+      { name:'test', deps:'', cmds:'go test ./...', phony:true, desc:'テストを実行' },
+      { name:'lint', deps:'', cmds:'golangci-lint run', phony:true, desc:'Lintを実行' },
+      { name:'fmt', deps:'', cmds:'go fmt ./...', phony:true, desc:'コードをフォーマット' },
+      { name:'clean', deps:'', cmds:'rm -f $(BINARY)', phony:true, desc:'バイナリを削除' }
+    ];
+  } else if (type === 'python') {
+    variables = [
+      { name:'PYTHON', value:'python3' },
+      { name:'PIP', value:'pip3' },
+      { name:'VENV', value:'.venv' }
+    ];
+    targets = [
+      { name:'venv', deps:'', cmds:'$(PYTHON) -m venv $(VENV)', phony:true, desc:'仮想環境を作成' },
+      { name:'install', deps:'', cmds:'$(PIP) install -r requirements.txt', phony:true, desc:'依存パッケージをインストール' },
+      { name:'run', deps:'', cmds:'$(PYTHON) main.py', phony:true, desc:'アプリを実行' },
+      { name:'test', deps:'', cmds:'$(PYTHON) -m pytest', phony:true, desc:'テストを実行' },
+      { name:'lint', deps:'', cmds:'flake8 .', phony:true, desc:'Lintを実行' },
+      { name:'format', deps:'', cmds:'black .', phony:true, desc:'コードをフォーマット' },
+      { name:'clean', deps:'', cmds:'find . -type d -name __pycache__ -exec rm -rf {} +\nrm -rf .pytest_cache dist build *.egg-info', phony:true, desc:'キャッシュを削除' }
+    ];
+  } else if (type === 'c') {
+    variables = [
+      { name:'CC', value:'gcc' },
+      { name:'CFLAGS', value:'-Wall -Wextra -O2' },
+      { name:'BINARY', value:'myapp' },
+      { name:'SRCS', value:'main.c' },
+      { name:'OBJS', value:'$(SRCS:.c=.o)' }
+    ];
+    targets = [
+      { name:'all', deps:'$(BINARY)', cmds:'', phony:true, desc:'全ファイルをビルド' },
+      { name:'$(BINARY)', deps:'$(OBJS)', cmds:'$(CC) $(CFLAGS) -o $@ $^', phony:false, desc:'' },
+      { name:'%.o', deps:'%.c', cmds:'$(CC) $(CFLAGS) -c $< -o $@', phony:false, desc:'' },
+      { name:'clean', deps:'', cmds:'rm -f $(BINARY) $(OBJS)', phony:true, desc:'ビルド成果物を削除' }
+    ];
+  }
+  renderVars();
+  renderTargets();
+  generate();
+  showToast(`${type === 'nodejs' ? 'Node.js' : type === 'go' ? 'Go' : type === 'python' ? 'Python' : 'C'} プリセットを読み込みました`);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Init
+renderVars();
+renderTargets();
+generate();
+</script>
+</body>
+</html>
