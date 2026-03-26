@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content=".envエディター。KEY=VALUE形式の環境変数をテーブルUIで編集・管理。コメント対応・エクスポート機能付き。">
+<meta name="keywords" content=".env,環境変数,エディター,KEY=VALUE,設定ファイル,エクスポート">
+<meta name="author" content="ToolBox">
+<title>.envエディター | ToolBox</title>
+<meta property="og:title" content=".envエディター | ToolBox">
+<meta property="og:description" content=".envファイルをテーブルUIで編集・管理。コメント対応・エクスポート付き。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://web-tool-site.com/tools/env-editor.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content=".envエディター | ToolBox">
+<meta name="twitter:description" content=".envファイルをテーブルUIで編集・管理。">
+<link rel="canonical" href="https://web-tool-site.com/tools/env-editor.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": ".envエディター",
+  "description": ".envファイルをテーブルUIで編集・管理します。コメント対応・エクスポート機能付き。",
+  "url": "https://web-tool-site.com/tools/env-editor.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0"}
+}
+</script>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .tool-container { display:flex; flex-direction:column; gap:1.25rem; max-width:1000px; margin:0 auto; }
+  .top-bar { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; justify-content:space-between; }
+  .top-bar-left { display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .btn { padding:0.6rem 1.1rem; border:none; border-radius:0.5rem; font-size:0.875rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .btn-primary { background:#007bff; color:#fff; }
+  .btn-primary:hover { background:#0056b3; }
+  .btn-success { background:#28a745; color:#fff; }
+  .btn-success:hover { background:#218838; }
+  .btn-secondary { background:#6c757d; color:#fff; }
+  .btn-secondary:hover { background:#545b62; }
+  .btn-warning { background:#ffc107; color:#333; }
+  .btn-warning:hover { background:#e0a800; }
+  .btn-danger { background:#dc3545; color:#fff; }
+  .btn-danger:hover { background:#c82333; }
+  .btn-sm { padding:0.3rem 0.6rem; font-size:0.8rem; }
+  .import-area { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:0.5rem; padding:1rem; }
+  .import-area textarea { width:100%; height:120px; font-family:'JetBrains Mono',monospace; font-size:0.85rem; border:1px solid #ddd; border-radius:0.4rem; padding:0.5rem; box-sizing:border-box; resize:vertical; }
+  .import-area textarea:focus { outline:none; border-color:#007bff; }
+  .env-table { width:100%; border-collapse:collapse; background:#fff; border-radius:0.5rem; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  .env-table th { background:#f0f4f8; padding:0.6rem 0.75rem; text-align:left; font-size:0.8rem; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.05em; }
+  .env-table td { padding:0.4rem 0.5rem; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+  .env-table tr:last-child td { border-bottom:none; }
+  .env-table tr.commented { opacity:0.5; }
+  .env-table tr.commented td input { text-decoration:line-through; }
+  .env-table input[type="text"] { width:100%; padding:0.35rem 0.5rem; border:1px solid transparent; border-radius:0.35rem; font-family:'JetBrains Mono',monospace; font-size:0.85rem; background:transparent; }
+  .env-table input[type="text"]:focus { outline:none; border-color:#007bff; background:#fff; }
+  .env-table .col-drag { width:2rem; color:#ccc; cursor:grab; text-align:center; }
+  .env-table .col-key { width:30%; }
+  .env-table .col-val { width:40%; }
+  .env-table .col-comment { width:20%; }
+  .env-table .col-actions { width:6rem; white-space:nowrap; }
+  .env-table .comment-row td { background:#fffde7; }
+  .env-table .comment-row input { color:#888; font-style:italic; }
+  .action-btn { border:none; border-radius:0.3rem; padding:0.25rem 0.4rem; cursor:pointer; font-size:0.75rem; font-weight:600; }
+  .action-comment { background:#e8f4fd; color:#007bff; }
+  .action-comment:hover { background:#007bff; color:#fff; }
+  .action-delete { background:#fde8e8; color:#dc3545; }
+  .action-delete:hover { background:#dc3545; color:#fff; }
+  .action-secret { background:#f3e8ff; color:#7c3aed; }
+  .action-secret:hover { background:#7c3aed; color:#fff; }
+  .output-section { background:#1e2433; border-radius:0.75rem; padding:1.25rem; }
+  .output-section h3 { margin:0 0 0.75rem 0; color:#e0e0e0; font-size:0.95rem; }
+  .output-textarea { width:100%; height:200px; background:#0d1117; color:#e6edf3; border:none; border-radius:0.5rem; padding:1rem; font-family:'JetBrains Mono',monospace; font-size:0.85rem; box-sizing:border-box; resize:vertical; }
+  .output-textarea:focus { outline:none; }
+  .stats-bar { display:flex; gap:1rem; flex-wrap:wrap; font-size:0.82rem; color:#666; padding:0.5rem 0; }
+  .stat-item { display:flex; align-items:center; gap:0.3rem; }
+  .stat-dot { width:0.5rem; height:0.5rem; border-radius:50%; }
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#333; color:#fff; padding:0.75rem 1.25rem; border-radius:0.5rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:999; }
+  .toast.show { opacity:1; }
+
+  @media (prefers-color-scheme: dark) {
+    .env-table { background:#1e2433; box-shadow:none; }
+    .env-table th { background:#252d3d; color:#aaa; }
+    .env-table td { border-color:#2a2a3a; }
+    .env-table input[type="text"] { color:#e0e0e0; }
+    .env-table input[type="text"]:focus { background:#252d3d; }
+    .env-table .comment-row td { background:#2a2a1a; }
+    .import-area { background:#1e2433; border-color:#333; }
+    .import-area textarea { background:#252d3d; border-color:#444; color:#e0e0e0; }
+    .stats-bar { color:#aaa; }
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-content">
+    <div class="logo">ToolBox</div>
+    <nav class="nav">
+      <a href="../index.html" class="nav-link">ホーム</a>
+      <a href="../index.html#tools" class="nav-link">ツール一覧</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="tool-container">
+    <h1>.env エディター</h1>
+    <p>KEY=VALUE形式の環境変数をテーブルUIで管理・編集します。コメント行やシークレット値の隠し表示にも対応。</p>
+
+    <!-- Import -->
+    <div class="import-area">
+      <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;color:#555;">.envファイルの内容を貼り付けてインポート</p>
+      <textarea id="importText" placeholder="# データベース設定&#10;DB_HOST=localhost&#10;DB_PORT=5432&#10;DB_NAME=myapp&#10;DB_PASSWORD=secret123&#10;&#10;# API設定&#10;API_KEY=your-api-key-here&#10;DEBUG=false"></textarea>
+      <div style="margin-top:0.5rem;display:flex;gap:0.5rem;">
+        <button class="btn btn-primary btn-sm" onclick="importFromText()">インポート</button>
+        <button class="btn btn-secondary btn-sm" onclick="loadSample()">サンプル読み込み</button>
+      </div>
+    </div>
+
+    <!-- Top actions -->
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <button class="btn btn-success" onclick="addRow()">＋ 行追加</button>
+        <button class="btn btn-warning" onclick="addCommentRow()">＃ コメント追加</button>
+        <button class="btn btn-secondary" onclick="sortRows()">↑↓ ソート</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAll()">クリア</button>
+      </div>
+      <div id="statsBar" class="stats-bar"></div>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto;">
+      <table class="env-table" id="envTable">
+        <thead>
+          <tr>
+            <th class="col-drag"></th>
+            <th class="col-key">KEY</th>
+            <th class="col-val">VALUE</th>
+            <th class="col-comment">コメント</th>
+            <th class="col-actions">操作</th>
+          </tr>
+        </thead>
+        <tbody id="envBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Output -->
+    <div class="output-section">
+      <h3>エクスポート（.envフォーマット）</h3>
+      <textarea id="outputArea" class="output-textarea" readonly></textarea>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+        <button class="btn btn-success btn-sm" onclick="copyOutput()">コピー</button>
+        <button class="btn btn-primary btn-sm" onclick="downloadEnv()">ダウンロード (.env)</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<section class="tool-description-section" style="max-width:1000px;margin:32px auto;padding:0 20px;">
+  <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+    <h2 style="font-size:1.2rem;margin-bottom:12px;">.envエディターとは？</h2>
+    <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">Dockerや各種フレームワークで使用される.envファイルをテーブル形式で編集するツールです。コメント行の追加・シークレット値のマスク・.env形式へのエクスポートに対応しています。</p>
+    <p style="font-size:13px;color:#888;margin-top:16px;">すべてブラウザ上で動作します。入力データがサーバーに送信されることはありません。</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+      <a href="../about.html">このサイトについて</a>
+      <a href="../contact.html">お問い合わせ</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../terms.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+let rows = [];
+let secretMap = new Set();
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function loadSample() {
+  document.getElementById('importText').value =
+`# アプリケーション設定
+APP_NAME=MyApp
+APP_ENV=development
+APP_PORT=3000
+DEBUG=true
+
+# データベース
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=myapp_db
+DB_USER=postgres
+DB_PASSWORD=super_secret_password
+
+# 外部API
+STRIPE_API_KEY=sk_test_xxxxxxxxxxxxxxxxxxxx
+SENDGRID_API_KEY=SG.xxxxxxxx.yyyyyyyy`;
+  importFromText();
+}
+
+function parseEnvText(text) {
+  const result = [];
+  text.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    if (trimmed === '') {
+      result.push({ type: 'empty', key: '', value: '', comment: '' });
+    } else if (trimmed.startsWith('#')) {
+      result.push({ type: 'comment', key: '', value: '', comment: trimmed });
+    } else {
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx === -1) {
+        result.push({ type: 'var', key: trimmed, value: '', comment: '' });
+      } else {
+        let key = trimmed.slice(0, eqIdx).trim();
+        let value = trimmed.slice(eqIdx + 1);
+        // remove inline comment
+        let comment = '';
+        const hashIdx = value.indexOf(' #');
+        if (hashIdx !== -1) { comment = value.slice(hashIdx + 2); value = value.slice(0, hashIdx); }
+        // remove quotes
+        value = value.trim().replace(/^["']|["']$/g, '');
+        result.push({ type: 'var', key, value, comment: comment.trim() });
+      }
+    }
+  });
+  return result;
+}
+
+function importFromText() {
+  const text = document.getElementById('importText').value;
+  rows = parseEnvText(text);
+  secretMap.clear();
+  render();
+}
+
+function render() {
+  const tbody = document.getElementById('envBody');
+  tbody.innerHTML = '';
+  rows.forEach((row, i) => {
+    const tr = document.createElement('tr');
+    if (row.type === 'comment') tr.classList.add('comment-row');
+    if (row.type === 'empty') { tbody.appendChild(tr); updateOutput(); return; }
+
+    const isSecret = secretMap.has(i);
+    const keyVal = row.key || '';
+    const valVal = row.value || '';
+    const comVal = row.comment || '';
+
+    if (row.type === 'comment') {
+      tr.innerHTML = `
+        <td class="col-drag">⠿</td>
+        <td colspan="2"><input type="text" value="${escAttr(comVal)}" data-i="${i}" data-field="comment" oninput="onInput(this)" style="color:#888;font-style:italic;"></td>
+        <td></td>
+        <td class="col-actions"><button class="action-btn action-delete" onclick="deleteRow(${i})">削除</button></td>`;
+    } else {
+      tr.innerHTML = `
+        <td class="col-drag">⠿</td>
+        <td class="col-key"><input type="text" value="${escAttr(keyVal)}" data-i="${i}" data-field="key" oninput="onInput(this)" placeholder="KEY" style="font-weight:600;"></td>
+        <td class="col-val"><input type="${isSecret ? 'password' : 'text'}" value="${escAttr(valVal)}" data-i="${i}" data-field="value" oninput="onInput(this)" placeholder="value"></td>
+        <td class="col-comment"><input type="text" value="${escAttr(comVal)}" data-i="${i}" data-field="comment" oninput="onInput(this)" placeholder="# コメント" style="color:#888;font-size:0.8rem;"></td>
+        <td class="col-actions">
+          <button class="action-btn action-secret" onclick="toggleSecret(${i})" title="${isSecret ? '表示' : '隠す'}">${isSecret ? '👁' : '🙈'}</button>
+          <button class="action-btn action-comment" onclick="toggleComment(${i})" title="コメントアウト">#</button>
+          <button class="action-btn action-delete" onclick="deleteRow(${i})" title="削除">✕</button>
+        </td>`;
+    }
+    tbody.appendChild(tr);
+  });
+  updateOutput();
+  updateStats();
+}
+
+function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function onInput(el) {
+  const i = parseInt(el.dataset.i);
+  const field = el.dataset.field;
+  rows[i][field] = el.value;
+  updateOutput();
+  updateStats();
+}
+
+function addRow() {
+  rows.push({ type: 'var', key: '', value: '', comment: '' });
+  render();
+}
+
+function addCommentRow() {
+  rows.push({ type: 'comment', key: '', value: '', comment: '# ' });
+  render();
+}
+
+function deleteRow(i) {
+  rows.splice(i, 1);
+  secretMap.delete(i);
+  render();
+}
+
+function toggleSecret(i) {
+  if (secretMap.has(i)) secretMap.delete(i);
+  else secretMap.add(i);
+  render();
+}
+
+function toggleComment(i) {
+  rows[i].type = rows[i].type === 'comment' ? 'var' : 'comment';
+  if (rows[i].type === 'comment' && !rows[i].comment) rows[i].comment = `# ${rows[i].key}=${rows[i].value}`;
+  render();
+}
+
+function sortRows() {
+  const vars = rows.filter(r => r.type === 'var').sort((a,b) => a.key.localeCompare(b.key));
+  const others = rows.filter(r => r.type !== 'var');
+  rows = [...others, ...vars];
+  render();
+}
+
+function clearAll() {
+  rows = [];
+  secretMap.clear();
+  document.getElementById('importText').value = '';
+  render();
+}
+
+function generateEnvText() {
+  return rows.map(r => {
+    if (r.type === 'empty') return '';
+    if (r.type === 'comment') return r.comment || '#';
+    if (!r.key) return '';
+    let line = `${r.key}=${r.value}`;
+    if (r.comment) line += ` # ${r.comment}`;
+    return line;
+  }).join('\n');
+}
+
+function updateOutput() {
+  document.getElementById('outputArea').value = generateEnvText();
+}
+
+function updateStats() {
+  const vars = rows.filter(r => r.type === 'var' && r.key);
+  const comments = rows.filter(r => r.type === 'comment');
+  document.getElementById('statsBar').innerHTML = `
+    <span class="stat-item"><span class="stat-dot" style="background:#28a745"></span>${vars.length} 変数</span>
+    <span class="stat-item"><span class="stat-dot" style="background:#888"></span>${comments.length} コメント</span>
+    <span class="stat-item"><span class="stat-dot" style="background:#7c3aed"></span>${secretMap.size} シークレット</span>`;
+}
+
+function copyOutput() {
+  const text = document.getElementById('outputArea').value;
+  navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+}
+
+function downloadEnv() {
+  const text = generateEnvText();
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '.env';
+  a.click();
+  showToast('ダウンロードしました');
+}
+
+loadSample();
+</script>
+</body>
+</html>

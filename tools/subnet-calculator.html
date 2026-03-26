@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="サブネット計算機。CIDRノーテーションからネットワークアドレス・ブロードキャスト・使用可能ホスト数・サブネットマスクを計算します。">
+<meta name="keywords" content="サブネット,CIDR,ネットワーク,IPアドレス,ブロードキャスト,サブネットマスク,ホスト数">
+<meta name="author" content="ToolBox">
+<title>サブネット計算機 | ToolBox</title>
+<meta property="og:title" content="サブネット計算機 | ToolBox">
+<meta property="og:description" content="CIDRからネットワークアドレス・ブロードキャスト・ホスト数等を計算。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://web-tool-site.com/tools/subnet-calculator.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="サブネット計算機 | ToolBox">
+<meta name="twitter:description" content="CIDRからネットワーク情報を即計算。">
+<link rel="canonical" href="https://web-tool-site.com/tools/subnet-calculator.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "サブネット計算機",
+  "description": "CIDRノーテーションからネットワークアドレス・ブロードキャスト・ホスト数を計算します。",
+  "url": "https://web-tool-site.com/tools/subnet-calculator.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0"}
+}
+</script>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .tool-container { display:flex; flex-direction:column; gap:1.5rem; max-width:900px; margin:0 auto; }
+  .input-row { display:flex; gap:0.75rem; align-items:flex-end; flex-wrap:wrap; }
+  .input-row input { flex:1; min-width:220px; padding:0.75rem 1rem; border:1px solid #ddd; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:1rem; }
+  .input-row input:focus { outline:none; border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.1); }
+  .btn { padding:0.75rem 1.5rem; border:none; border-radius:0.5rem; font-size:1rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .btn-primary { background:#007bff; color:#fff; }
+  .btn-primary:hover { background:#0056b3; transform:translateY(-1px); }
+  .btn-secondary { background:#6c757d; color:#fff; }
+  .presets { display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .preset-btn { padding:0.35rem 0.75rem; border:1px solid #007bff; border-radius:1rem; background:#fff; color:#007bff; font-size:0.8rem; cursor:pointer; font-family:'JetBrains Mono',monospace; }
+  .preset-btn:hover { background:#007bff; color:#fff; }
+  .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  @media(max-width:640px) { .result-grid { grid-template-columns:1fr; } }
+  .info-card { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.25rem; }
+  .info-card h3 { margin:0 0 1rem 0; font-size:1rem; color:#555; border-bottom:1px solid #ddd; padding-bottom:0.5rem; }
+  .info-row { display:flex; justify-content:space-between; align-items:center; padding:0.4rem 0; border-bottom:1px solid #f0f0f0; }
+  .info-row:last-child { border-bottom:none; }
+  .info-label { font-size:0.85rem; color:#666; }
+  .info-value { font-family:'JetBrains Mono',monospace; font-size:0.9rem; font-weight:600; color:#333; cursor:pointer; }
+  .info-value:hover { color:#007bff; }
+  .binary-display { background:#1e2433; color:#a8ff78; font-family:'JetBrains Mono',monospace; font-size:0.8rem; padding:1rem; border-radius:0.5rem; overflow-x:auto; white-space:nowrap; }
+  .binary-display .sep { color:#666; }
+  .binary-display .net-bits { color:#7bb3f0; }
+  .binary-display .host-bits { color:#ff9f7f; }
+  .addr-range { background:#e8f5e9; border:1px solid #c8e6c9; border-radius:0.5rem; padding:0.75rem; font-family:'JetBrains Mono',monospace; font-size:0.9rem; }
+  .error-box { background:#f8d7da; color:#721c24; border-radius:0.5rem; padding:1rem; }
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#333; color:#fff; padding:0.75rem 1.25rem; border-radius:0.5rem; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:999; }
+  .toast.show { opacity:1; }
+
+  @media (prefers-color-scheme: dark) {
+    .info-card { background:#1e2433; border-color:#333; }
+    .info-card h3 { color:#aaa; border-color:#333; }
+    .info-row { border-color:#2a2a3a; }
+    .info-label { color:#888; }
+    .info-value { color:#e0e0e0; }
+    .addr-range { background:#1a3a1a; border-color:#2a4a2a; color:#a8ff78; }
+    .input-row input { background:#1e2433; border-color:#444; color:#e0e0e0; }
+    .preset-btn { background:#1e2433; border-color:#555; color:#7bb3f0; }
+    .preset-btn:hover { background:#007bff; color:#fff; }
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-content">
+    <div class="logo">ToolBox</div>
+    <nav class="nav">
+      <a href="../index.html" class="nav-link">ホーム</a>
+      <a href="../index.html#tools" class="nav-link">ツール一覧</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="tool-container">
+    <h1>サブネット計算機</h1>
+    <p>IPアドレス/プレフィックス長（CIDR形式）を入力してサブネット情報を計算します。</p>
+
+    <div class="input-row">
+      <input type="text" id="cidrInput" placeholder="例: 192.168.1.0/24" value="192.168.1.0/24">
+      <button class="btn btn-primary" onclick="calculate()">計算</button>
+      <button class="btn btn-secondary" onclick="clearAll()">クリア</button>
+    </div>
+
+    <div>
+      <p style="font-size:0.85rem;color:#666;margin-bottom:0.5rem;">プリセット:</p>
+      <div class="presets">
+        <button class="preset-btn" onclick="setPreset('10.0.0.0/8')">/8 クラスA</button>
+        <button class="preset-btn" onclick="setPreset('172.16.0.0/12')">/12 クラスB</button>
+        <button class="preset-btn" onclick="setPreset('192.168.0.0/16')">/16 クラスC</button>
+        <button class="preset-btn" onclick="setPreset('192.168.1.0/24')">/24 一般的</button>
+        <button class="preset-btn" onclick="setPreset('192.168.1.0/25')">/25 半分割</button>
+        <button class="preset-btn" onclick="setPreset('10.0.0.0/30')">/30 P2P</button>
+      </div>
+    </div>
+
+    <div id="result"></div>
+  </div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
+  <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
+    <h2 style="font-size:1.2rem;margin-bottom:12px;">サブネット計算機とは？</h2>
+    <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">CIDRノーテーション（192.168.1.0/24 など）からネットワーク情報を一括計算するツールです。ネットワーク設計・インフラ構築・ファイアウォール設定に活用できます。</p>
+    <h3 style="font-size:1rem;margin-bottom:8px;">計算される情報</h3>
+    <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
+      <li>ネットワークアドレス・ブロードキャストアドレス</li>
+      <li>使用可能ホスト数・IPアドレス範囲</li>
+      <li>サブネットマスク（ドット形式・16進数）</li>
+      <li>2進数表示（ネットワーク部・ホスト部の視覚化）</li>
+    </ul>
+    <p style="font-size:13px;color:#888;margin-top:16px;">すべてブラウザ上で動作します。入力データがサーバーに送信されることはありません。</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+      <a href="../about.html">このサイトについて</a>
+      <a href="../contact.html">お問い合わせ</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../terms.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('コピーしました: ' + text));
+}
+
+function setPreset(v) { document.getElementById('cidrInput').value = v; calculate(); }
+function clearAll() { document.getElementById('cidrInput').value = ''; document.getElementById('result').innerHTML = ''; }
+
+function ipToInt(ip) {
+  const parts = ip.split('.').map(Number);
+  if (parts.length !== 4 || parts.some(p => isNaN(p) || p < 0 || p > 255)) throw new Error('無効なIPアドレス: ' + ip);
+  return (parts[0] << 24 | parts[1] << 16 | parts[2] << 8 | parts[3]) >>> 0;
+}
+
+function intToIp(n) {
+  return [(n >>> 24) & 0xff, (n >>> 16) & 0xff, (n >>> 8) & 0xff, n & 0xff].join('.');
+}
+
+function intToHex(n) {
+  return '0x' + ('00000000' + (n >>> 0).toString(16).toUpperCase()).slice(-8);
+}
+
+function intToBinary(n) {
+  return ('00000000000000000000000000000000' + (n >>> 0).toString(2)).slice(-32);
+}
+
+function formatBinaryIP(n, prefix) {
+  const b = intToBinary(n);
+  const octets = [b.slice(0,8), b.slice(8,16), b.slice(16,24), b.slice(24,32)];
+  let result = '';
+  let bitsLeft = prefix;
+  for (let i = 0; i < 4; i++) {
+    if (i > 0) result += '<span class="sep">.</span>';
+    const octet = octets[i];
+    const netBits = Math.min(8, bitsLeft);
+    const hostBits = 8 - netBits;
+    result += `<span class="net-bits">${octet.slice(0, netBits)}</span><span class="host-bits">${octet.slice(netBits)}</span>`;
+    bitsLeft -= netBits;
+  }
+  return result;
+}
+
+function calculate() {
+  const input = document.getElementById('cidrInput').value.trim();
+  const resultEl = document.getElementById('result');
+  if (!input) { resultEl.innerHTML = ''; return; }
+
+  try {
+    const [ipPart, prefixPart] = input.split('/');
+    if (!ipPart || prefixPart === undefined) throw new Error('CIDR形式で入力してください（例: 192.168.1.0/24）');
+    const prefix = parseInt(prefixPart);
+    if (isNaN(prefix) || prefix < 0 || prefix > 32) throw new Error('プレフィックス長は0〜32の整数で指定してください');
+
+    const ipInt = ipToInt(ipPart);
+    const maskInt = prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0;
+    const networkInt = (ipInt & maskInt) >>> 0;
+    const broadcastInt = (networkInt | (~maskInt >>> 0)) >>> 0;
+    const firstHost = prefix >= 31 ? networkInt : networkInt + 1;
+    const lastHost = prefix >= 31 ? broadcastInt : broadcastInt - 1;
+    const totalIPs = Math.pow(2, 32 - prefix);
+    const usableHosts = prefix >= 31 ? totalIPs : totalIPs - 2;
+
+    const network   = intToIp(networkInt);
+    const broadcast = intToIp(broadcastInt);
+    const mask      = intToIp(maskInt);
+    const wildcard  = intToIp(~maskInt >>> 0);
+    const first     = intToIp(firstHost);
+    const last      = intToIp(lastHost);
+    const maskHex   = intToHex(maskInt);
+
+    resultEl.innerHTML = `
+      <div class="result-grid">
+        <div class="info-card">
+          <h3>基本情報</h3>
+          <div class="info-row"><span class="info-label">入力アドレス</span><span class="info-value" onclick="copyText('${ipPart}')">${ipPart}</span></div>
+          <div class="info-row"><span class="info-label">プレフィックス長</span><span class="info-value" onclick="copyText('/${prefix}')">/${prefix}</span></div>
+          <div class="info-row"><span class="info-label">ネットワークアドレス</span><span class="info-value" onclick="copyText('${network}')">${network}</span></div>
+          <div class="info-row"><span class="info-label">ブロードキャスト</span><span class="info-value" onclick="copyText('${broadcast}')">${broadcast}</span></div>
+          <div class="info-row"><span class="info-label">サブネットマスク</span><span class="info-value" onclick="copyText('${mask}')">${mask}</span></div>
+          <div class="info-row"><span class="info-label">ワイルドカードマスク</span><span class="info-value" onclick="copyText('${wildcard}')">${wildcard}</span></div>
+          <div class="info-row"><span class="info-label">マスク（16進数）</span><span class="info-value" onclick="copyText('${maskHex}')">${maskHex}</span></div>
+        </div>
+        <div class="info-card">
+          <h3>ホスト情報</h3>
+          <div class="info-row"><span class="info-label">総IPアドレス数</span><span class="info-value">${totalIPs.toLocaleString()}</span></div>
+          <div class="info-row"><span class="info-label">使用可能ホスト数</span><span class="info-value" style="color:#28a745;">${usableHosts.toLocaleString()}</span></div>
+          <div class="info-row"><span class="info-label">最初のホスト</span><span class="info-value" onclick="copyText('${first}')">${first}</span></div>
+          <div class="info-row"><span class="info-label">最後のホスト</span><span class="info-value" onclick="copyText('${last}')">${last}</span></div>
+          <div style="margin-top:0.75rem;">
+            <p style="font-size:0.8rem;color:#888;margin-bottom:0.4rem;">IPアドレス範囲</p>
+            <div class="addr-range" onclick="copyText('${first} - ${last}')" title="クリックしてコピー">${first} 〜 ${last}</div>
+          </div>
+        </div>
+      </div>
+      <div class="info-card" style="margin-top:1rem;">
+        <h3>2進数表示 <span style="font-size:0.75rem;font-weight:400;color:#888;">（<span style="color:#7bb3f0;">青=ネットワーク部</span> / <span style="color:#ff9f7f;">橙=ホスト部</span>）</span></h3>
+        <p style="font-size:0.8rem;color:#888;margin-bottom:0.5rem;">ネットワークアドレス</p>
+        <div class="binary-display">${formatBinaryIP(networkInt, prefix)}</div>
+        <p style="font-size:0.8rem;color:#888;margin:0.5rem 0 0.5rem;">サブネットマスク</p>
+        <div class="binary-display">${formatBinaryIP(maskInt, prefix)}</div>
+      </div>`;
+  } catch(e) {
+    resultEl.innerHTML = `<div class="error-box">${e.message}</div>`;
+  }
+}
+
+calculate();
+document.getElementById('cidrInput').addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+</script>
+</body>
+</html>

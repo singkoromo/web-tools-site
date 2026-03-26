@@ -127,6 +127,14 @@
   <url><loc>https://web-tool-site.com/tools/html-table-generator.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://web-tool-site.com/tools/unicode-search.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://web-tool-site.com/tools/api-mock.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- 新規追加ツール (2026-03-26) -->
+  <url><loc>https://web-tool-site.com/tools/cron-parser.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/subnet-calculator.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/git-diff-viewer.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/docker-run-generator.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/env-editor.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/px-rem-converter.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://web-tool-site.com/tools/chmod-calculator.html</loc><lastmod>2026-03-26</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <!-- サイトページ -->
   <url><loc>https://web-tool-site.com/about.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://web-tool-site.com/contact.html</loc><lastmod>2026-03-24</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
