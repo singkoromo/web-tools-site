@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セマンティックバージョニングツール - ToolBox</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav a { color: #555; text-decoration: none; font-weight: 500; }
+nav a:hover { color: #f093fb; }
+.tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+.tool-header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; text-align: center; }
+.tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.tool-header p { opacity: 0.9; }
+.tool-content { padding: 2rem; }
+button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.btn-primary { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+.btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #545b62; transform: translateY(-2px); }
+.btn-major { background: #e74c3c; color: white; }
+.btn-major:hover { background: #c0392b; transform: translateY(-2px); }
+.btn-minor { background: #f39c12; color: white; }
+.btn-minor:hover { background: #d68910; transform: translateY(-2px); }
+.btn-patch { background: #27ae60; color: white; }
+.btn-patch:hover { background: #1e8449; transform: translateY(-2px); }
+.btn-pre { background: #8e44ad; color: white; }
+.btn-pre:hover { background: #6c3483; transform: translateY(-2px); }
+.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+input, select { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; }
+input:focus, select:focus { outline: none; border-color: #f093fb; }
+.form-group { margin-bottom: 1.5rem; }
+.label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; font-family: 'Inter', sans-serif; }
+.result-box { background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; min-height: 3rem; word-break: break-all; }
+.section-card { background: #fafafa; border: 1px solid #e8e8e8; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.section-title { font-size: 1.1rem; font-weight: 700; color: #2c3e50; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid; border-image: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) 1; }
+.version-display { font-size: 2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #2c3e50; padding: 1rem; background: #fff; border: 2px solid #f0c0f8; border-radius: 8px; text-align: center; margin: 1rem 0; }
+.alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+.alert-success { background: #e8f5e9; border: 1px solid #a5d6a7; color: #2e7d32; }
+.alert-danger { background: #ffebee; border: 1px solid #ef9a9a; color: #c62828; }
+.alert-info { background: #e3f2fd; border: 1px solid #90caf9; color: #1565c0; }
+.alert-warning { background: #fff8e1; border: 1px solid #ffd54f; color: #e65100; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.parse-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+.parse-item { background: white; border: 1px solid #e8e8e8; border-radius: 8px; padding: 0.75rem; text-align: center; }
+.parse-item-label { font-size: 0.75rem; color: #888; text-transform: uppercase; font-weight: 600; }
+.parse-item-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #2c3e50; margin-top: 0.25rem; }
+.compare-result { text-align: center; font-size: 1.5rem; font-weight: 800; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+.range-explain { margin-top: 0.75rem; font-size: 0.9rem; color: #555; background: #f0f4ff; border: 1px solid #c5d3f6; border-radius: 6px; padding: 0.75rem; }
+footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+.footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+.footer-inner .footer-links a:hover { color: #fff; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+@media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .grid-2 { grid-template-columns: 1fr; } nav ul { gap: 1rem; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <a href="../index.html" class="logo">🧰 ToolBox</a>
+    <nav>
+      <ul>
+        <li><a href="../index.html">ホーム</a></li>
+        <li><a href="../index.html#tools">ツール一覧</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-page">
+  <div class="tool-card-main">
+    <div class="tool-header">
+      <h1>🔢 セマンティックバージョニングツール</h1>
+      <p>Semantic Versioning（semver）のバージョン計算・比較・範囲チェックツール。MAJOR.MINOR.PATCHの各要素を操作してnpmスタイルのバージョン範囲を確認できます。</p>
+    </div>
+    <div class="tool-content">
+
+      <!-- Section 1: Version Bump -->
+      <div class="section-card">
+        <div class="section-title">1. バージョンバンプ</div>
+        <div class="form-group">
+          <label class="label">現在のバージョン</label>
+          <input type="text" id="bumpInput" value="1.2.3" placeholder="1.2.3" oninput="updateBump()">
+        </div>
+        <div class="btn-group">
+          <button class="btn-major" onclick="bumpVersion('major')">MAJOR → <span id="nextMajor">2.0.0</span></button>
+          <button class="btn-minor" onclick="bumpVersion('minor')">MINOR → <span id="nextMinor">1.3.0</span></button>
+          <button class="btn-patch" onclick="bumpVersion('patch')">PATCH → <span id="nextPatch">1.2.4</span></button>
+        </div>
+        <div class="btn-group">
+          <button class="btn-pre btn-sm" onclick="bumpPrerelease('alpha')">α alpha → <span id="nextAlpha">1.2.4-alpha.1</span></button>
+          <button class="btn-pre btn-sm" onclick="bumpPrerelease('beta')">β beta → <span id="nextBeta">1.2.4-beta.1</span></button>
+          <button class="btn-pre btn-sm" onclick="bumpPrerelease('rc')">RC → <span id="nextRc">1.2.4-rc.1</span></button>
+        </div>
+        <div class="version-display" id="bumpResult">—</div>
+      </div>
+
+      <!-- Section 2: Version Compare -->
+      <div class="section-card">
+        <div class="section-title">2. バージョン比較</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="label">バージョン A</label>
+            <input type="text" id="compareA" value="2.1.0" placeholder="2.1.0">
+          </div>
+          <div class="form-group">
+            <label class="label">バージョン B</label>
+            <input type="text" id="compareB" value="1.9.5" placeholder="1.9.5">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="compareVersions()">比較する</button>
+        <div id="compareResult" style="margin-top:1rem"></div>
+      </div>
+
+      <!-- Section 3: Range Check -->
+      <div class="section-card">
+        <div class="section-title">3. バージョン範囲チェック</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="label">バージョン</label>
+            <input type="text" id="rangeVersion" value="1.5.3" placeholder="1.5.3">
+          </div>
+          <div class="form-group">
+            <label class="label">範囲（npmスタイル）</label>
+            <input type="text" id="rangeExpr" value="^1.0.0" placeholder="^1.0.0, ~1.2.0, >=1.0.0 &lt;2.0.0">
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-secondary btn-sm" onclick="setRange('^1.0.0')">^1.0.0</button>
+          <button class="btn-secondary btn-sm" onclick="setRange('~1.5.0')">~1.5.0</button>
+          <button class="btn-secondary btn-sm" onclick="setRange('>=1.0.0 <2.0.0')">>=1.0.0 &lt;2.0.0</button>
+          <button class="btn-secondary btn-sm" onclick="setRange('1.x')">1.x</button>
+          <button class="btn-secondary btn-sm" onclick="setRange('*')">*</button>
+        </div>
+        <button class="btn-primary" onclick="checkRange()">チェック</button>
+        <div id="rangeResult" style="margin-top:1rem"></div>
+      </div>
+
+      <!-- Section 4: Parse -->
+      <div class="section-card">
+        <div class="section-title">4. バージョン解析</div>
+        <div class="form-group">
+          <label class="label">バージョン文字列</label>
+          <input type="text" id="parseInput" value="2.3.1-beta.2+build.456" placeholder="2.3.1-beta.2+build.456" oninput="parseVersion()">
+        </div>
+        <div id="parseResult"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+    </div>
+    <p style="color:#aaa;font-size:0.9rem">© 2024 ToolBox - 開発者向けツール集</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+
+const SEMVER_RE = /^(\d+)\.(\d+)\.(\d+)(?:-([^+]+))?(?:\+(.+))?$/;
+
+function parseSemver(str) {
+  str = str.trim();
+  const m = SEMVER_RE.exec(str);
+  if (!m) return null;
+  return {
+    major: parseInt(m[1], 10),
+    minor: parseInt(m[2], 10),
+    patch: parseInt(m[3], 10),
+    prerelease: m[4] || null,
+    build: m[5] || null,
+    raw: str
+  };
+}
+
+function semverStr(v) {
+  let s = `${v.major}.${v.minor}.${v.patch}`;
+  if (v.prerelease) s += `-${v.prerelease}`;
+  if (v.build) s += `+${v.build}`;
+  return s;
+}
+
+// Compare two semver objects: returns 1, -1, or 0
+function semverCmp(a, b) {
+  if (a.major !== b.major) return a.major > b.major ? 1 : -1;
+  if (a.minor !== b.minor) return a.minor > b.minor ? 1 : -1;
+  if (a.patch !== b.patch) return a.patch > b.patch ? 1 : -1;
+  // prerelease: no prerelease > prerelease
+  if (!a.prerelease && b.prerelease) return 1;
+  if (a.prerelease && !b.prerelease) return -1;
+  if (a.prerelease && b.prerelease) {
+    if (a.prerelease > b.prerelease) return 1;
+    if (a.prerelease < b.prerelease) return -1;
+  }
+  return 0;
+}
+
+// ---- Section 1: Bump ----
+function updateBump() {
+  const v = parseSemver(document.getElementById('bumpInput').value);
+  if (!v) {
+    document.getElementById('nextMajor').textContent = '?';
+    document.getElementById('nextMinor').textContent = '?';
+    document.getElementById('nextPatch').textContent = '?';
+    document.getElementById('nextAlpha').textContent = '?';
+    document.getElementById('nextBeta').textContent = '?';
+    document.getElementById('nextRc').textContent = '?';
+    document.getElementById('bumpResult').textContent = '無効なバージョン';
+    return;
+  }
+  const major = semverStr({major: v.major+1, minor: 0, patch: 0});
+  const minor = semverStr({major: v.major, minor: v.minor+1, patch: 0});
+  const patch = semverStr({major: v.major, minor: v.minor, patch: v.patch+1});
+  const nextPatchBase = {major: v.major, minor: v.minor, patch: v.patch+1};
+  document.getElementById('nextMajor').textContent = major;
+  document.getElementById('nextMinor').textContent = minor;
+  document.getElementById('nextPatch').textContent = patch;
+  document.getElementById('nextAlpha').textContent = patch + '-alpha.1';
+  document.getElementById('nextBeta').textContent = patch + '-beta.1';
+  document.getElementById('nextRc').textContent = patch + '-rc.1';
+  document.getElementById('bumpResult').textContent = '—';
+}
+
+function bumpVersion(type) {
+  const v = parseSemver(document.getElementById('bumpInput').value);
+  if (!v) { showToast('有効なバージョンを入力してください'); return; }
+  let next;
+  if (type === 'major') next = semverStr({major: v.major+1, minor: 0, patch: 0});
+  else if (type === 'minor') next = semverStr({major: v.major, minor: v.minor+1, patch: 0});
+  else next = semverStr({major: v.major, minor: v.minor, patch: v.patch+1});
+  document.getElementById('bumpResult').textContent = next;
+  showToast('バージョンをバンプしました');
+}
+
+function bumpPrerelease(tag) {
+  const v = parseSemver(document.getElementById('bumpInput').value);
+  if (!v) { showToast('有効なバージョンを入力してください'); return; }
+  const next = `${v.major}.${v.minor}.${v.patch+1}-${tag}.1`;
+  document.getElementById('bumpResult').textContent = next;
+  showToast('プレリリースバージョンを生成しました');
+}
+
+// ---- Section 2: Compare ----
+function compareVersions() {
+  const aStr = document.getElementById('compareA').value.trim();
+  const bStr = document.getElementById('compareB').value.trim();
+  const a = parseSemver(aStr);
+  const b = parseSemver(bStr);
+  const el = document.getElementById('compareResult');
+
+  if (!a || !b) {
+    el.innerHTML = '<div class="alert alert-danger">有効なセマンティックバージョンを両方入力してください。</div>';
+    return;
+  }
+
+  const cmp = semverCmp(a, b);
+  let symbol, cls, msg;
+  if (cmp > 0) { symbol = `${aStr} &gt; ${bStr}`; cls = 'alert-success'; msg = `バージョン A（${aStr}）はバージョン B（${bStr}）より新しい`; }
+  else if (cmp < 0) { symbol = `${aStr} &lt; ${bStr}`; cls = 'alert-warning'; msg = `バージョン A（${aStr}）はバージョン B（${bStr}）より古い`; }
+  else { symbol = `${aStr} = ${bStr}`; cls = 'alert-info'; msg = `バージョン A と B は同じです`; }
+
+  const changes = [];
+  if (a.major !== b.major) changes.push(`MAJOR: ${b.major} → ${a.major}（破壊的変更）`);
+  if (a.minor !== b.minor) changes.push(`MINOR: ${b.minor} → ${a.minor}（後方互換の機能追加）`);
+  if (a.patch !== b.patch) changes.push(`PATCH: ${b.patch} → ${a.patch}（バグ修正）`);
+  if (a.prerelease !== b.prerelease) changes.push(`プレリリース: ${b.prerelease || 'なし'} → ${a.prerelease || 'なし'}`);
+
+  el.innerHTML = `
+    <div class="alert ${cls}"><strong>${symbol}</strong><br>${msg}</div>
+    ${changes.length > 0 ? `<div class="result-box">${changes.map(c => '• ' + c).join('\n')}</div>` : ''}
+  `;
+}
+
+// ---- Section 3: Range ----
+function setRange(r) {
+  document.getElementById('rangeExpr').value = r;
+}
+
+function satisfiesRange(ver, range) {
+  range = range.trim();
+  const v = parseSemver(ver);
+  if (!v) return { ok: false, error: '無効なバージョン文字列です' };
+
+  // Handle multiple space-separated conditions (AND)
+  const parts = range.split(/\s+(?=[><=~^])/);
+  for (const part of parts) {
+    const result = satisfiesSingle(v, part.trim());
+    if (!result) return { ok: false };
+  }
+  return { ok: true };
+}
+
+function satisfiesSingle(v, expr) {
+  expr = expr.trim();
+  if (expr === '*' || expr === '') return true;
+
+  // x-range: 1.x, 1.2.x
+  if (/^\d+\.x(\.x)?$/i.test(expr)) {
+    const parts = expr.split('.');
+    const major = parseInt(parts[0]);
+    if (v.major !== major) return false;
+    if (parts[1] !== 'x' && parts[1] !== 'X') {
+      if (v.minor !== parseInt(parts[1])) return false;
+    }
+    return true;
+  }
+
+  // ^ compatible
+  if (expr.startsWith('^')) {
+    const base = parseSemver(expr.slice(1));
+    if (!base) return false;
+    if (base.major !== 0) {
+      return v.major === base.major && semverCmp(v, base) >= 0;
+    } else if (base.minor !== 0) {
+      return v.major === 0 && v.minor === base.minor && semverCmp(v, base) >= 0;
+    } else {
+      return v.major === 0 && v.minor === 0 && v.patch === base.patch;
+    }
+  }
+
+  // ~ approximately
+  if (expr.startsWith('~')) {
+    const base = parseSemver(expr.slice(1));
+    if (!base) return false;
+    return v.major === base.major && v.minor === base.minor && semverCmp(v, base) >= 0;
+  }
+
+  // >=, <=, >, <, =
+  const m = expr.match(/^(>=|<=|>|<|=)(.+)$/);
+  if (m) {
+    const op = m[1];
+    const target = parseSemver(m[2].trim());
+    if (!target) return false;
+    const c = semverCmp(v, target);
+    if (op === '>=') return c >= 0;
+    if (op === '<=') return c <= 0;
+    if (op === '>') return c > 0;
+    if (op === '<') return c < 0;
+    if (op === '=') return c === 0;
+  }
+
+  // Plain version
+  const target = parseSemver(expr);
+  if (target) return semverCmp(v, target) === 0;
+
+  return false;
+}
+
+function explainRange(range) {
+  range = range.trim();
+  if (range === '*') return '任意のバージョンにマッチします。';
+  if (range.startsWith('^')) return `^ (キャレット): ${range.slice(1)} 以上、次のメジャーバージョン未満。後方互換の更新を許可します。`;
+  if (range.startsWith('~')) return `~ (チルダ): ${range.slice(1)} 以上、次のマイナーバージョン未満。パッチ更新のみを許可します。`;
+  if (/^\d+\.x/i.test(range)) return `x-range: メジャーバージョンが ${range.split('.')[0]} の任意のバージョンにマッチします。`;
+  if (range.includes('>=') || range.includes('<=') || range.includes('>') || range.includes('<')) return `比較演算子による範囲指定: ${range}`;
+  return `完全一致: バージョン ${range} のみにマッチします。`;
+}
+
+function checkRange() {
+  const ver = document.getElementById('rangeVersion').value.trim();
+  const range = document.getElementById('rangeExpr').value.trim();
+  const el = document.getElementById('rangeResult');
+
+  const v = parseSemver(ver);
+  if (!v) { el.innerHTML = '<div class="alert alert-danger">有効なバージョンを入力してください。</div>'; return; }
+
+  const result = satisfiesRange(ver, range);
+  el.innerHTML = `
+    <div class="alert ${result.ok ? 'alert-success' : 'alert-danger'}">
+      <strong>${ver}</strong> は範囲 <strong>${range}</strong> を ${result.ok ? '✅ 満たしています' : '❌ 満たしていません'}
+    </div>
+    <div class="range-explain">📖 範囲の説明: ${explainRange(range)}</div>
+  `;
+}
+
+// ---- Section 4: Parse ----
+function parseVersion() {
+  const str = document.getElementById('parseInput').value.trim();
+  const el = document.getElementById('parseResult');
+  const v = parseSemver(str);
+
+  if (!v) {
+    el.innerHTML = '<div class="alert alert-danger">❌ 有効なセマンティックバージョンではありません。形式: MAJOR.MINOR.PATCH[-prerelease][+build]</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="alert alert-success">✅ 有効なセマンティックバージョンです</div>
+    <div class="parse-grid">
+      <div class="parse-item"><div class="parse-item-label">MAJOR</div><div class="parse-item-value">${v.major}</div></div>
+      <div class="parse-item"><div class="parse-item-label">MINOR</div><div class="parse-item-value">${v.minor}</div></div>
+      <div class="parse-item"><div class="parse-item-label">PATCH</div><div class="parse-item-value">${v.patch}</div></div>
+      <div class="parse-item"><div class="parse-item-label">プレリリース</div><div class="parse-item-value" style="font-size:0.9rem">${v.prerelease || '—'}</div></div>
+      <div class="parse-item"><div class="parse-item-label">ビルドメタ</div><div class="parse-item-value" style="font-size:0.9rem">${v.build || '—'}</div></div>
+      <div class="parse-item"><div class="parse-item-label">安定版</div><div class="parse-item-value" style="font-size:0.9rem">${v.prerelease ? 'いいえ' : 'はい'}</div></div>
+    </div>
+  `;
+}
+
+// Init
+updateBump();
+parseVersion();
+</script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カラーコントラストチェッカー - ToolBox</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav a { color: #555; text-decoration: none; font-weight: 500; }
+nav a:hover { color: #4a90e2; }
+.tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+.tool-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; text-align: center; }
+.tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.tool-header p { opacity: 0.9; }
+.tool-content { padding: 2rem; }
+button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.btn-primary { background: #4a90e2; color: white; }
+.btn-primary:hover { background: #357abd; transform: translateY(-2px); }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #545b62; transform: translateY(-2px); }
+.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+input[type="text"], input[type="color"] { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+input:focus { outline: none; border-color: #667eea; }
+.form-group { margin-bottom: 1.5rem; }
+.label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; font-family: 'Inter', sans-serif; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.section-title { font-size: 1.1rem; font-weight: 700; color: #2c3e50; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #667eea; }
+.color-picker-row { display: flex; align-items: center; gap: 0.75rem; }
+.color-picker-row input[type="color"] { width: 52px; height: 44px; padding: 2px; border-radius: 6px; cursor: pointer; }
+.color-picker-row input[type="text"] { flex: 1; }
+.contrast-display { text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 12px; margin: 1.5rem 0; }
+.contrast-ratio { font-size: 3.5rem; font-weight: 800; color: #2c3e50; font-family: 'JetBrains Mono', monospace; }
+.contrast-label { font-size: 1rem; color: #666; margin-top: 0.25rem; }
+.wcag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1.5rem 0; }
+.wcag-item { padding: 0.75rem 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+.wcag-pass { background: #e8f5e9; border: 1px solid #a5d6a7; }
+.wcag-fail { background: #ffebee; border: 1px solid #ef9a9a; }
+.wcag-item-label { font-weight: 600; font-size: 0.9rem; }
+.wcag-item-label small { display: block; font-weight: 400; color: #666; font-size: 0.78rem; }
+.wcag-badge { font-size: 1.3rem; }
+.preview-area { border-radius: 12px; overflow: hidden; margin: 1.5rem 0; }
+.preview-inner { padding: 1.5rem; }
+.preview-normal { font-size: 16px; margin-bottom: 0.75rem; }
+.preview-large { font-size: 18px; font-weight: 700; margin-bottom: 0.75rem; }
+.preview-small { font-size: 13px; margin-bottom: 0.75rem; }
+.preview-ui { display: inline-block; padding: 0.5rem 1rem; border-radius: 6px; border-width: 2px; border-style: solid; font-weight: 600; font-size: 0.9rem; }
+.preset-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; border-radius: 4px; border: 1px solid #ddd; cursor: pointer; background: white; transition: all 0.2s; font-family: 'Inter', sans-serif; font-weight: 500; }
+.preset-btn:hover { background: #f0f0f0; }
+.swap-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; padding: 0.6rem 1rem; cursor: pointer; font-size: 0.9rem; font-weight: 600; font-family: 'Inter', sans-serif; }
+.suggestion-box { background: #f0f4ff; border: 1px solid #c5d3f6; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 0.9rem; }
+footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+.footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+.footer-inner .footer-links a:hover { color: #fff; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+@media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .grid-2, .wcag-grid { grid-template-columns: 1fr; } nav ul { gap: 1rem; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <a href="../index.html" class="logo">🧰 ToolBox</a>
+    <nav>
+      <ul>
+        <li><a href="../index.html">ホーム</a></li>
+        <li><a href="../index.html#tools">ツール一覧</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-page">
+  <div class="tool-card-main">
+    <div class="tool-header">
+      <h1>🎨 カラーコントラストチェッカー</h1>
+      <p>WCAG 2.1のアクセシビリティ基準に基づいてテキストと背景色のコントラスト比を計算。AA/AAAレベルの適合状況を確認できます。</p>
+    </div>
+    <div class="tool-content">
+
+      <!-- Color Inputs -->
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="label">前景色（テキスト）</label>
+          <div class="color-picker-row">
+            <input type="color" id="fgPicker" value="#000000" oninput="syncColorInput('fg')">
+            <input type="text" id="fgHex" value="#000000" placeholder="#000000" oninput="syncColorPicker('fg')" maxlength="7">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="label">背景色</label>
+          <div class="color-picker-row">
+            <input type="color" id="bgPicker" value="#ffffff" oninput="syncColorInput('bg')">
+            <input type="text" id="bgHex" value="#ffffff" placeholder="#ffffff" oninput="syncColorPicker('bg')" maxlength="7">
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-bottom:1.5rem">
+        <button class="swap-btn" onclick="swapColors()">⇄ 色を入れ替え</button>
+      </div>
+
+      <!-- Presets -->
+      <div class="form-group">
+        <label class="label">プリセット</label>
+        <div class="btn-group">
+          <button class="preset-btn" onclick="setPreset('#000000','#ffffff')">黒 / 白</button>
+          <button class="preset-btn" onclick="setPreset('#ffffff','#000000')">白 / 黒</button>
+          <button class="preset-btn" onclick="setPreset('#003087','#ffffff')">ネイビー / 白</button>
+          <button class="preset-btn" onclick="setPreset('#ffffff','#0057b7')">白 / ブルー</button>
+          <button class="preset-btn" onclick="setPreset('#333333','#f5f5f5')">ダークグレー / ライトグレー</button>
+          <button class="preset-btn" onclick="setPreset('#ffffff','#e74c3c')">白 / レッド</button>
+          <button class="preset-btn" onclick="setPreset('#2c3e50','#ecf0f1')">ダーク / オフホワイト</button>
+        </div>
+      </div>
+
+      <!-- Contrast Display -->
+      <div class="contrast-display">
+        <div class="contrast-ratio" id="contrastRatio">21.00:1</div>
+        <div class="contrast-label">コントラスト比</div>
+      </div>
+
+      <!-- WCAG Results -->
+      <div class="section-title">WCAG 2.1 適合チェック</div>
+      <div class="wcag-grid" id="wcagGrid">
+        <!-- filled by JS -->
+      </div>
+
+      <!-- Preview -->
+      <div class="section-title">プレビュー</div>
+      <div class="preview-area" id="previewArea">
+        <div class="preview-inner" id="previewInner">
+          <div class="preview-normal" id="prevNormal">通常テキスト（16px）— The quick brown fox jumps over the lazy dog.</div>
+          <div class="preview-large" id="prevLarge">大きなテキスト（18px 太字）— アクセシビリティは重要です。</div>
+          <div class="preview-small" id="prevSmall">小さなテキスト（13px）— 小さい文字はより高いコントラストが必要です。</div>
+          <div style="margin-top:1rem">
+            <span class="preview-ui" id="prevUI">UIコンポーネント例</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggestion -->
+      <div class="suggestion-box" id="suggestionBox" style="display:none"></div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+    </div>
+    <p style="color:#aaa;font-size:0.9rem">© 2024 ToolBox - 開発者向けツール集</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) hex = hex.split('').map(c => c+c).join('');
+  if (hex.length !== 6) return null;
+  const n = parseInt(hex, 16);
+  if (isNaN(n)) return null;
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function linearize(c) {
+  c = c / 255;
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function luminance(hex) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 0;
+  const R = linearize(rgb.r);
+  const G = linearize(rgb.g);
+  const B = linearize(rgb.b);
+  return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+}
+
+function contrastRatio(hex1, hex2) {
+  const L1 = luminance(hex1);
+  const L2 = luminance(hex2);
+  const lighter = Math.max(L1, L2);
+  const darker = Math.min(L1, L2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function syncColorInput(which) {
+  const picker = document.getElementById(which + 'Picker');
+  const hexInput = document.getElementById(which + 'Hex');
+  hexInput.value = picker.value;
+  recalculate();
+}
+
+function syncColorPicker(which) {
+  const hexInput = document.getElementById(which + 'Hex');
+  const picker = document.getElementById(which + 'Picker');
+  let val = hexInput.value.trim();
+  if (!val.startsWith('#')) val = '#' + val;
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    picker.value = val;
+    recalculate();
+  }
+}
+
+function swapColors() {
+  const fg = document.getElementById('fgHex').value;
+  const bg = document.getElementById('bgHex').value;
+  document.getElementById('fgHex').value = bg;
+  document.getElementById('bgHex').value = fg;
+  document.getElementById('fgPicker').value = bg;
+  document.getElementById('bgPicker').value = fg;
+  recalculate();
+}
+
+function setPreset(fg, bg) {
+  document.getElementById('fgHex').value = fg;
+  document.getElementById('bgHex').value = bg;
+  document.getElementById('fgPicker').value = fg;
+  document.getElementById('bgPicker').value = bg;
+  recalculate();
+}
+
+function recalculate() {
+  const fg = document.getElementById('fgHex').value.trim();
+  const bg = document.getElementById('bgHex').value.trim();
+
+  if (!hexToRgb(fg.replace('#','')) || !hexToRgb(bg.replace('#',''))) return;
+
+  const ratio = contrastRatio(fg, bg);
+  document.getElementById('contrastRatio').textContent = ratio.toFixed(2) + ':1';
+
+  // WCAG checks
+  const checks = [
+    { label: '通常テキスト AA', sub: '4.5:1 以上', needed: 4.5 },
+    { label: '通常テキスト AAA', sub: '7:1 以上', needed: 7 },
+    { label: '大きなテキスト AA', sub: '3:1 以上', needed: 3 },
+    { label: '大きなテキスト AAA', sub: '4.5:1 以上', needed: 4.5 },
+    { label: 'UIコンポーネント AA', sub: '3:1 以上', needed: 3 },
+  ];
+
+  let allPass = true;
+  const grid = document.getElementById('wcagGrid');
+  grid.innerHTML = '';
+  checks.forEach(c => {
+    const pass = ratio >= c.needed;
+    if (!pass) allPass = false;
+    const div = document.createElement('div');
+    div.className = 'wcag-item ' + (pass ? 'wcag-pass' : 'wcag-fail');
+    div.innerHTML = `
+      <div class="wcag-item-label">${c.label}<small>${c.sub}</small></div>
+      <span class="wcag-badge">${pass ? '✅' : '❌'}</span>
+    `;
+    grid.appendChild(div);
+  });
+
+  // Update preview
+  const previewInner = document.getElementById('previewInner');
+  previewInner.style.backgroundColor = bg;
+  previewInner.style.color = fg;
+  document.getElementById('prevUI').style.borderColor = fg;
+  document.getElementById('prevUI').style.color = fg;
+
+  // Suggestion if failing AA normal text
+  const suggestionBox = document.getElementById('suggestionBox');
+  if (ratio < 4.5) {
+    const suggestion = suggestColor(fg, bg);
+    suggestionBox.style.display = 'block';
+    suggestionBox.innerHTML = `<strong>💡 改善提案:</strong> AA基準（4.5:1）を満たすには、前景色を <strong>${suggestion.fg}</strong>、背景色を <strong>${suggestion.bg}</strong> に変更することを検討してください。（推定比: ${suggestion.ratio.toFixed(2)}:1）`;
+  } else {
+    suggestionBox.style.display = 'none';
+  }
+}
+
+function suggestColor(fg, bg) {
+  // Simple suggestion: darken fg or lighten bg to get 4.5:1
+  const bgRgb = hexToRgb(bg.replace('#',''));
+  const fgLum = luminance(fg);
+  const bgLum = luminance(bg);
+
+  // Try darkening foreground if it's the lighter one
+  let newFg = fg;
+  let newBg = bg;
+  if (fgLum > bgLum) {
+    // fg is lighter, try making it darker
+    newFg = '#000000';
+  } else {
+    // fg is darker, try making it darker still
+    newFg = '#000000';
+    newBg = '#ffffff';
+  }
+  const newRatio = contrastRatio(newFg, newBg);
+  return { fg: newFg, bg: newBg, ratio: newRatio };
+}
+
+// Init
+recalculate();
+</script>
+</body>
+</html>

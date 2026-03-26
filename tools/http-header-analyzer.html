@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTTPヘッダー解析ツール - ToolBox</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav a { color: #555; text-decoration: none; font-weight: 500; }
+nav a:hover { color: #4a90e2; }
+.tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+.tool-header { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #1a4a2e; padding: 2rem; text-align: center; }
+.tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; color: #1a4a2e; }
+.tool-header p { opacity: 0.8; color: #2a5a3e; }
+.tool-content { padding: 2rem; }
+button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.btn-primary { background: #43e97b; color: #1a4a2e; }
+.btn-primary:hover { background: #2ecc71; transform: translateY(-2px); }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #545b62; transform: translateY(-2px); }
+.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+textarea { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; resize: vertical; }
+textarea:focus { outline: none; border-color: #43e97b; }
+.form-group { margin-bottom: 1.5rem; }
+.label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; font-family: 'Inter', sans-serif; }
+.section-title { font-size: 1.1rem; font-weight: 700; color: #2c3e50; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #43e97b; }
+.headers-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.headers-table th { background: #f0fdf4; padding: 0.75rem 1rem; text-align: left; font-weight: 700; color: #2c3e50; border-bottom: 2px solid #43e97b; }
+.headers-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+.headers-table tr:hover td { background: #f9fffe; }
+.header-name { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #1a4a2e; white-space: nowrap; }
+.header-value { font-family: 'JetBrains Mono', monospace; color: #555; word-break: break-all; }
+.header-desc { color: #666; font-size: 0.85rem; }
+.security-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+.security-item { padding: 0.75rem 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+.security-present { background: #e8f5e9; border: 1px solid #a5d6a7; }
+.security-missing { background: #ffebee; border: 1px solid #ef9a9a; }
+.security-warn { background: #fff8e1; border: 1px solid #ffd54f; }
+.security-item-info { flex: 1; }
+.security-item-name { font-weight: 700; font-size: 0.85rem; color: #2c3e50; font-family: 'JetBrains Mono', monospace; }
+.security-item-desc { font-size: 0.78rem; color: #666; margin-top: 0.15rem; }
+.security-badge { font-size: 1.2rem; flex-shrink: 0; }
+.score-bar-wrap { background: #e0e0e0; border-radius: 99px; height: 12px; margin: 0.5rem 0; overflow: hidden; }
+.score-bar { height: 100%; border-radius: 99px; transition: width 0.5s; }
+.score-label { font-size: 0.9rem; color: #555; }
+.alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+.alert-info { background: #e8f4f8; border: 1px solid #bee5eb; color: #0c5460; }
+footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+.footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+.footer-inner .footer-links a:hover { color: #fff; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+@media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } nav ul { gap: 1rem; } .headers-table { font-size: 0.8rem; } .headers-table th, .headers-table td { padding: 0.5rem; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <a href="../index.html" class="logo">🧰 ToolBox</a>
+    <nav>
+      <ul>
+        <li><a href="../index.html">ホーム</a></li>
+        <li><a href="../index.html#tools">ツール一覧</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-page">
+  <div class="tool-card-main">
+    <div class="tool-header">
+      <h1>🔍 HTTPヘッダー解析ツール</h1>
+      <p>HTTPレスポンスヘッダーの内容を解析・説明するツール。セキュリティヘッダーの設定状況確認や各ヘッダーの意味を日本語で解説します。</p>
+    </div>
+    <div class="tool-content">
+
+      <div class="form-group">
+        <label class="label">HTTPヘッダーを貼り付け（key: value形式）</label>
+        <textarea id="headerInput" rows="10" placeholder="HTTP/1.1 200 OK&#10;Content-Type: text/html; charset=UTF-8&#10;Cache-Control: max-age=3600&#10;..."></textarea>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-primary" onclick="parseHeaders()">解析する</button>
+        <button class="btn-secondary" onclick="loadExample()">サンプルを読み込む</button>
+        <button class="btn-secondary btn-sm" onclick="clearAll()">クリア</button>
+      </div>
+
+      <div id="resultsArea" style="display:none">
+        <!-- Security Score -->
+        <div class="section-title" style="margin-top:1.5rem">セキュリティスコア</div>
+        <div id="scoreDisplay" style="margin-bottom:1.5rem">
+          <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem">
+            <span style="font-size:2.5rem;font-weight:800;color:#2c3e50" id="scoreNum">0</span>
+            <div style="flex:1">
+              <div class="score-bar-wrap"><div class="score-bar" id="scoreBar" style="width:0%;background:#e74c3c"></div></div>
+              <div class="score-label" id="scoreLabel">スコアを計算中...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">セキュリティヘッダーチェック</div>
+        <div class="security-grid" id="securityGrid"></div>
+
+        <!-- Parsed Headers Table -->
+        <div class="section-title">解析結果</div>
+        <div style="overflow-x:auto">
+          <table class="headers-table">
+            <thead>
+              <tr>
+                <th>ヘッダー名</th>
+                <th>値</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody id="headersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="emptyState" class="alert alert-info">
+        HTTPレスポンスヘッダーを上のテキストエリアに貼り付けて「解析する」ボタンを押してください。「サンプルを読み込む」でサンプルデータを試すこともできます。
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+    </div>
+    <p style="color:#aaa;font-size:0.9rem">© 2024 ToolBox - 開発者向けツール集</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+
+const EXAMPLE_HEADERS = `HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+Cache-Control: max-age=3600
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'
+Referrer-Policy: no-referrer-when-downgrade
+Server: nginx/1.24.0
+Content-Length: 2345
+ETag: "abc123def456"
+Last-Modified: Thu, 01 Jan 2024 00:00:00 GMT
+Access-Control-Allow-Origin: https://example.com`;
+
+const HEADER_DESCRIPTIONS = {
+  'content-type': 'レスポンスのMIMEタイプとエンコーディングを指定します。',
+  'content-length': 'レスポンスボディのバイト数を示します。',
+  'content-encoding': 'レスポンスボディの圧縮方式を指定します（gzip, br等）。',
+  'cache-control': 'キャッシュの動作を制御します。max-age、no-cache、no-store等のディレクティブが使用されます。',
+  'set-cookie': 'クライアントにCookieを設定します。',
+  'authorization': 'リクエストの認証情報を含みます（通常はリクエストヘッダー）。',
+  'content-security-policy': 'XSS等のコンテンツインジェクション攻撃を防ぐためのポリシーを定義します。',
+  'x-frame-options': 'クリックジャッキング攻撃を防ぐため、iframe内での表示を制御します。',
+  'strict-transport-security': 'HTTPS接続を強制するHSTSヘッダーです。ブラウザに一定期間HTTPSのみで接続するよう指示します。',
+  'x-content-type-options': 'MIMEタイプスニッフィングを防ぎ、Content-Typeで指定されたタイプを厳守させます。',
+  'x-xss-protection': 'ブラウザ内蔵のXSSフィルターを有効/無効にします（現在は非推奨）。',
+  'referrer-policy': 'Refererヘッダーに含まれる情報の量を制御します。',
+  'permissions-policy': '特定のブラウザ機能（カメラ、マイク等）の使用を制限します。',
+  'etag': 'リソースの特定バージョンの識別子です。条件付きリクエストに使用されます。',
+  'last-modified': 'リソースの最終更新日時を示します。条件付きリクエストに使用されます。',
+  'access-control-allow-origin': 'CORS（クロスオリジンリソース共有）で許可するオリジンを指定します。',
+  'access-control-allow-methods': 'CORSで許可するHTTPメソッドを指定します。',
+  'access-control-allow-headers': 'CORSで許可するリクエストヘッダーを指定します。',
+  'location': 'リダイレクト先のURLを指定します。3xx系レスポンスで使用されます。',
+  'server': 'サーバーソフトウェアの情報を示します（セキュリティ上、詳細を隠すことが推奨されます）。',
+  'x-powered-by': 'バックエンド技術の情報を示します（セキュリティ上、削除が推奨されます）。',
+  'vary': 'キャッシュのバリエーション（どのリクエストヘッダーに基づくか）を指定します。',
+  'connection': 'TCP接続の維持・切断を制御します。',
+  'transfer-encoding': 'データの転送エンコーディングを指定します（chunked等）。',
+  'date': 'レスポンスが生成された日時を示します。',
+  'expires': 'レスポンスの有効期限を示します（Cache-Controlが優先されます）。',
+  'pragma': 'HTTP/1.0時代のキャッシュ制御ヘッダーです（後方互換性のため残存）。',
+  'www-authenticate': '認証が必要な場合に認証方式を示します。',
+  'accept-ranges': '範囲リクエストのサポートを示します。',
+  'age': 'プロキシキャッシュにオブジェクトが存在した秒数を示します。',
+  'link': 'リソース間の関係を定義します（プリロード等）。',
+  'x-request-id': 'リクエストの追跡IDを含みます（デバッグ用）。',
+};
+
+const SECURITY_CHECKS = [
+  { name: 'Content-Security-Policy', key: 'content-security-policy', desc: 'XSS・インジェクション攻撃を防ぐCSPポリシー', importance: 'high' },
+  { name: 'X-Frame-Options', key: 'x-frame-options', desc: 'クリックジャッキング攻撃の防止', importance: 'high' },
+  { name: 'X-Content-Type-Options', key: 'x-content-type-options', desc: 'MIMEタイプスニッフィングの防止', importance: 'high' },
+  { name: 'Strict-Transport-Security', key: 'strict-transport-security', desc: 'HTTPS強制（HSTS）', importance: 'high' },
+  { name: 'X-XSS-Protection', key: 'x-xss-protection', desc: 'ブラウザXSSフィルター（非推奨、CSPを優先）', importance: 'low' },
+  { name: 'Referrer-Policy', key: 'referrer-policy', desc: 'Referer情報の漏洩制御', importance: 'medium' },
+  { name: 'Permissions-Policy', key: 'permissions-policy', desc: 'ブラウザ機能へのアクセス制御', importance: 'medium' },
+  { name: 'Cache-Control', key: 'cache-control', desc: 'キャッシュポリシーの明示的設定', importance: 'medium' },
+];
+
+function parseHeaderLine(line) {
+  const idx = line.indexOf(':');
+  if (idx < 0) return null;
+  const name = line.substring(0, idx).trim();
+  const value = line.substring(idx + 1).trim();
+  if (!name) return null;
+  return { name, value };
+}
+
+function parseHeaders() {
+  const input = document.getElementById('headerInput').value.trim();
+  if (!input) { showToast('ヘッダーを入力してください'); return; }
+
+  const lines = input.split('\n');
+  const headers = [];
+
+  lines.forEach(line => {
+    line = line.trim();
+    if (!line) return;
+    // Skip status line
+    if (line.match(/^HTTP\/\d/i)) return;
+    const parsed = parseHeaderLine(line);
+    if (parsed) headers.push(parsed);
+  });
+
+  if (headers.length === 0) { showToast('解析できるヘッダーがありません'); return; }
+
+  // Build lookup map
+  const headerMap = {};
+  headers.forEach(h => { headerMap[h.name.toLowerCase()] = h.value; });
+
+  // Render security checks
+  const secGrid = document.getElementById('securityGrid');
+  secGrid.innerHTML = '';
+  let score = 0;
+  const maxScore = SECURITY_CHECKS.filter(c => c.importance === 'high').length * 3 +
+    SECURITY_CHECKS.filter(c => c.importance === 'medium').length * 2 +
+    SECURITY_CHECKS.filter(c => c.importance === 'low').length * 1;
+  let earned = 0;
+
+  SECURITY_CHECKS.forEach(check => {
+    const present = headerMap.hasOwnProperty(check.key);
+    const pts = check.importance === 'high' ? 3 : check.importance === 'medium' ? 2 : 1;
+    if (present) earned += pts;
+
+    const div = document.createElement('div');
+    div.className = 'security-item ' + (present ? 'security-present' : 'security-missing');
+    div.innerHTML = `
+      <div class="security-item-info">
+        <div class="security-item-name">${check.name}</div>
+        <div class="security-item-desc">${check.desc}</div>
+      </div>
+      <span class="security-badge">${present ? '✅' : '❌'}</span>
+    `;
+    secGrid.appendChild(div);
+  });
+
+  // Score
+  const pct = Math.round((earned / maxScore) * 100);
+  document.getElementById('scoreNum').textContent = pct + '/100';
+  const bar = document.getElementById('scoreBar');
+  bar.style.width = pct + '%';
+  bar.style.background = pct >= 75 ? '#27ae60' : pct >= 50 ? '#f39c12' : '#e74c3c';
+  document.getElementById('scoreLabel').textContent = pct >= 75 ? 'セキュリティ設定は良好です' : pct >= 50 ? '一部のセキュリティヘッダーが不足しています' : 'セキュリティヘッダーの追加を強くお勧めします';
+
+  // Render table
+  const tbody = document.getElementById('headersTableBody');
+  tbody.innerHTML = '';
+  headers.forEach(h => {
+    const desc = HEADER_DESCRIPTIONS[h.name.toLowerCase()] || '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="header-name">${escapeHtml(h.name)}</span></td>
+      <td><span class="header-value">${escapeHtml(h.value)}</span></td>
+      <td class="header-desc">${desc}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('resultsArea').style.display = 'block';
+  document.getElementById('emptyState').style.display = 'none';
+  showToast(`${headers.length}件のヘッダーを解析しました`);
+}
+
+function loadExample() {
+  document.getElementById('headerInput').value = EXAMPLE_HEADERS;
+  parseHeaders();
+}
+
+function clearAll() {
+  document.getElementById('headerInput').value = '';
+  document.getElementById('resultsArea').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'block';
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

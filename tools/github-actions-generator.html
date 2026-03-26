@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Actionsワークフロー生成ツール | ToolBox</title>
+    <meta name="description" content="GitHub Actionsのワークフロー（.github/workflows/*.yml）をGUIで生成。CI/CDパイプラインの雛形を素早く作成できます。">
+    <meta property="og:title" content="GitHub Actionsワークフロー生成ツール | ToolBox">
+    <meta property="og:description" content="GitHub Actionsのワークフロー（.github/workflows/*.yml）をGUIで生成。CI/CDパイプラインの雛形を素早く作成できます。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/github-actions-generator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"GitHub Actionsワークフロー生成ツール","url":"https://web-tool-site.com/tools/github-actions-generator.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav a { color: #555; text-decoration: none; font-weight: 500; }
+.tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+.tool-header { background: linear-gradient(135deg, #2b5876 0%, #4e4376 100%); color: white; padding: 2rem; text-align: center; }
+.tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.tool-header p { opacity: 0.9; }
+.tool-content { padding: 2rem; }
+button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.btn-primary { background: #2b5876; color: white; }
+.btn-primary:hover { background: #1e3f54; transform: translateY(-2px); }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #5a6268; transform: translateY(-2px); }
+.btn-success { background: #27ae60; color: white; }
+.btn-success:hover { background: #219a52; transform: translateY(-2px); }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+input[type="text"], input[type="number"], select, textarea { font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 0.6rem 0.75rem; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+input[type="text"], input[type="number"], select { width: 100%; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #4e4376; }
+.form-group { margin-bottom: 1.25rem; }
+.label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+.section-title { font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; background: #f0f0f8; border-left: 3px solid #4e4376; border-radius: 0 4px 4px 0; }
+.section-divider { border: none; border-top: 1px solid #eee; margin: 1.25rem 0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.check-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; padding: 0.3rem 0; }
+.check-label input[type="checkbox"] { width: auto; cursor: pointer; }
+.check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; }
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+.preset-btn { padding: 0.6rem 0.75rem; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 500; text-align: left; transition: all 0.2s; color: #333; }
+.preset-btn:hover { border-color: #4e4376; background: #f0f0f8; }
+.preset-btn.active { border-color: #4e4376; background: #4e4376; color: white; }
+.preset-btn .preset-icon { font-size: 1.2rem; display: block; margin-bottom: 0.2rem; }
+.sub-options { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 0.75rem; margin-top: 0.5rem; }
+.sub-options .label { font-size: 0.85rem; margin-bottom: 0.4rem; }
+.yaml-output { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #e6edf3; white-space: pre; overflow-x: auto; min-height: 400px; line-height: 1.7; }
+.yaml-key { color: #79c0ff; }
+.yaml-string { color: #a8ff9e; }
+.yaml-comment { color: #8b949e; font-style: italic; }
+.yaml-bool { color: #ff7b72; }
+.yaml-number { color: #ffa657; }
+.output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.output-header .label { margin-bottom: 0; }
+.filename-display { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; background: #f0f0f8; padding: 0.3rem 0.6rem; border-radius: 4px; color: #4e4376; font-weight: 600; }
+.info-tip { font-size: 0.78rem; color: #888; margin-top: 0.25rem; }
+.step-tag { display: inline-block; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.75rem; font-weight: 600; margin-right: 0.3rem; }
+.step-tag-checkout { background: #e8f4fd; color: #0c5460; }
+.step-tag-build { background: #e8f8e8; color: #1a5c1a; }
+.step-tag-test { background: #fef3cd; color: #856404; }
+.step-tag-deploy { background: #fde8e8; color: #721c24; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+.footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .grid-2 { grid-template-columns: 1fr; } nav ul { gap: 1rem; } .preset-grid { grid-template-columns: 1fr; } .check-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <a href="../index.html" class="logo">🧰 ToolBox</a>
+        <nav><ul>
+            <li><a href="../index.html">ホーム</a></li>
+            <li><a href="../index.html#tools">ツール一覧</a></li>
+            <li><a href="../about.html">About</a></li>
+        </ul></nav>
+    </div>
+</header>
+
+<main class="tool-page">
+    <div class="tool-card-main">
+        <div class="tool-header">
+            <h1>⚙️ GitHub Actions ワークフロー生成ツール</h1>
+            <p>.github/workflows/*.yml をGUIで簡単に生成します</p>
+        </div>
+        <div class="tool-content">
+            <div class="layout">
+
+                <!-- Left: Config -->
+                <div>
+                    <!-- Workflow basics -->
+                    <div class="section-title">📋 基本情報</div>
+                    <div class="form-group">
+                        <label class="label" for="workflowName">ワークフロー名</label>
+                        <input type="text" id="workflowName" value="CI" placeholder="例: Node.js CI, Deploy to Production" oninput="generate()">
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="fileName">ファイル名</label>
+                        <input type="text" id="fileName" value="ci" placeholder="ci, deploy, test" oninput="generate()">
+                        <div class="info-tip">.github/workflows/<span id="fileNamePreview">ci</span>.yml に保存されます</div>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Triggers -->
+                    <div class="section-title">🚀 トリガー (on:)</div>
+                    <div class="check-grid">
+                        <label class="check-label"><input type="checkbox" id="trig-push" checked onchange="toggleTriggerOptions(); generate()"> push</label>
+                        <label class="check-label"><input type="checkbox" id="trig-pr" checked onchange="toggleTriggerOptions(); generate()"> pull_request</label>
+                        <label class="check-label"><input type="checkbox" id="trig-schedule" onchange="toggleTriggerOptions(); generate()"> schedule (定期実行)</label>
+                        <label class="check-label"><input type="checkbox" id="trig-dispatch" onchange="toggleTriggerOptions(); generate()"> workflow_dispatch (手動)</label>
+                        <label class="check-label"><input type="checkbox" id="trig-release" onchange="toggleTriggerOptions(); generate()"> release</label>
+                    </div>
+
+                    <div id="pushOptions" class="sub-options" style="margin-top:0.75rem;">
+                        <span class="label">push / pull_request のブランチフィルター</span>
+                        <input type="text" id="pushBranches" value="main" placeholder="main, develop, release/*" oninput="generate()">
+                        <div class="info-tip">カンマ区切りで複数指定可</div>
+                    </div>
+                    <div id="scheduleOptions" class="sub-options" style="margin-top:0.5rem;display:none;">
+                        <span class="label">Cron スケジュール</span>
+                        <select id="cronPreset" onchange="applyCronPreset()" style="margin-bottom:0.5rem;">
+                            <option value="">プリセットを選択...</option>
+                            <option value="0 0 * * *">毎日 00:00 UTC</option>
+                            <option value="0 9 * * 1-5">平日 09:00 UTC</option>
+                            <option value="0 0 * * 0">毎週日曜 00:00 UTC</option>
+                            <option value="0 0 1 * *">毎月1日 00:00 UTC</option>
+                        </select>
+                        <input type="text" id="cronExpr" value="0 0 * * *" placeholder="0 0 * * *" oninput="generate()">
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Preset workflows -->
+                    <div class="section-title">📦 プリセット選択</div>
+                    <div class="preset-grid" id="presetGrid">
+                        <button class="preset-btn active" onclick="selectPreset('nodejs', this)">
+                            <span class="preset-icon">🟢</span>Node.js CI
+                        </button>
+                        <button class="preset-btn" onclick="selectPreset('python', this)">
+                            <span class="preset-icon">🐍</span>Python CI
+                        </button>
+                        <button class="preset-btn" onclick="selectPreset('docker', this)">
+                            <span class="preset-icon">🐳</span>Docker Build &amp; Push
+                        </button>
+                        <button class="preset-btn" onclick="selectPreset('pages', this)">
+                            <span class="preset-icon">📄</span>GitHub Pages Deploy
+                        </button>
+                        <button class="preset-btn" onclick="selectPreset('custom', this)">
+                            <span class="preset-icon">✏️</span>カスタム
+                        </button>
+                    </div>
+
+                    <!-- Job settings -->
+                    <div class="section-title">🖥️ ジョブ設定</div>
+                    <div class="form-group">
+                        <label class="label" for="runner">ランナー OS</label>
+                        <select id="runner" onchange="generate()">
+                            <option value="ubuntu-latest">ubuntu-latest</option>
+                            <option value="windows-latest">windows-latest</option>
+                            <option value="macos-latest">macos-latest</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="nodeVersionGroup">
+                        <label class="label" for="nodeVersion">Node.js バージョン</label>
+                        <select id="nodeVersion" onchange="generate()">
+                            <option value="18">18 (LTS)</option>
+                            <option value="20" selected>20 (LTS)</option>
+                            <option value="22">22 (Current)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="pythonVersionGroup" style="display:none;">
+                        <label class="label" for="pythonVersion">Python バージョン</label>
+                        <select id="pythonVersion" onchange="generate()">
+                            <option value="3.10">3.10</option>
+                            <option value="3.11" selected>3.11</option>
+                            <option value="3.12">3.12</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="dockerOptionsGroup" style="display:none;">
+                        <label class="label" for="dockerImage">Docker イメージ名</label>
+                        <input type="text" id="dockerImage" value="myapp" placeholder="myapp, ghcr.io/user/repo" oninput="generate()">
+                        <div class="info-tip">タグは自動で付与されます（latest / SHA）</div>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Extra options -->
+                    <div class="section-title">⚙️ 追加オプション</div>
+                    <div class="form-group">
+                        <label class="check-label">
+                            <input type="checkbox" id="useCache" checked onchange="generate()">
+                            <span>依存関係をキャッシュする</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="check-label">
+                            <input type="checkbox" id="useMatrix" onchange="toggleMatrix(); generate()">
+                            <span>マトリックスビルドを使用する</span>
+                        </label>
+                    </div>
+                    <div id="matrixOptions" class="sub-options" style="display:none;">
+                        <span class="label">マトリックス値（カンマ区切り）</span>
+                        <input type="text" id="matrixValues" value="18, 20, 22" placeholder="18, 20, 22" oninput="generate()">
+                    </div>
+                    <div class="form-group">
+                        <label class="check-label">
+                            <input type="checkbox" id="useArtifacts" onchange="generate()">
+                            <span>ビルド成果物をアップロードする (actions/upload-artifact)</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="timeoutMins">タイムアウト（分）</label>
+                        <input type="number" id="timeoutMins" value="" min="1" max="360" placeholder="デフォルト: 360分" oninput="generate()">
+                    </div>
+
+                    <div class="btn-group" style="margin-top:0.5rem;">
+                        <button class="btn-secondary" onclick="resetAll()">🔄 リセット</button>
+                    </div>
+                </div>
+
+                <!-- Right: Output -->
+                <div>
+                    <div class="output-header">
+                        <span class="label">生成された YAML</span>
+                        <span class="filename-display">.github/workflows/<span id="fileNameBadge">ci</span>.yml</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="copyYAML()">📋 コピー</button>
+                        <button class="btn-success" onclick="downloadYAML()">⬇️ ダウンロード</button>
+                    </div>
+                    <div class="yaml-output" id="yamlOutput"></div>
+
+                    <hr class="section-divider">
+
+                    <!-- Steps summary -->
+                    <div class="section-title">📋 ステップ一覧</div>
+                    <div id="stepsSummary" style="display:flex;flex-wrap:wrap;gap:0.4rem;"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+    <footer class="footer"><div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a><a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a><a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a><a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div></footer>
+    <div class="toast" id="toast"></div>
+    <script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('コピーしました')).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('コピーしました');});}
+
+let currentPreset = 'nodejs';
+
+function selectPreset(name, btn) {
+    currentPreset = name;
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Show/hide version selectors
+    document.getElementById('nodeVersionGroup').style.display = ['nodejs','pages','custom'].includes(name) ? 'block' : 'none';
+    document.getElementById('pythonVersionGroup').style.display = name === 'python' ? 'block' : 'none';
+    document.getElementById('dockerOptionsGroup').style.display = name === 'docker' ? 'block' : 'none';
+
+    generate();
+}
+
+function toggleTriggerOptions() {
+    const hasPush = document.getElementById('trig-push').checked;
+    const hasPR = document.getElementById('trig-pr').checked;
+    document.getElementById('pushOptions').style.display = (hasPush || hasPR) ? 'block' : 'none';
+    document.getElementById('scheduleOptions').style.display = document.getElementById('trig-schedule').checked ? 'block' : 'none';
+}
+
+function toggleMatrix() {
+    const checked = document.getElementById('useMatrix').checked;
+    document.getElementById('matrixOptions').style.display = checked ? 'block' : 'none';
+}
+
+function applyCronPreset() {
+    const val = document.getElementById('cronPreset').value;
+    if (val) { document.getElementById('cronExpr').value = val; generate(); }
+}
+
+function indent(str, n) {
+    const pad = ' '.repeat(n);
+    return str.split('\n').map(l => l ? pad + l : l).join('\n');
+}
+
+function getBranches() {
+    return document.getElementById('pushBranches').value
+        .split(',').map(b => b.trim()).filter(Boolean);
+}
+
+function generate() {
+    const wfName = document.getElementById('workflowName').value.trim() || 'CI';
+    const fileName = document.getElementById('fileName').value.trim() || 'ci';
+    const runner = document.getElementById('runner').value;
+    const nodeVer = document.getElementById('nodeVersion').value;
+    const pyVer = document.getElementById('pythonVersion').value;
+    const dockerImg = document.getElementById('dockerImage').value.trim() || 'myapp';
+    const useCache = document.getElementById('useCache').checked;
+    const useMatrix = document.getElementById('useMatrix').checked;
+    const matrixVals = document.getElementById('matrixValues').value.split(',').map(v=>v.trim()).filter(Boolean);
+    const useArtifacts = document.getElementById('useArtifacts').checked;
+    const timeout = document.getElementById('timeoutMins').value.trim();
+    const branches = getBranches();
+    const branchList = branches.map(b => `[ '${b}' ]`).join(', ');
+    const branchYaml = branches.length === 1 ? `[ ${branches[0]} ]` : '[ ' + branches.join(', ') + ' ]';
+
+    // Update filename displays
+    document.getElementById('fileNamePreview').textContent = fileName;
+    document.getElementById('fileNameBadge').textContent = fileName;
+
+    let yaml = '';
+
+    // --- Header ---
+    yaml += `name: ${wfName}\n\n`;
+
+    // --- Triggers ---
+    yaml += `on:\n`;
+    const hasPush = document.getElementById('trig-push').checked;
+    const hasPR = document.getElementById('trig-pr').checked;
+    const hasSchedule = document.getElementById('trig-schedule').checked;
+    const hasDispatch = document.getElementById('trig-dispatch').checked;
+    const hasRelease = document.getElementById('trig-release').checked;
+
+    if (hasPush) {
+        yaml += `  push:\n`;
+        if (branches.length > 0) yaml += `    branches: ${branchYaml}\n`;
+    }
+    if (hasPR) {
+        yaml += `  pull_request:\n`;
+        if (branches.length > 0) yaml += `    branches: ${branchYaml}\n`;
+    }
+    if (hasSchedule) {
+        const cron = document.getElementById('cronExpr').value.trim() || '0 0 * * *';
+        yaml += `  schedule:\n    - cron: '${cron}'\n`;
+    }
+    if (hasDispatch) {
+        yaml += `  workflow_dispatch:\n`;
+    }
+    if (hasRelease) {
+        yaml += `  release:\n    types: [ published ]\n`;
+    }
+    if (!hasPush && !hasPR && !hasSchedule && !hasDispatch && !hasRelease) {
+        yaml += `  push:\n    branches: [ main ]\n`;
+    }
+
+    yaml += `\n`;
+
+    // --- Jobs ---
+    yaml += `jobs:\n`;
+
+    const jobName = currentPreset === 'docker' ? 'build-and-push' :
+                    currentPreset === 'pages' ? 'deploy' :
+                    currentPreset === 'python' ? 'test' : 'build';
+
+    yaml += `  ${jobName}:\n`;
+    yaml += `    runs-on: ${runner}\n`;
+
+    if (timeout) yaml += `    timeout-minutes: ${timeout}\n`;
+
+    // Matrix
+    if (useMatrix && currentPreset === 'nodejs') {
+        yaml += `    strategy:\n`;
+        yaml += `      matrix:\n`;
+        yaml += `        node-version: [ ${matrixVals.join(', ')} ]\n`;
+        yaml += `      fail-fast: false\n`;
+    }
+    if (useMatrix && currentPreset === 'python') {
+        const pyVersions = ['3.10', '3.11', '3.12'];
+        yaml += `    strategy:\n`;
+        yaml += `      matrix:\n`;
+        yaml += `        python-version: [ '3.10', '3.11', '3.12' ]\n`;
+    }
+
+    // Permissions for pages/docker
+    if (currentPreset === 'pages') {
+        yaml += `    permissions:\n`;
+        yaml += `      contents: read\n`;
+        yaml += `      pages: write\n`;
+        yaml += `      id-token: write\n`;
+    }
+    if (currentPreset === 'docker') {
+        yaml += `    permissions:\n`;
+        yaml += `      contents: read\n`;
+        yaml += `      packages: write\n`;
+    }
+
+    yaml += `\n    steps:\n`;
+
+    const steps = [];
+
+    // --- Steps per preset ---
+    if (currentPreset === 'nodejs') {
+        steps.push({ tag: 'checkout', name: 'Checkout', uses: 'actions/checkout@v4' });
+
+        const matrixNodeVer = useMatrix ? '${{ matrix.node-version }}' : nodeVer;
+        const setupStep = `      - name: Use Node.js ${matrixNodeVer}\n        uses: actions/setup-node@v4\n        with:\n          node-version: '${matrixNodeVer}'`;
+        if (useCache) {
+            steps.push({ tag: 'build', raw: setupStep + `\n          cache: 'npm'` });
+        } else {
+            steps.push({ tag: 'build', raw: setupStep });
+        }
+        steps.push({ tag: 'build', name: 'Install dependencies', run: 'npm ci' });
+        steps.push({ tag: 'test', name: 'Run tests', run: 'npm test' });
+        steps.push({ tag: 'build', name: 'Build', run: 'npm run build' });
+
+        if (useArtifacts) {
+            steps.push({ tag: 'deploy', raw: `      - name: Upload build artifacts\n        uses: actions/upload-artifact@v4\n        with:\n          name: build-output\n          path: dist/\n          retention-days: 7` });
+        }
+
+    } else if (currentPreset === 'python') {
+        steps.push({ tag: 'checkout', name: 'Checkout', uses: 'actions/checkout@v4' });
+
+        const matrixPyVer = useMatrix ? '${{ matrix.python-version }}' : pyVer;
+        const pySetup = `      - name: Set up Python ${matrixPyVer}\n        uses: actions/setup-python@v5\n        with:\n          python-version: '${matrixPyVer}'`;
+        if (useCache) {
+            steps.push({ tag: 'build', raw: pySetup + `\n          cache: 'pip'` });
+        } else {
+            steps.push({ tag: 'build', raw: pySetup });
+        }
+        steps.push({ tag: 'build', name: 'Install dependencies', run: 'python -m pip install --upgrade pip\npip install -r requirements.txt' });
+        steps.push({ tag: 'test', name: 'Lint with flake8', run: 'pip install flake8\nflake8 . --count --select=E9,F63,F7,F82 --show-source --statistics' });
+        steps.push({ tag: 'test', name: 'Run tests with pytest', run: 'pip install pytest pytest-cov\npytest --cov=. --cov-report=xml' });
+
+        if (useArtifacts) {
+            steps.push({ tag: 'deploy', raw: `      - name: Upload coverage report\n        uses: actions/upload-artifact@v4\n        with:\n          name: coverage-report\n          path: coverage.xml` });
+        }
+
+    } else if (currentPreset === 'docker') {
+        steps.push({ tag: 'checkout', name: 'Checkout', uses: 'actions/checkout@v4' });
+        steps.push({ tag: 'build', raw: `      - name: Set up Docker Buildx\n        uses: docker/setup-buildx-action@v3` });
+        steps.push({ tag: 'build', raw: `      - name: Log in to GitHub Container Registry\n        uses: docker/login-action@v3\n        with:\n          registry: ghcr.io\n          username: \${{ github.actor }}\n          password: \${{ secrets.GITHUB_TOKEN }}` });
+        steps.push({ tag: 'deploy', raw: `      - name: Extract metadata (tags, labels)\n        id: meta\n        uses: docker/metadata-action@v5\n        with:\n          images: ghcr.io/\${{ github.repository_owner }}/${dockerImg}\n          tags: |\n            type=ref,event=branch\n            type=ref,event=pr\n            type=sha,prefix=sha-\n            type=raw,value=latest,enable=\${{ github.ref == 'refs/heads/main' }}` });
+        steps.push({ tag: 'deploy', raw: `      - name: Build and push Docker image\n        uses: docker/build-push-action@v5\n        with:\n          context: .\n          push: \${{ github.event_name != 'pull_request' }}\n          tags: \${{ steps.meta.outputs.tags }}\n          labels: \${{ steps.meta.outputs.labels }}\n          cache-from: type=gha\n          cache-to: type=gha,mode=max` });
+
+    } else if (currentPreset === 'pages') {
+        steps.push({ tag: 'checkout', name: 'Checkout', uses: 'actions/checkout@v4' });
+        steps.push({ tag: 'build', raw: `      - name: Use Node.js ${nodeVer}\n        uses: actions/setup-node@v4\n        with:\n          node-version: '${nodeVer}'${useCache ? "\n          cache: 'npm'" : ''}` });
+        steps.push({ tag: 'build', name: 'Install dependencies', run: 'npm ci' });
+        steps.push({ tag: 'build', name: 'Build', run: 'npm run build' });
+        steps.push({ tag: 'deploy', raw: `      - name: Setup Pages\n        uses: actions/configure-pages@v4` });
+        steps.push({ tag: 'deploy', raw: `      - name: Upload artifact\n        uses: actions/upload-pages-artifact@v3\n        with:\n          path: './dist'` });
+        steps.push({ tag: 'deploy', raw: `      - name: Deploy to GitHub Pages\n        id: deployment\n        uses: actions/deploy-pages@v4` });
+
+    } else {
+        // Custom
+        steps.push({ tag: 'checkout', name: 'Checkout', uses: 'actions/checkout@v4' });
+        steps.push({ tag: 'build', name: 'Your build step', run: '# ここにビルドコマンドを追加してください\necho "Build step"' });
+        steps.push({ tag: 'test', name: 'Your test step', run: '# ここにテストコマンドを追加してください\necho "Test step"' });
+    }
+
+    // Render steps
+    for (const step of steps) {
+        if (step.raw) {
+            yaml += step.raw + '\n';
+        } else if (step.uses) {
+            yaml += `      - name: ${step.name}\n        uses: ${step.uses}\n`;
+        } else if (step.run) {
+            const runLines = step.run.split('\n');
+            if (runLines.length === 1) {
+                yaml += `      - name: ${step.name}\n        run: ${step.run}\n`;
+            } else {
+                yaml += `      - name: ${step.name}\n        run: |\n`;
+                runLines.forEach(l => { yaml += `          ${l}\n`; });
+            }
+        }
+    }
+
+    // Env vars section hint
+    if (currentPreset === 'docker') {
+        yaml += `\n# ヒント: シークレットは Settings > Secrets and variables > Actions で設定してください\n# 例: \${{ secrets.DOCKER_HUB_TOKEN }}\n`;
+    }
+
+    // Render output
+    document.getElementById('yamlOutput').textContent = yaml;
+
+    // Steps summary tags
+    const tagLabels = { checkout: '📥 チェックアウト', build: '🔨 ビルド', test: '🧪 テスト', deploy: '🚀 デプロイ' };
+    const tagColors = { checkout: '#e8f4fd', build: '#e8f8e8', test: '#fef3cd', deploy: '#fde8e8' };
+    const tagText = { checkout: '#0c5460', build: '#1a5c1a', test: '#856404', deploy: '#721c24' };
+    const seenTags = [...new Set(steps.map(s => s.tag).filter(Boolean))];
+    document.getElementById('stepsSummary').innerHTML = seenTags.map(tag =>
+        `<span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.3rem 0.7rem;border-radius:4px;font-size:0.82rem;font-weight:600;background:${tagColors[tag]};color:${tagText[tag]};">${tagLabels[tag]}</span>`
+    ).join('');
+}
+
+function copyYAML() {
+    copyText(document.getElementById('yamlOutput').textContent);
+}
+
+function downloadYAML() {
+    const yaml = document.getElementById('yamlOutput').textContent;
+    const fileName = (document.getElementById('fileName').value.trim() || 'ci') + '.yml';
+    const blob = new Blob([yaml], { type: 'text/yaml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('ダウンロードしました: ' + fileName);
+}
+
+function resetAll() {
+    document.getElementById('workflowName').value = 'CI';
+    document.getElementById('fileName').value = 'ci';
+    document.getElementById('trig-push').checked = true;
+    document.getElementById('trig-pr').checked = true;
+    document.getElementById('trig-schedule').checked = false;
+    document.getElementById('trig-dispatch').checked = false;
+    document.getElementById('trig-release').checked = false;
+    document.getElementById('pushBranches').value = 'main';
+    document.getElementById('runner').value = 'ubuntu-latest';
+    document.getElementById('nodeVersion').value = '20';
+    document.getElementById('pythonVersion').value = '3.11';
+    document.getElementById('dockerImage').value = 'myapp';
+    document.getElementById('useCache').checked = true;
+    document.getElementById('useMatrix').checked = false;
+    document.getElementById('matrixValues').value = '18, 20, 22';
+    document.getElementById('useArtifacts').checked = false;
+    document.getElementById('timeoutMins').value = '';
+    document.getElementById('matrixOptions').style.display = 'none';
+    document.getElementById('scheduleOptions').style.display = 'none';
+    toggleTriggerOptions();
+
+    currentPreset = 'nodejs';
+    document.querySelectorAll('.preset-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+    document.getElementById('nodeVersionGroup').style.display = 'block';
+    document.getElementById('pythonVersionGroup').style.display = 'none';
+    document.getElementById('dockerOptionsGroup').style.display = 'none';
+
+    generate();
+    showToast('リセットしました');
+}
+
+// Init
+toggleTriggerOptions();
+generate();
+    </script>
+</body>
+</html>

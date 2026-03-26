@@ -11,309 +11,310 @@
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>タイムゾーン変換・世界時計 | ToolBox</title>
-    <meta name="description" content="タイムゾーン間の時刻変換と世界時計。UTC・JST・EST・PST・CET など主要タイムゾーン対応の無料オンラインツール。">
-    <meta name="keywords" content="タイムゾーン 変換 世界時計 UTC JST EST PST 時差 時刻変換">
-    <meta name="author" content="ToolBox">
-    <meta property="og:title" content="タイムゾーン変換・世界時計 | ToolBox">
-    <meta property="og:description" content="タイムゾーン間の時刻変換と世界時計。主要都市の現在時刻をリアルタイム表示。">
+    <title>世界タイムゾーン変換ツール | ToolBox</title>
+    <meta name="description" content="世界各地のタイムゾーン間で時刻を変換。開発チームのミーティング調整やサーバー時刻管理に便利。">
+    <meta property="og:title" content="世界タイムゾーン変換ツール | ToolBox">
+    <meta property="og:description" content="世界各地のタイムゾーン間で時刻を変換。開発チームのミーティング調整やサーバー時刻管理に便利。">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://web-tool-site.com/tools/timezone-converter.html">
+    <meta name="twitter:card" content="summary">
     <link rel="canonical" href="https://web-tool-site.com/tools/timezone-converter.html">
-    <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"タイムゾーン変換・世界時計","description":"タイムゾーン間の時刻変換と世界時計ツール","url":"https://web-tool-site.com/tools/timezone-converter.html","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}
-    </script>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"世界タイムゾーン変換ツール","description":"世界各地のタイムゾーン間で時刻を変換。開発チームのミーティング調整やサーバー時刻管理に便利。","url":"https://web-tool-site.com/tools/timezone-converter.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #eee; min-height: 100vh; }
-        header { background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 100; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 700; color: #fff; text-decoration: none; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
         nav ul { list-style: none; display: flex; gap: 2rem; }
-        nav a { color: #ccc; text-decoration: none; font-weight: 500; }
-        nav a:hover { color: #fff; }
-        .tool-page { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
-        .tool-header { text-align: center; padding: 2rem 1rem; margin-bottom: 2rem; }
-        .tool-header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #a8edea, #fed6e3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem; }
-        .tool-header p { color: #aaa; font-size: 1rem; }
-        .converter-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; backdrop-filter: blur(10px); }
-        .converter-card h2 { font-size: 1.1rem; font-weight: 700; color: #a8edea; margin-bottom: 1.5rem; }
-        .converter-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: end; margin-bottom: 1.5rem; }
-        .field-group { display: flex; flex-direction: column; gap: 0.5rem; }
-        .field-group label { font-size: 0.85rem; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; }
-        .field-group input[type="datetime-local"], .field-group select {
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
-            color: #fff; padding: 0.75rem 1rem; font-size: 0.95rem; font-family: 'Inter', sans-serif; width: 100%;
-        }
-        .field-group input:focus, .field-group select:focus { outline: none; border-color: #a8edea; }
-        .field-group select option { background: #16213e; color: #fff; }
-        .arrow-btn { background: linear-gradient(135deg, #a8edea, #fed6e3); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s; margin-bottom: 2px; }
-        .arrow-btn:hover { transform: scale(1.1) rotate(180deg); }
-        .result-box { background: rgba(168,237,234,0.08); border: 1px solid rgba(168,237,234,0.3); border-radius: 10px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .result-time { font-size: 1.8rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #a8edea; }
-        .result-meta { font-size: 0.85rem; color: #aaa; }
-        .convert-btn { background: linear-gradient(135deg, #a8edea, #67d4d0); color: #1a1a2e; border: none; border-radius: 8px; padding: 0.75rem 1.75rem; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .convert-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168,237,234,0.3); }
-        .world-clock { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
-        .clock-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem; text-align: center; transition: background 0.2s; }
-        .clock-card:hover { background: rgba(255,255,255,0.1); }
-        .clock-city { font-size: 0.8rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem; }
-        .clock-tz { font-size: 0.75rem; color: #666; margin-bottom: 0.6rem; }
-        .clock-time { font-size: 1.5rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: #fff; margin-bottom: 0.25rem; }
-        .clock-date { font-size: 0.78rem; color: #aaa; }
-        .clock-card.highlight { border-color: rgba(168,237,234,0.4); background: rgba(168,237,234,0.07); }
-        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 0.9rem 1.4rem; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 1000; animation: slideIn 0.3s ease; }
-        .toast.hide { animation: slideOut 0.3s ease forwards; }
-        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { to { transform: translateX(400px); opacity: 0; } }
-        footer { background: rgba(0,0,0,0.3); color: #666; text-align: center; padding: 1.5rem; margin-top: 2rem; font-size: 0.9rem; border-top: 1px solid rgba(255,255,255,0.05); }
-        footer a { color: #888; text-decoration: none; }
-        .seo-section { max-width: 900px; margin: 32px auto; padding: 0 20px; }
-        .seo-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 28px 24px; border: 1px solid rgba(255,255,255,0.1); }
-        .seo-box h2 { font-size: 1.2rem; margin-bottom: 12px; color: #a8edea; }
-        .seo-box p, .seo-box li { font-size: 14px; color: #aaa; line-height: 1.8; }
-        .seo-box ul { padding-left: 20px; }
-        @media (max-width: 700px) {
-            .converter-grid { grid-template-columns: 1fr; }
-            .arrow-btn { transform: rotate(90deg); margin: 0 auto; }
-            .world-clock { grid-template-columns: repeat(2, 1fr); }
-            .header-container { flex-direction: column; gap: 0.75rem; }
-        }
+        nav a { color: #555; text-decoration: none; font-weight: 500; }
+        nav a:hover { color: #4a90e2; }
+        .tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+        .tool-header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 2rem; text-align: center; }
+        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .tool-header p { opacity: 0.9; }
+        .tool-content { padding: 2rem; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+        .btn-primary { background: #4a90e2; color: white; }
+        .btn-primary:hover { background: #357abd; transform: translateY(-2px); }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        input[type="datetime-local"], select { font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; }
+        input:focus, select:focus { outline: none; border-color: #4a90e2; }
+        .form-group { margin-bottom: 1.5rem; }
+        .label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+        footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+        .footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        th { background: #f8f9fa; font-weight: 600; }
+        tr:hover { background: #f8f9fa; }
+        @media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .grid-2 { grid-template-columns: 1fr; } }
+
+        .section-title { font-size: 1.2rem; font-weight: 700; color: #1a1a2e; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #0f3460; }
+        .converter-section { background: #f8f9fa; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .grid-now { display: flex; align-items: flex-end; padding-bottom: 1.5rem; }
+        .conversion-result { background: #1a1a2e; color: #e0e0ff; border-radius: 8px; padding: 1.5rem; margin-top: 1rem; overflow-x: auto; }
+        .conversion-result table { color: #e0e0ff; }
+        .conversion-result th { background: rgba(255,255,255,0.1); color: #aac8ff; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .conversion-result td { border-bottom: 1px solid rgba(255,255,255,0.08); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+        .conversion-result tr:hover { background: rgba(255,255,255,0.05); }
+        .world-clock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .clock-card { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white; border-radius: 10px; padding: 1rem; text-align: center; }
+        .clock-card .city { font-size: 0.85rem; opacity: 0.8; margin-bottom: 0.25rem; }
+        .clock-card .time { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 600; letter-spacing: 1px; }
+        .clock-card .date-str { font-size: 0.75rem; opacity: 0.7; margin-top: 0.25rem; }
+        .clock-card .tz-label { font-size: 0.65rem; opacity: 0.5; margin-top: 0.1rem; }
+        .source-row { background: rgba(100,180,255,0.15) !important; }
     </style>
 </head>
 <body>
     <header>
         <div class="header-container">
-            <a href="../index.html" class="logo">🔧 ToolBox</a>
-            <nav><ul>
-                <li><a href="../index.html">ホーム</a></li>
-                <li><a href="../index.html#tools">ツール一覧</a></li>
-            </ul></nav>
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav><ul><li><a href="../index.html">ホーム</a></li><li><a href="../index.html#tools">ツール一覧</a></li></ul></nav>
         </div>
     </header>
-
-    <div class="tool-page">
+    <div class="tool-page"><div class="tool-card-main">
         <div class="tool-header">
-            <h1>🌍 タイムゾーン変換・世界時計</h1>
-            <p>タイムゾーン間の時刻変換と世界の主要都市の現在時刻</p>
+            <h1>世界タイムゾーン変換ツール</h1>
+            <p>世界各地のタイムゾーン間で時刻を変換。ミーティング調整やサーバー時刻管理に。</p>
         </div>
+        <div class="tool-content">
 
-        <!-- Converter -->
-        <div class="converter-card">
-            <h2>⇄ 時刻変換</h2>
-            <div class="converter-grid">
-                <div class="field-group">
-                    <label>元のタイムゾーン</label>
-                    <select id="fromTz"></select>
-                    <input type="datetime-local" id="fromTime">
+            <div class="converter-section">
+                <div class="section-title">時刻変換</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="label">変換する日時</label>
+                        <input type="datetime-local" id="dateTimeInput">
+                    </div>
+                    <div class="grid-now">
+                        <button class="btn-primary" onclick="setCurrentTime()">現在時刻を設定</button>
+                    </div>
                 </div>
-                <button class="arrow-btn" onclick="swapTz()" title="入れ替え">⇄</button>
-                <div class="field-group">
-                    <label>変換先タイムゾーン</label>
-                    <select id="toTz"></select>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="label">変換元タイムゾーン</label>
+                        <select id="fromTz"></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">主な変換先</label>
+                        <select id="toTzDisplay"></select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="convertTime()">全タイムゾーンに変換</button>
+                    <button class="btn-secondary" onclick="swapTz()">入れ替え</button>
+                </div>
+                <div class="conversion-result" id="conversionResult" style="display:none;">
+                    <table>
+                        <thead><tr><th>タイムゾーン</th><th>変換後の日時</th><th>UTCオフセット</th></tr></thead>
+                        <tbody id="resultBody"></tbody>
+                    </table>
                 </div>
             </div>
-            <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem;">
-                <button class="convert-btn" onclick="convertTime()">変換する</button>
-                <button class="convert-btn" style="background:linear-gradient(135deg,#667eea,#764ba2);" onclick="useNow()">現在時刻を使用</button>
-            </div>
-            <div class="result-box" id="resultBox" style="display:none">
-                <div>
-                    <div class="result-meta" id="resultFrom"></div>
-                    <div class="result-time" id="resultTime"></div>
-                    <div class="result-meta" id="resultTzName"></div>
-                </div>
-                <button class="convert-btn" style="background:rgba(168,237,234,0.15);color:#a8edea;border:1px solid rgba(168,237,234,0.3);" onclick="copyResult()">コピー</button>
-            </div>
+
+            <div class="section-title">世界時計（リアルタイム）</div>
+            <div class="world-clock-grid" id="worldClock"></div>
+
         </div>
-
-        <!-- World Clock -->
-        <div class="converter-card">
-            <h2>🕐 世界時計</h2>
-            <div class="world-clock" id="worldClock"></div>
+    </div></div>
+    <footer class="footer"><div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a><a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a><a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a><a href="../terms.html">利用規約</a>
         </div>
-    </div>
-
-    <div class="seo-section">
-        <div class="seo-box">
-            <h2>タイムゾーン変換ツールとは？</h2>
-            <p>世界各地のタイムゾーン間で日時を変換するツールです。リモートワークや国際会議の時間調整、APIログの時刻解析などに活用できます。</p>
-            <ul>
-                <li>UTC・JST・EST・PST・CET など主要タイムゾーン対応</li>
-                <li>世界時計でリアルタイムに主要都市の時刻を確認</li>
-                <li>夏時間（DST）はブラウザのIntl APIで自動処理</li>
-            </ul>
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2026 ToolBox. All rights reserved. | <a href="../index.html">ホーム</a> | <a href="../privacy.html">プライバシーポリシー</a></p>
-    </footer>
-
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div></footer>
+    <div class="toast" id="toast"></div>
     <script>
-    const TIMEZONES = [
-        { label: 'UTC (協定世界時)', tz: 'UTC' },
-        { label: 'JST - 東京/大阪 (UTC+9)', tz: 'Asia/Tokyo' },
-        { label: 'CST - 上海/北京 (UTC+8)', tz: 'Asia/Shanghai' },
-        { label: 'IST - インド (UTC+5:30)', tz: 'Asia/Kolkata' },
-        { label: 'GST - ドバイ (UTC+4)', tz: 'Asia/Dubai' },
-        { label: 'MSK - モスクワ (UTC+3)', tz: 'Europe/Moscow' },
-        { label: 'EET - アテネ/ヘルシンキ (UTC+2)', tz: 'Europe/Helsinki' },
-        { label: 'CET - パリ/ベルリン (UTC+1)', tz: 'Europe/Paris' },
-        { label: 'GMT - ロンドン (UTC+0)', tz: 'Europe/London' },
-        { label: 'CVT - カーボベルデ (UTC-1)', tz: 'Atlantic/Cape_Verde' },
-        { label: 'BRT - サンパウロ (UTC-3)', tz: 'America/Sao_Paulo' },
-        { label: 'EST - ニューヨーク (UTC-5)', tz: 'America/New_York' },
-        { label: 'CST - シカゴ (UTC-6)', tz: 'America/Chicago' },
-        { label: 'MST - デンバー (UTC-7)', tz: 'America/Denver' },
-        { label: 'PST - ロサンゼルス (UTC-8)', tz: 'America/Los_Angeles' },
-        { label: 'AKST - アンカレッジ (UTC-9)', tz: 'America/Anchorage' },
-        { label: 'HST - ホノルル (UTC-10)', tz: 'Pacific/Honolulu' },
-        { label: 'NZST - オークランド (UTC+12)', tz: 'Pacific/Auckland' },
-        { label: 'AEST - シドニー (UTC+10)', tz: 'Australia/Sydney' },
-        { label: 'AWST - パース (UTC+8)', tz: 'Australia/Perth' },
-        { label: 'KST - ソウル (UTC+9)', tz: 'Asia/Seoul' },
-        { label: 'SGT - シンガポール (UTC+8)', tz: 'Asia/Singapore' },
-        { label: 'WIB - ジャカルタ (UTC+7)', tz: 'Asia/Jakarta' },
-        { label: 'ICT - バンコク (UTC+7)', tz: 'Asia/Bangkok' },
+    function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+
+    const tzGroups = [
+        { group: "UTC", zones: [{ value: "UTC", label: "UTC（協定世界時）" }] },
+        { group: "アメリカ", zones: [
+            { value: "America/New_York", label: "ニューヨーク (ET)" },
+            { value: "America/Chicago", label: "シカゴ (CT)" },
+            { value: "America/Denver", label: "デンバー (MT)" },
+            { value: "America/Los_Angeles", label: "ロサンゼルス (PT)" },
+            { value: "America/Sao_Paulo", label: "サンパウロ (BRT)" },
+            { value: "America/Toronto", label: "トロント (ET)" },
+            { value: "America/Vancouver", label: "バンクーバー (PT)" },
+            { value: "America/Mexico_City", label: "メキシコシティ (CST)" },
+            { value: "Pacific/Honolulu", label: "ホノルル (HST)" }
+        ]},
+        { group: "ヨーロッパ", zones: [
+            { value: "Europe/London", label: "ロンドン (GMT/BST)" },
+            { value: "Europe/Paris", label: "パリ (CET)" },
+            { value: "Europe/Berlin", label: "ベルリン (CET)" },
+            { value: "Europe/Amsterdam", label: "アムステルダム (CET)" },
+            { value: "Europe/Rome", label: "ローマ (CET)" },
+            { value: "Europe/Moscow", label: "モスクワ (MSK)" }
+        ]},
+        { group: "アフリカ・中東", zones: [
+            { value: "Africa/Cairo", label: "カイロ (EET)" },
+            { value: "Asia/Dubai", label: "ドバイ (GST)" }
+        ]},
+        { group: "アジア", zones: [
+            { value: "Asia/Kolkata", label: "コルカタ (IST)" },
+            { value: "Asia/Dhaka", label: "ダッカ (BST)" },
+            { value: "Asia/Bangkok", label: "バンコク (ICT)" },
+            { value: "Asia/Singapore", label: "シンガポール (SGT)" },
+            { value: "Asia/Tokyo", label: "東京 (JST)" },
+            { value: "Asia/Seoul", label: "ソウル (KST)" },
+            { value: "Asia/Shanghai", label: "上海 (CST)" },
+            { value: "Asia/Hong_Kong", label: "香港 (HKT)" },
+            { value: "Asia/Taipei", label: "台北 (CST)" }
+        ]},
+        { group: "オセアニア", zones: [
+            { value: "Australia/Sydney", label: "シドニー (AEST)" },
+            { value: "Australia/Melbourne", label: "メルボルン (AEST)" },
+            { value: "Pacific/Auckland", label: "オークランド (NZST)" }
+        ]}
     ];
 
-    const WORLD_CLOCKS = [
-        { city: '東京', tz: 'Asia/Tokyo', label: 'JST' },
-        { city: 'ロンドン', tz: 'Europe/London', label: 'GMT/BST' },
-        { city: 'パリ', tz: 'Europe/Paris', label: 'CET/CEST' },
-        { city: 'ニューヨーク', tz: 'America/New_York', label: 'EST/EDT' },
-        { city: 'ロサンゼルス', tz: 'America/Los_Angeles', label: 'PST/PDT' },
-        { city: 'シカゴ', tz: 'America/Chicago', label: 'CST/CDT' },
-        { city: 'サンパウロ', tz: 'America/Sao_Paulo', label: 'BRT' },
-        { city: 'UTC', tz: 'UTC', label: 'UTC' },
-        { city: 'ドバイ', tz: 'Asia/Dubai', label: 'GST' },
-        { city: 'ムンバイ', tz: 'Asia/Kolkata', label: 'IST' },
-        { city: 'シンガポール', tz: 'Asia/Singapore', label: 'SGT' },
-        { city: 'シドニー', tz: 'Australia/Sydney', label: 'AEST/AEDT' },
+    const worldClockCities = [
+        { tz: "Asia/Tokyo", city: "東京", flag: "🇯🇵" },
+        { tz: "America/New_York", city: "ニューヨーク", flag: "🇺🇸" },
+        { tz: "Europe/London", city: "ロンドン", flag: "🇬🇧" },
+        { tz: "Europe/Paris", city: "パリ", flag: "🇫🇷" },
+        { tz: "Asia/Dubai", city: "ドバイ", flag: "🇦🇪" },
+        { tz: "Asia/Singapore", city: "シンガポール", flag: "🇸🇬" },
+        { tz: "Australia/Sydney", city: "シドニー", flag: "🇦🇺" },
+        { tz: "America/Los_Angeles", city: "ロサンゼルス", flag: "🇺🇸" },
+        { tz: "America/Chicago", city: "シカゴ", flag: "🇺🇸" },
+        { tz: "Asia/Seoul", city: "ソウル", flag: "🇰🇷" }
     ];
 
-    function populateSelects() {
-        const fromEl = document.getElementById('fromTz');
-        const toEl = document.getElementById('toTz');
-        const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        TIMEZONES.forEach(tz => {
-            const o1 = new Option(tz.label, tz.tz);
-            const o2 = new Option(tz.label, tz.tz);
-            if (tz.tz === userTz || (userTz === 'Asia/Tokyo' && tz.tz === 'Asia/Tokyo')) {
-                o1.selected = true;
-            }
-            if (tz.tz === 'UTC') o2.selected = true;
-            fromEl.appendChild(o1);
-            toEl.appendChild(o2);
+    function buildSelects() {
+        const fromSel = document.getElementById('fromTz');
+        const toSel = document.getElementById('toTzDisplay');
+        tzGroups.forEach(group => {
+            const og1 = document.createElement('optgroup');
+            og1.label = group.group;
+            const og2 = document.createElement('optgroup');
+            og2.label = group.group;
+            group.zones.forEach(z => {
+                const o1 = document.createElement('option');
+                o1.value = z.value; o1.textContent = z.label;
+                const o2 = document.createElement('option');
+                o2.value = z.value; o2.textContent = z.label;
+                og1.appendChild(o1);
+                og2.appendChild(o2);
+            });
+            fromSel.appendChild(og1);
+            toSel.appendChild(og2);
         });
+        fromSel.value = 'Asia/Tokyo';
+        toSel.value = 'America/New_York';
     }
 
-    function useNow() {
+    function setCurrentTime() {
         const now = new Date();
         const pad = n => String(n).padStart(2, '0');
         const local = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-        document.getElementById('fromTime').value = local;
-        convertTime();
+        document.getElementById('dateTimeInput').value = local;
+        showToast('現在時刻を設定しました');
+    }
+
+    function getUtcOffset(tz, date) {
+        try {
+            const utcStr = date.toLocaleString('en-US', { timeZone: 'UTC' });
+            const tzStr = date.toLocaleString('en-US', { timeZone: tz });
+            const diff = (new Date(tzStr) - new Date(utcStr)) / 60000;
+            const h = Math.floor(Math.abs(diff) / 60);
+            const m = Math.abs(diff) % 60;
+            const sign = diff >= 0 ? '+' : '-';
+            return `UTC${sign}${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        } catch(e) { return 'N/A'; }
     }
 
     function convertTime() {
+        const dtInput = document.getElementById('dateTimeInput').value;
+        if (!dtInput) { showToast('日時を入力してください'); return; }
         const fromTz = document.getElementById('fromTz').value;
-        const toTz = document.getElementById('toTz').value;
-        const fromTimeVal = document.getElementById('fromTime').value;
-        if (!fromTimeVal) { alert('日時を入力してください'); return; }
 
-        // Parse the datetime-local as if it's in fromTz
-        const [datePart, timePart] = fromTimeVal.split('T');
-        const [year, month, day] = datePart.split('-').map(Number);
-        const [hour, min] = timePart.split(':').map(Number);
+        // Parse the datetime-local value as if it's in the fromTz timezone
+        const [datePart, timePart] = dtInput.split('T');
+        const [yr, mo, da] = datePart.split('-').map(Number);
+        const [hr, mi] = timePart.split(':').map(Number);
 
-        // Use Intl to figure out offset
-        const testDate = new Date(Date.UTC(year, month-1, day, hour, min));
-        const formatter = new Intl.DateTimeFormat('en-US', {
-            timeZone: fromTz,
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+        // Get UTC equivalent: find what UTC time corresponds to this local time in fromTz
+        // We do this by creating a UTC date, then computing the difference
+        const utcGuess = new Date(Date.UTC(yr, mo-1, da, hr, mi, 0));
+        const tzGuessStr = utcGuess.toLocaleString('en-US', { timeZone: fromTz });
+        const tzGuessDate = new Date(tzGuessStr);
+        const diffMs = utcGuess - tzGuessDate;
+        const inputUTC = new Date(utcGuess.getTime() + diffMs);
+
+        const allZones = tzGroups.flatMap(g => g.zones);
+        const tbody = document.getElementById('resultBody');
+        tbody.innerHTML = '';
+
+        allZones.forEach(z => {
+            try {
+                const fmt = new Intl.DateTimeFormat('ja-JP', {
+                    timeZone: z.value,
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit',
+                    hour12: false, weekday: 'short'
+                });
+                const formatted = fmt.format(inputUTC);
+                const offset = getUtcOffset(z.value, inputUTC);
+                const tr = document.createElement('tr');
+                if (z.value === fromTz) tr.className = 'source-row';
+                tr.innerHTML = `<td>${z.value === fromTz ? '▶ ' : ''}${z.label}</td><td>${formatted}</td><td>${offset}</td>`;
+                tbody.appendChild(tr);
+            } catch(e) {}
         });
-        const utcFormatter = new Intl.DateTimeFormat('en-US', {
-            timeZone: 'UTC',
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-        });
-        // Find offset by comparing UTC display vs fromTz display for the same UTC instant
-        const utcParts = utcFormatter.formatToParts(testDate);
-        const tzParts = formatter.formatToParts(testDate);
-        const getVal = (parts, type) => parseInt(parts.find(p => p.type === type)?.value || '0');
-        const utcH = getVal(utcParts, 'hour') % 24;
-        const tzH = getVal(tzParts, 'hour') % 24;
-        const tzM = getVal(tzParts, 'minute');
-        const utcM = getVal(utcParts, 'minute');
-        let offsetMin = (tzH * 60 + tzM) - (utcH * 60 + utcM);
-        // Rough offset
-        const utcMs = Date.UTC(year, month-1, day, hour, min) - offsetMin * 60000;
 
-        const result = new Date(utcMs);
-        const toFormatter = new Intl.DateTimeFormat('ja-JP', {
-            timeZone: toTz,
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
-            weekday: 'short', hour12: false
-        });
-        const resultStr = toFormatter.format(result);
-
-        document.getElementById('resultFrom').textContent = `${fromTz} → ${toTz}`;
-        document.getElementById('resultTime').textContent = resultStr;
-        document.getElementById('resultTzName').textContent = toTz;
-        document.getElementById('resultBox').style.display = 'flex';
+        document.getElementById('conversionResult').style.display = 'block';
     }
 
     function swapTz() {
         const f = document.getElementById('fromTz');
-        const t = document.getElementById('toTz');
-        const tmp = f.value;
-        f.value = t.value;
-        t.value = tmp;
+        const t = document.getElementById('toTzDisplay');
+        const tmp = f.value; f.value = t.value; t.value = tmp;
+        showToast('タイムゾーンを入れ替えました');
     }
 
-    function copyResult() {
-        const txt = document.getElementById('resultTime').textContent;
-        navigator.clipboard.writeText(txt).then(() => showToast('コピーしました！'));
+    function buildWorldClock() {
+        const container = document.getElementById('worldClock');
+        worldClockCities.forEach(c => {
+            const key = c.tz.replace(/\//g, '-');
+            const div = document.createElement('div');
+            div.className = 'clock-card';
+            div.innerHTML = `<div class="city">${c.flag} ${c.city}</div><div class="time" id="time-${key}">--:--:--</div><div class="date-str" id="date-${key}">----/--/--</div><div class="tz-label">${c.tz}</div>`;
+            container.appendChild(div);
+        });
     }
 
     function updateWorldClock() {
-        const container = document.getElementById('worldClock');
         const now = new Date();
-        const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        container.innerHTML = WORLD_CLOCKS.map(c => {
-            const tf = new Intl.DateTimeFormat('ja-JP', {
-                timeZone: c.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-            });
-            const df = new Intl.DateTimeFormat('ja-JP', {
-                timeZone: c.tz, year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short'
-            });
-            const hl = c.tz === userTz ? ' highlight' : '';
-            return `<div class="clock-card${hl}">
-                <div class="clock-city">${c.city}</div>
-                <div class="clock-tz">${c.label}</div>
-                <div class="clock-time">${tf.format(now)}</div>
-                <div class="clock-date">${df.format(now)}</div>
-            </div>`;
-        }).join('');
+        worldClockCities.forEach(c => {
+            const key = c.tz.replace(/\//g, '-');
+            try {
+                const timeFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: c.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                const dateFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: c.tz, year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' });
+                const timeEl = document.getElementById('time-' + key);
+                const dateEl = document.getElementById('date-' + key);
+                if (timeEl) timeEl.textContent = timeFmt.format(now);
+                if (dateEl) dateEl.textContent = dateFmt.format(now);
+            } catch(e) {}
+        });
     }
 
-    function showToast(msg) {
-        const t = document.createElement('div');
-        t.className = 'toast';
-        t.textContent = msg;
-        document.body.appendChild(t);
-        setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 300); }, 2000);
-    }
-
-    populateSelects();
-    useNow();
+    buildSelects();
+    buildWorldClock();
+    setCurrentTime();
     updateWorldClock();
     setInterval(updateWorldClock, 1000);
     </script>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS/Atomフィードバリデーター | ToolBox</title>
+    <meta name="description" content="RSS 2.0およびAtom 1.0フィードのXMLを検証するツール。必須要素のチェック、エンコーディング確認、URLの形式検証を行います。">
+    <meta property="og:title" content="RSS/Atomフィードバリデーター | ToolBox">
+    <meta property="og:description" content="RSS 2.0およびAtom 1.0フィードのXMLを検証するツール。必須要素のチェック、エンコーディング確認、URLの形式検証を行います。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/rss-validator.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"RSS/Atomフィードバリデーター","url":"https://web-tool-site.com/tools/rss-validator.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav a { color: #555; text-decoration: none; font-weight: 500; }
+.tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+.tool-header { background: linear-gradient(135deg, #f77062 0%, #fe5196 100%); color: white; padding: 2rem; text-align: center; }
+.tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.tool-header p { opacity: 0.9; }
+.tool-content { padding: 2rem; }
+button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.btn-primary { background: #f77062; color: white; }
+.btn-primary:hover { background: #e55a4e; transform: translateY(-2px); }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #5a6268; transform: translateY(-2px); }
+.btn-info { background: #17a2b8; color: white; }
+.btn-info:hover { background: #138496; transform: translateY(-2px); }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+textarea { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; resize: vertical; }
+textarea:focus { outline: none; border-color: #f77062; }
+.form-group { margin-bottom: 1.5rem; }
+.label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+.alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+.alert-danger { background: #fee; border: 1px solid #fcc; color: #c33; }
+.alert-success { background: #efe; border: 1px solid #cfc; color: #363; }
+.alert-info { background: #e8f4f8; border: 1px solid #bee5eb; color: #0c5460; }
+.alert-warning { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+.section-divider { border: none; border-top: 1px solid #eee; margin: 1.5rem 0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.feed-info-card { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.25rem; margin-bottom: 1rem; }
+.feed-info-card h3 { font-size: 1rem; color: #333; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #ddd; }
+.feed-info-row { display: flex; gap: 0.5rem; margin-bottom: 0.4rem; font-size: 0.9rem; }
+.feed-info-key { font-weight: 600; color: #555; min-width: 120px; flex-shrink: 0; }
+.feed-info-val { color: #333; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; word-break: break-all; }
+.check-list { list-style: none; padding: 0; }
+.check-list li { padding: 0.4rem 0; font-size: 0.9rem; display: flex; align-items: flex-start; gap: 0.5rem; border-bottom: 1px solid #f0f0f0; }
+.check-list li:last-child { border-bottom: none; }
+.check-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.badge-rss { background: #ff6600; color: white; }
+.badge-atom { background: #0066cc; color: white; }
+.badge-unknown { background: #999; color: white; }
+.badge-valid { background: #27ae60; color: white; }
+.badge-invalid { background: #e74c3c; color: white; }
+.items-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.5rem; }
+.items-table th { background: #f8f9fa; padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; color: #555; border-bottom: 2px solid #ddd; }
+.items-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #eee; vertical-align: top; }
+.items-table tr:hover td { background: #f8f9fa; }
+.items-table td a { color: #f77062; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+.items-table td a:hover { text-decoration: underline; }
+.result-section { display: none; }
+.result-section.visible { display: block; }
+.summary-bar { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+.summary-bar.valid { background: #d4edda; border: 1px solid #c3e6cb; }
+.summary-bar.invalid { background: #f8d7da; border: 1px solid #f5c6cb; }
+.summary-bar.warning { background: #fff3cd; border: 1px solid #ffc107; }
+.summary-stat { text-align: center; }
+.summary-stat .num { font-size: 1.5rem; font-weight: 700; }
+.summary-stat .lbl { font-size: 0.75rem; color: #666; }
+.stat-divider { width: 1px; height: 40px; background: rgba(0,0,0,0.1); }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+.footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+@media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .grid-2 { grid-template-columns: 1fr; } nav ul { gap: 1rem; } .feed-info-row { flex-direction: column; gap: 0; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <a href="../index.html" class="logo">🧰 ToolBox</a>
+        <nav><ul>
+            <li><a href="../index.html">ホーム</a></li>
+            <li><a href="../index.html#tools">ツール一覧</a></li>
+            <li><a href="../about.html">About</a></li>
+        </ul></nav>
+    </div>
+</header>
+
+<main class="tool-page">
+    <div class="tool-card-main">
+        <div class="tool-header">
+            <h1>📡 RSS/Atomフィードバリデーター</h1>
+            <p>RSS 2.0 / Atom 1.0 フィードの構造を検証し、問題点を報告します</p>
+        </div>
+        <div class="tool-content">
+
+            <div class="form-group">
+                <label class="label" for="xmlInput">RSS/Atom XML を貼り付けてください</label>
+                <textarea id="xmlInput" rows="14" placeholder="<?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#10;<rss version=&quot;2.0&quot;>&#10;  <channel>..."></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" onclick="validate()">✅ 検証する</button>
+                <button class="btn-info" onclick="loadExampleRSS()">📄 RSS サンプル</button>
+                <button class="btn-info" onclick="loadExampleAtom()">📄 Atom サンプル</button>
+                <button class="btn-secondary" onclick="clearAll()">クリア</button>
+            </div>
+
+            <!-- Results -->
+            <div id="resultSection" class="result-section">
+                <hr class="section-divider">
+
+                <!-- Summary bar -->
+                <div id="summaryBar" class="summary-bar">
+                    <div class="summary-stat">
+                        <div class="num" id="statType">-</div>
+                        <div class="lbl">フィード形式</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="summary-stat">
+                        <div class="num" id="statPassed" style="color:#27ae60;">0</div>
+                        <div class="lbl">合格チェック</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="summary-stat">
+                        <div class="num" id="statFailed" style="color:#e74c3c;">0</div>
+                        <div class="lbl">失敗チェック</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="summary-stat">
+                        <div class="num" id="statItems">0</div>
+                        <div class="lbl">エントリー数</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="summary-stat">
+                        <div class="num" id="statOverall">-</div>
+                        <div class="lbl">総合結果</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Feed Info -->
+                    <div>
+                        <div class="feed-info-card">
+                            <h3>📋 フィード情報</h3>
+                            <div id="feedInfoContent">
+                                <div class="feed-info-row"><span class="feed-info-key">タイトル</span><span class="feed-info-val" id="infoTitle">-</span></div>
+                                <div class="feed-info-row"><span class="feed-info-key">リンク</span><span class="feed-info-val" id="infoLink">-</span></div>
+                                <div class="feed-info-row"><span class="feed-info-key">説明</span><span class="feed-info-val" id="infoDesc">-</span></div>
+                                <div class="feed-info-row"><span class="feed-info-key">言語</span><span class="feed-info-val" id="infoLang">-</span></div>
+                                <div class="feed-info-row"><span class="feed-info-key">最終更新</span><span class="feed-info-val" id="infoUpdated">-</span></div>
+                                <div class="feed-info-row"><span class="feed-info-key">エントリー数</span><span class="feed-info-val" id="infoCount">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Validation checks -->
+                    <div>
+                        <div class="feed-info-card">
+                            <h3>🔍 検証チェックリスト</h3>
+                            <ul class="check-list" id="checkList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items table -->
+                <div class="feed-info-card">
+                    <h3>📰 エントリー一覧</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="items-table" id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>タイトル</th>
+                                    <th>リンク</th>
+                                    <th>公開日</th>
+                                    <th>状態</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+    <footer class="footer"><div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a><a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a><a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a><a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div></footer>
+    <div class="toast" id="toast"></div>
+    <script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('コピーしました')).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('コピーしました');});}
+
+const SAMPLE_RSS = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>サンプルフィード</title>
+    <link>https://example.com</link>
+    <description>サンプルRSSフィード</description>
+    <language>ja</language>
+    <lastBuildDate>Thu, 26 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>最初の記事</title>
+      <link>https://example.com/post1</link>
+      <description>記事の説明</description>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://example.com/post1</guid>
+    </item>
+    <item>
+      <title>2番目の記事</title>
+      <link>https://example.com/post2</link>
+      <description>2番目の記事の説明</description>
+      <pubDate>Wed, 25 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://example.com/post2</guid>
+    </item>
+    <item>
+      <title>3番目の記事</title>
+      <link>https://example.com/post3</link>
+      <description>3番目の記事の説明。この記事は少し長い説明があります。</description>
+      <pubDate>Tue, 24 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://example.com/post3</guid>
+    </item>
+  </channel>
+</rss>`;
+
+const SAMPLE_ATOM = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>サンプル Atom フィード</title>
+  <link href="https://example.com/" rel="alternate"/>
+  <link href="https://example.com/feed.atom" rel="self"/>
+  <id>https://example.com/</id>
+  <updated>2026-03-26T00:00:00Z</updated>
+  <author>
+    <name>サンプル著者</name>
+    <email>author@example.com</email>
+  </author>
+  <entry>
+    <title>最初のエントリー</title>
+    <link href="https://example.com/entry1" rel="alternate"/>
+    <id>https://example.com/entry1</id>
+    <updated>2026-03-26T00:00:00Z</updated>
+    <summary>エントリーの概要テキストです。</summary>
+  </entry>
+  <entry>
+    <title>2番目のエントリー</title>
+    <link href="https://example.com/entry2" rel="alternate"/>
+    <id>https://example.com/entry2</id>
+    <updated>2026-03-25T00:00:00Z</updated>
+    <summary>2番目のエントリーの概要です。</summary>
+  </entry>
+</feed>`;
+
+function loadExampleRSS() {
+    document.getElementById('xmlInput').value = SAMPLE_RSS;
+    showToast('RSSサンプルを読み込みました');
+}
+
+function loadExampleAtom() {
+    document.getElementById('xmlInput').value = SAMPLE_ATOM;
+    showToast('Atomサンプルを読み込みました');
+}
+
+function clearAll() {
+    document.getElementById('xmlInput').value = '';
+    document.getElementById('resultSection').classList.remove('visible');
+}
+
+function isValidUrl(str) {
+    try { new URL(str); return true; } catch { return false; }
+}
+
+function isValidRFC2822Date(str) {
+    if (!str) return false;
+    const d = new Date(str);
+    return !isNaN(d.getTime());
+}
+
+function isValidISO8601Date(str) {
+    if (!str) return false;
+    const d = new Date(str);
+    return !isNaN(d.getTime()) && str.includes('T');
+}
+
+function getText(el, tag, ns) {
+    if (!el) return '';
+    const child = ns ? el.getElementsByTagNameNS(ns, tag)[0] : el.getElementsByTagName(tag)[0];
+    return child ? (child.textContent || '').trim() : '';
+}
+
+function getAttr(el, tag, attr) {
+    if (!el) return '';
+    const child = el.getElementsByTagName(tag)[0];
+    return child ? (child.getAttribute(attr) || '') : '';
+}
+
+function validate() {
+    const xml = document.getElementById('xmlInput').value.trim();
+    if (!xml) { showToast('XMLを入力してください'); return; }
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, 'application/xml');
+    const parseError = doc.querySelector('parsererror');
+
+    if (parseError) {
+        document.getElementById('resultSection').classList.add('visible');
+        document.getElementById('summaryBar').className = 'summary-bar invalid';
+        document.getElementById('statType').textContent = 'エラー';
+        document.getElementById('statPassed').textContent = '0';
+        document.getElementById('statFailed').textContent = '1';
+        document.getElementById('statItems').textContent = '0';
+        document.getElementById('statOverall').textContent = '❌';
+        document.getElementById('checkList').innerHTML = `<li><span class="check-icon">❌</span><span>XML解析エラー: ${parseError.textContent.substring(0,200)}</span></li>`;
+        document.getElementById('infoTitle').textContent = '-';
+        document.getElementById('infoLink').textContent = '-';
+        document.getElementById('infoDesc').textContent = '-';
+        document.getElementById('infoLang').textContent = '-';
+        document.getElementById('infoUpdated').textContent = '-';
+        document.getElementById('infoCount').textContent = '-';
+        document.getElementById('itemsBody').innerHTML = '';
+        return;
+    }
+
+    const root = doc.documentElement;
+    const rootTag = root.tagName.toLowerCase();
+    const isRSS = rootTag === 'rss';
+    const isAtom = rootTag === 'feed';
+
+    const checks = [];
+    let feedTitle = '', feedLink = '', feedDesc = '', feedLang = '', feedUpdated = '', itemCount = 0;
+    const items = [];
+
+    if (isRSS) {
+        // RSS 2.0 validation
+        const version = root.getAttribute('version');
+        checks.push({ pass: !!version && version === '2.0', msg: `<rss> 要素に version="2.0" 属性 (現在: ${version || '未設定'})` });
+
+        const channel = root.getElementsByTagName('channel')[0];
+        checks.push({ pass: !!channel, msg: '<channel> 要素が存在する' });
+
+        if (channel) {
+            feedTitle = getText(channel, 'title');
+            feedLink = getText(channel, 'link');
+            feedDesc = getText(channel, 'description');
+            feedLang = getText(channel, 'language');
+            feedUpdated = getText(channel, 'lastBuildDate') || getText(channel, 'pubDate');
+
+            checks.push({ pass: !!feedTitle, msg: `<channel><title> が存在する${feedTitle ? ': "'+feedTitle.substring(0,40)+'"' : ''}` });
+            checks.push({ pass: !!feedLink, msg: `<channel><link> が存在する${feedLink ? ': '+feedLink.substring(0,50) : ''}` });
+            checks.push({ pass: !!feedDesc, msg: `<channel><description> が存在する` });
+            if (feedLink) checks.push({ pass: isValidUrl(feedLink), msg: `<channel><link> が有効なURL形式` });
+
+            const itemEls = channel.getElementsByTagName('item');
+            itemCount = itemEls.length;
+            checks.push({ pass: itemCount > 0, msg: `<item> が1件以上存在する (${itemCount}件)` });
+
+            for (let i = 0; i < itemEls.length; i++) {
+                const item = itemEls[i];
+                const iTitle = getText(item, 'title');
+                const iDesc = getText(item, 'description');
+                const iLink = getText(item, 'link');
+                const iPubDate = getText(item, 'pubDate');
+                const iGuid = getText(item, 'guid');
+                const hasContent = !!(iTitle || iDesc);
+                const validDate = iPubDate ? isValidRFC2822Date(iPubDate) : null;
+                const validLink = iLink ? isValidUrl(iLink) : null;
+
+                let itemStatus = 'valid';
+                const itemWarnings = [];
+                if (!hasContent) { itemStatus = 'invalid'; itemWarnings.push('title/descriptionなし'); }
+                if (validDate === false) { itemStatus = itemStatus === 'invalid' ? 'invalid' : 'warn'; itemWarnings.push('pubDate形式不正'); }
+                if (validLink === false) { itemStatus = itemStatus === 'invalid' ? 'invalid' : 'warn'; itemWarnings.push('link形式不正'); }
+                if (!iGuid) itemWarnings.push('guid未設定');
+
+                items.push({ title: iTitle || '(タイトルなし)', link: iLink, date: iPubDate, status: itemStatus, warnings: itemWarnings });
+
+                if (i < 5) {
+                    checks.push({ pass: hasContent, msg: `item[${i+1}]: <title> または <description> が存在する` });
+                    if (iPubDate) checks.push({ pass: validDate, msg: `item[${i+1}]: pubDate が RFC 2822 形式 (${iPubDate.substring(0,30)})` });
+                    if (iLink) checks.push({ pass: validLink, msg: `item[${i+1}]: <link> が有効なURL形式` });
+                }
+            }
+        }
+    } else if (isAtom) {
+        // Atom 1.0 validation
+        const xmlns = root.getAttribute('xmlns');
+        checks.push({ pass: !!xmlns && xmlns.includes('atom'), msg: `<feed> に Atom xmlns 属性 (${xmlns || '未設定'})` });
+
+        feedTitle = getText(root, 'title');
+        const feedId = getText(root, 'id');
+        feedUpdated = getText(root, 'updated');
+
+        checks.push({ pass: !!feedTitle, msg: `<feed><title> が存在する${feedTitle ? ': "'+feedTitle.substring(0,40)+'"' : ''}` });
+        checks.push({ pass: !!feedId, msg: `<feed><id> が存在する${feedId ? ': '+feedId.substring(0,50) : ''}` });
+        checks.push({ pass: !!feedUpdated, msg: `<feed><updated> が存在する` });
+        if (feedUpdated) checks.push({ pass: isValidISO8601Date(feedUpdated), msg: `<feed><updated> が ISO 8601 形式 (${feedUpdated.substring(0,25)})` });
+
+        // Links
+        const links = root.getElementsByTagName('link');
+        let altLink = '';
+        for (let l of links) {
+            if (!l.parentElement || l.parentElement.tagName.toLowerCase() !== 'entry') {
+                const rel = l.getAttribute('rel') || 'alternate';
+                if (rel === 'alternate') altLink = l.getAttribute('href') || '';
+            }
+        }
+        feedLink = altLink;
+        checks.push({ pass: !!altLink, msg: `<feed><link rel="alternate"> が存在する${altLink ? ': '+altLink.substring(0,50) : ''}` });
+        if (altLink) checks.push({ pass: isValidUrl(altLink), msg: `<feed> の alternate link が有効なURL形式` });
+
+        const entryEls = root.getElementsByTagName('entry');
+        itemCount = entryEls.length;
+        checks.push({ pass: itemCount > 0, msg: `<entry> が1件以上存在する (${itemCount}件)` });
+
+        for (let i = 0; i < entryEls.length; i++) {
+            const entry = entryEls[i];
+            const eTitle = getText(entry, 'title');
+            const eId = getText(entry, 'id');
+            const eUpdated = getText(entry, 'updated');
+            const entryLinks = entry.getElementsByTagName('link');
+            let eLink = '';
+            for (let l of entryLinks) {
+                const rel = l.getAttribute('rel') || 'alternate';
+                if (rel === 'alternate') { eLink = l.getAttribute('href') || ''; break; }
+            }
+            const eSummary = getText(entry, 'summary') || getText(entry, 'content');
+            const validDate = eUpdated ? isValidISO8601Date(eUpdated) : false;
+            const validLink = eLink ? isValidUrl(eLink) : null;
+
+            let itemStatus = 'valid';
+            const itemWarnings = [];
+            if (!eTitle) { itemStatus = 'warn'; itemWarnings.push('title未設定'); }
+            if (!eId) { itemStatus = 'invalid'; itemWarnings.push('id未設定'); }
+            if (!eUpdated || !validDate) { itemStatus = itemStatus === 'invalid' ? 'invalid' : 'warn'; itemWarnings.push('updated不正'); }
+            if (validLink === false) itemWarnings.push('link形式不正');
+
+            items.push({ title: eTitle || '(タイトルなし)', link: eLink, date: eUpdated, status: itemStatus, warnings: itemWarnings });
+
+            if (i < 5) {
+                checks.push({ pass: !!eTitle, msg: `entry[${i+1}]: <title> が存在する` });
+                checks.push({ pass: !!eId, msg: `entry[${i+1}]: <id> が存在する` });
+                checks.push({ pass: !!eUpdated && validDate, msg: `entry[${i+1}]: <updated> が ISO 8601 形式${eUpdated ? ' ('+eUpdated.substring(0,25)+')' : ''}` });
+                if (eLink) checks.push({ pass: validLink, msg: `entry[${i+1}]: <link> が有効なURL形式` });
+            }
+        }
+        feedDesc = getText(root, 'subtitle') || '';
+        feedLang = root.getAttribute('xml:lang') || '';
+    } else {
+        checks.push({ pass: false, msg: 'RSS 2.0 (<rss>) または Atom 1.0 (<feed>) のルート要素が必要です' });
+    }
+
+    const passed = checks.filter(c => c.pass).length;
+    const failed = checks.filter(c => !c.pass).length;
+    const isValid = failed === 0 && (isRSS || isAtom);
+
+    // Render
+    document.getElementById('resultSection').classList.add('visible');
+
+    const typeLabel = isRSS ? 'RSS 2.0' : isAtom ? 'Atom 1.0' : '不明';
+    const typeBadge = isRSS ? 'badge-rss' : isAtom ? 'badge-atom' : 'badge-unknown';
+    document.getElementById('statType').innerHTML = `<span class="badge ${typeBadge}">${typeLabel}</span>`;
+    document.getElementById('statPassed').textContent = passed;
+    document.getElementById('statFailed').textContent = failed;
+    document.getElementById('statItems').textContent = itemCount;
+    document.getElementById('statOverall').innerHTML = isValid
+        ? '<span class="badge badge-valid">合格</span>'
+        : '<span class="badge badge-invalid">不合格</span>';
+
+    const bar = document.getElementById('summaryBar');
+    bar.className = 'summary-bar ' + (isValid ? 'valid' : failed <= 2 ? 'warning' : 'invalid');
+
+    document.getElementById('infoTitle').textContent = feedTitle || '-';
+    document.getElementById('infoLink').textContent = feedLink || '-';
+    document.getElementById('infoDesc').textContent = feedDesc ? feedDesc.substring(0,100) + (feedDesc.length>100?'...':'') : '-';
+    document.getElementById('infoLang').textContent = feedLang || '-';
+    document.getElementById('infoUpdated').textContent = feedUpdated || '-';
+    document.getElementById('infoCount').textContent = itemCount + ' 件';
+
+    document.getElementById('checkList').innerHTML = checks.map(c =>
+        `<li><span class="check-icon">${c.pass ? '✅' : '❌'}</span><span>${c.msg}</span></li>`
+    ).join('');
+
+    document.getElementById('itemsBody').innerHTML = items.map((item, i) => {
+        const statusIcon = item.status === 'valid' ? '✅' : item.status === 'warn' ? '⚠️' : '❌';
+        const warnText = item.warnings.length ? `<br><small style="color:#e74c3c;">${item.warnings.join(', ')}</small>` : '';
+        const linkEl = item.link ? `<a href="${item.link}" target="_blank" rel="noopener">${item.link.substring(0,50)}${item.link.length>50?'...':''}</a>` : '-';
+        return `<tr>
+            <td>${i+1}</td>
+            <td>${item.title.substring(0,60)}${item.title.length>60?'...':''}</td>
+            <td>${linkEl}</td>
+            <td style="white-space:nowrap;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">${item.date ? item.date.substring(0,25) : '-'}</td>
+            <td>${statusIcon}${warnText}</td>
+        </tr>`;
+    }).join('');
+
+    showToast(`検証完了: ${passed}件合格, ${failed}件不合格`);
+}
+    </script>
+</body>
+</html>

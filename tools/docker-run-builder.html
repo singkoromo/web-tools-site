@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>docker runコマンドビルダー | ToolBox</title>
+    <meta name="description" content="docker runコマンドのオプションをGUIで設定してコマンドを生成。ポートマッピング、ボリュームマウント、環境変数などを視覚的に設定できます。">
+    <meta property="og:title" content="docker runコマンドビルダー | ToolBox">
+    <meta property="og:description" content="docker runコマンドのオプションをGUIで設定してコマンドを生成。ポートマッピング、ボリュームマウント、環境変数などを視覚的に設定できます。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://web-tool-site.com/tools/docker-run-builder.html">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"docker runコマンドビルダー","url":"https://web-tool-site.com/tools/docker-run-builder.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav a { color: #555; text-decoration: none; font-weight: 500; }
+.tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+.tool-header { background: linear-gradient(135deg, #0099f7 0%, #f11712 100%); color: white; padding: 2rem; text-align: center; }
+.tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.tool-header p { opacity: 0.9; }
+.tool-content { padding: 2rem; }
+button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.btn-primary { background: #0099f7; color: white; }
+.btn-primary:hover { background: #0077cc; transform: translateY(-2px); }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #5a6268; transform: translateY(-2px); }
+.btn-danger { background: #e74c3c; color: white; }
+.btn-danger:hover { background: #c0392b; }
+.btn-add { background: #27ae60; color: white; padding: 0.4rem 0.9rem; font-size: 0.85rem; border-radius: 4px; }
+.btn-add:hover { background: #219a52; }
+.btn-remove { background: #e74c3c; color: white; padding: 0.3rem 0.7rem; font-size: 0.8rem; border-radius: 4px; }
+.btn-remove:hover { background: #c0392b; }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+input[type="text"], input[type="number"], select, textarea { font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #0099f7; }
+.form-group { margin-bottom: 1.25rem; }
+.label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+.section-title { font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; background: #f0f4f8; border-left: 3px solid #0099f7; border-radius: 0 4px 4px 0; }
+.section-divider { border: none; border-top: 1px solid #eee; margin: 1.25rem 0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+.layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.dynamic-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+.dynamic-row input, .dynamic-row select { flex: 1; min-width: 0; }
+.dynamic-row .sep { color: #999; font-weight: 700; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; }
+.command-preview { position: sticky; top: 80px; }
+.command-box { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #e6edf3; min-height: 120px; white-space: pre-wrap; word-break: break-all; line-height: 1.7; }
+.command-box .cmd-docker { color: #79c0ff; }
+.command-box .cmd-flag { color: #d2a8ff; }
+.command-box .cmd-value { color: #a8ff9e; }
+.command-box .cmd-image { color: #ffa657; font-weight: 600; }
+.command-box .cmd-line { color: #8b949e; }
+.result-plain { background: #1e1e1e; border: 1px solid #444; border-radius: 6px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #d4d4d4; white-space: pre-wrap; word-break: break-all; display: none; }
+.radio-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.radio-label { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; padding: 0.4rem 0.8rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; transition: all 0.2s; }
+.radio-label:hover { border-color: #0099f7; background: #f0f8ff; }
+.radio-label input[type="radio"] { cursor: pointer; width: auto; }
+.radio-label.selected { border-color: #0099f7; background: #e8f4ff; font-weight: 600; }
+.check-label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.9rem; }
+.check-label input[type="checkbox"] { width: auto; cursor: pointer; }
+.info-tip { font-size: 0.78rem; color: #888; margin-top: 0.25rem; font-style: italic; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+.footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .command-preview { position: static; } }
+@media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .grid-2 { grid-template-columns: 1fr; } nav ul { gap: 1rem; } .grid-3 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <a href="../index.html" class="logo">🧰 ToolBox</a>
+        <nav><ul>
+            <li><a href="../index.html">ホーム</a></li>
+            <li><a href="../index.html#tools">ツール一覧</a></li>
+            <li><a href="../about.html">About</a></li>
+        </ul></nav>
+    </div>
+</header>
+
+<main class="tool-page">
+    <div class="tool-card-main">
+        <div class="tool-header">
+            <h1>🐳 docker run コマンドビルダー</h1>
+            <p>GUIでオプションを設定して docker run コマンドを自動生成します</p>
+        </div>
+        <div class="tool-content">
+            <div class="layout">
+                <!-- Left: Options -->
+                <div>
+
+                    <!-- Basic -->
+                    <div class="section-title">📦 基本設定</div>
+                    <div class="form-group">
+                        <label class="label" for="imageName">イメージ名 <span style="color:#e74c3c;">*</span></label>
+                        <input type="text" id="imageName" placeholder="nginx:latest" value="nginx:latest" oninput="update()">
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="containerName">コンテナ名 (--name)</label>
+                        <input type="text" id="containerName" placeholder="mycontainer" oninput="update()">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">実行モード</label>
+                        <div class="radio-group" id="runModeGroup">
+                            <label class="radio-label" onclick="setMode(this)">
+                                <input type="radio" name="runMode" value=""> フォアグラウンド
+                            </label>
+                            <label class="radio-label selected" onclick="setMode(this)">
+                                <input type="radio" name="runMode" value="-d" checked> デタッチ (-d)
+                            </label>
+                            <label class="radio-label" onclick="setMode(this)">
+                                <input type="radio" name="runMode" value="-it"> インタラクティブ (-it)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="check-label">
+                            <input type="checkbox" id="removeAfterExit" onchange="update()">
+                            <span>終了後に削除 (--rm)</span>
+                        </label>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Ports -->
+                    <div class="section-title">🔌 ポートマッピング (-p)</div>
+                    <div id="portRows"></div>
+                    <button class="btn-add" onclick="addPort()">＋ ポートを追加</button>
+                    <div class="info-tip">ホストポート : コンテナポート の形式</div>
+
+                    <hr class="section-divider">
+
+                    <!-- Volumes -->
+                    <div class="section-title">💾 ボリュームマウント (-v)</div>
+                    <div id="volumeRows"></div>
+                    <button class="btn-add" onclick="addVolume()">＋ ボリュームを追加</button>
+                    <div class="info-tip">ホストパス : コンテナパス : モード の形式</div>
+
+                    <hr class="section-divider">
+
+                    <!-- Environment variables -->
+                    <div class="section-title">🔑 環境変数 (-e)</div>
+                    <div id="envRows"></div>
+                    <button class="btn-add" onclick="addEnv()">＋ 環境変数を追加</button>
+
+                    <hr class="section-divider">
+
+                    <!-- Network & Restart -->
+                    <div class="section-title">🌐 ネットワーク・再起動</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="label" for="networkSelect">ネットワーク</label>
+                            <select id="networkSelect" onchange="toggleCustomNet()" style="width:100%;">
+                                <option value="bridge">bridge (デフォルト)</option>
+                                <option value="host">host</option>
+                                <option value="none">none</option>
+                                <option value="custom">カスタム...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="label" for="restartPolicy">再起動ポリシー</label>
+                            <select id="restartPolicy" onchange="update()" style="width:100%;">
+                                <option value="">no (デフォルト)</option>
+                                <option value="always">always</option>
+                                <option value="on-failure">on-failure</option>
+                                <option value="unless-stopped">unless-stopped</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" id="customNetRow" style="display:none;">
+                        <label class="label" for="customNetName">カスタムネットワーク名</label>
+                        <input type="text" id="customNetName" placeholder="my-network" oninput="update()">
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Resources -->
+                    <div class="section-title">⚡ リソース制限</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="label" for="cpuLimit">CPU (--cpus)</label>
+                            <input type="text" id="cpuLimit" placeholder="例: 0.5, 1, 2" oninput="update()">
+                            <div class="info-tip">使用するCPUコア数（小数可）</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="label" for="memLimit">メモリ (--memory)</label>
+                            <input type="text" id="memLimit" placeholder="例: 512m, 1g, 256m" oninput="update()">
+                            <div class="info-tip">b / k / m / g 単位</div>
+                        </div>
+                    </div>
+
+                    <hr class="section-divider">
+
+                    <!-- Additional args -->
+                    <div class="section-title">⚙️ 追加オプション</div>
+                    <div class="form-group">
+                        <label class="label" for="additionalArgs">追加の引数</label>
+                        <input type="text" id="additionalArgs" placeholder="例: --user 1000:1000 --workdir /app" oninput="update()">
+                    </div>
+                    <div class="form-group">
+                        <label class="label" for="cmdOverride">コマンド上書き（COMMAND）</label>
+                        <input type="text" id="cmdOverride" placeholder="例: bash, /bin/sh, npm start" oninput="update()">
+                    </div>
+
+                    <hr class="section-divider">
+                    <div class="btn-group">
+                        <button class="btn-danger" onclick="resetAll()">🔄 リセット</button>
+                    </div>
+                </div>
+
+                <!-- Right: Preview -->
+                <div class="command-preview">
+                    <div class="section-title">👁️ コマンドプレビュー</div>
+                    <div class="command-box" id="commandDisplay"></div>
+
+                    <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <button class="btn-primary" onclick="copyCommand()">📋 コピー</button>
+                        <button class="btn-secondary" onclick="togglePlain()">プレーンテキスト表示</button>
+                    </div>
+                    <div class="result-plain" id="commandPlain"></div>
+
+                    <hr class="section-divider">
+
+                    <!-- Quick presets -->
+                    <div class="section-title">🚀 クイックプリセット</div>
+                    <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                        <button class="btn-secondary" style="text-align:left;font-size:0.85rem;" onclick="loadPreset('nginx')">🌐 Nginx ウェブサーバー</button>
+                        <button class="btn-secondary" style="text-align:left;font-size:0.85rem;" onclick="loadPreset('postgres')">🐘 PostgreSQL データベース</button>
+                        <button class="btn-secondary" style="text-align:left;font-size:0.85rem;" onclick="loadPreset('redis')">⚡ Redis キャッシュ</button>
+                        <button class="btn-secondary" style="text-align:left;font-size:0.85rem;" onclick="loadPreset('node')">🟢 Node.js アプリ</button>
+                        <button class="btn-secondary" style="text-align:left;font-size:0.85rem;" onclick="loadPreset('mysql')">🐬 MySQL データベース</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+    <footer class="footer"><div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a><a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a><a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a><a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div></footer>
+    <div class="toast" id="toast"></div>
+    <script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('コピーしました')).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('コピーしました');});}
+
+let portCount = 0, volumeCount = 0, envCount = 0;
+let plainVisible = false;
+
+function setMode(label) {
+    document.querySelectorAll('#runModeGroup .radio-label').forEach(l => l.classList.remove('selected'));
+    label.classList.add('selected');
+    label.querySelector('input').checked = true;
+    update();
+}
+
+function toggleCustomNet() {
+    const val = document.getElementById('networkSelect').value;
+    document.getElementById('customNetRow').style.display = val === 'custom' ? 'block' : 'none';
+    update();
+}
+
+function addPort(hp='', cp='', proto='tcp') {
+    portCount++;
+    const id = portCount;
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.id = 'port-row-' + id;
+    row.innerHTML = `
+        <input type="number" placeholder="8080" value="${hp}" min="1" max="65535" oninput="update()" style="width:80px;flex:none;">
+        <span class="sep">:</span>
+        <input type="number" placeholder="80" value="${cp}" min="1" max="65535" oninput="update()" style="width:80px;flex:none;">
+        <select onchange="update()" style="width:80px;flex:none;">
+            <option value="tcp" ${proto==='tcp'?'selected':''}>TCP</option>
+            <option value="udp" ${proto==='udp'?'selected':''}>UDP</option>
+        </select>
+        <button class="btn-remove" onclick="removeRow('port-row-${id}')">✕</button>`;
+    document.getElementById('portRows').appendChild(row);
+    update();
+}
+
+function addVolume(hp='', cp='', mode='rw') {
+    volumeCount++;
+    const id = volumeCount;
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.id = 'vol-row-' + id;
+    row.innerHTML = `
+        <input type="text" placeholder="/host/path" value="${hp}" oninput="update()">
+        <span class="sep">:</span>
+        <input type="text" placeholder="/container/path" value="${cp}" oninput="update()">
+        <select onchange="update()" style="width:70px;flex:none;">
+            <option value="rw" ${mode==='rw'?'selected':''}>rw</option>
+            <option value="ro" ${mode==='ro'?'selected':''}>ro</option>
+        </select>
+        <button class="btn-remove" onclick="removeRow('vol-row-${id}')">✕</button>`;
+    document.getElementById('volumeRows').appendChild(row);
+    update();
+}
+
+function addEnv(k='', v='') {
+    envCount++;
+    const id = envCount;
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.id = 'env-row-' + id;
+    row.innerHTML = `
+        <input type="text" placeholder="KEY" value="${k}" oninput="update()" style="font-family:'JetBrains Mono',monospace;">
+        <span class="sep">=</span>
+        <input type="text" placeholder="value" value="${v}" oninput="update()" style="font-family:'JetBrains Mono',monospace;">
+        <button class="btn-remove" onclick="removeRow('env-row-${id}')">✕</button>`;
+    document.getElementById('envRows').appendChild(row);
+    update();
+}
+
+function removeRow(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+    update();
+}
+
+function buildCommand() {
+    const image = document.getElementById('imageName').value.trim() || 'IMAGE';
+    const name = document.getElementById('containerName').value.trim();
+    const mode = document.querySelector('input[name="runMode"]:checked')?.value || '';
+    const rm = document.getElementById('removeAfterExit').checked;
+    const restart = document.getElementById('restartPolicy').value;
+    const netSel = document.getElementById('networkSelect').value;
+    const network = netSel === 'custom' ? document.getElementById('customNetName').value.trim() : netSel;
+    const cpu = document.getElementById('cpuLimit').value.trim();
+    const mem = document.getElementById('memLimit').value.trim();
+    const extra = document.getElementById('additionalArgs').value.trim();
+    const cmd = document.getElementById('cmdOverride').value.trim();
+
+    const parts = ['docker run'];
+
+    if (mode) parts.push(mode);
+    if (rm) parts.push('--rm');
+    if (name) parts.push(`--name ${name}`);
+
+    // Ports
+    document.querySelectorAll('[id^="port-row-"]').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const sel = row.querySelector('select');
+        const hp = inputs[0].value.trim();
+        const cp = inputs[1].value.trim();
+        const proto = sel?.value || 'tcp';
+        if (hp && cp) {
+            const flag = proto === 'udp' ? `-p ${hp}:${cp}/udp` : `-p ${hp}:${cp}`;
+            parts.push(flag);
+        }
+    });
+
+    // Volumes
+    document.querySelectorAll('[id^="vol-row-"]').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const sel = row.querySelector('select');
+        const hp = inputs[0].value.trim();
+        const cp = inputs[1].value.trim();
+        const mode = sel?.value || 'rw';
+        if (hp && cp) parts.push(`-v ${hp}:${cp}:${mode}`);
+    });
+
+    // Env
+    document.querySelectorAll('[id^="env-row-"]').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const k = inputs[0].value.trim();
+        const v = inputs[1].value.trim();
+        if (k) {
+            const val = v.includes(' ') ? `"${v}"` : v;
+            parts.push(v ? `-e ${k}=${val}` : `-e ${k}`);
+        }
+    });
+
+    if (network && network !== 'bridge') parts.push(`--network ${network}`);
+    if (restart) parts.push(`--restart ${restart}`);
+    if (cpu) parts.push(`--cpus ${cpu}`);
+    if (mem) parts.push(`--memory ${mem}`);
+    if (extra) parts.push(extra);
+
+    parts.push(image);
+    if (cmd) parts.push(cmd);
+
+    return parts;
+}
+
+function update() {
+    const parts = buildCommand();
+    const image = parts[parts.length - (document.getElementById('cmdOverride').value.trim() ? 2 : 1)];
+
+    // Formatted display with line continuation
+    let display = '';
+    const displayParts = [...parts];
+    if (displayParts.length <= 2) {
+        display = displayParts.join(' ');
+    } else {
+        display = displayParts[0] + ' \\\n';
+        for (let i = 1; i < displayParts.length - 1; i++) {
+            display += '  ' + displayParts[i] + ' \\\n';
+        }
+        display += '  ' + displayParts[displayParts.length - 1];
+    }
+
+    // Syntax highlight version
+    let html = display
+        .replace(/^(docker run)/, '<span class="cmd-docker">docker run</span>')
+        .replace(/(-{1,2}[\w-]+)/g, '<span class="cmd-flag">$1</span>')
+        .replace(/(\\)$/gm, '<span class="cmd-line">\\</span>')
+        .replace(new RegExp(escapeRegex(image) + '$', 'm'), `<span class="cmd-image">${image}</span>`);
+
+    document.getElementById('commandDisplay').innerHTML = html;
+    document.getElementById('commandPlain').textContent = parts.join(' \\\n  ').replace(/^(docker run) /, '$1 \\\n  ').replace('docker run \\\n  ', 'docker run \\\n  ');
+    document.getElementById('commandPlain').textContent = display;
+}
+
+function escapeRegex(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function copyCommand() {
+    const parts = buildCommand();
+    const plain = parts.join(' \\\n  ');
+    copyText(plain);
+}
+
+function togglePlain() {
+    plainVisible = !plainVisible;
+    document.getElementById('commandPlain').style.display = plainVisible ? 'block' : 'none';
+}
+
+function clearRows(prefix) {
+    document.querySelectorAll(`[id^="${prefix}"]`).forEach(el => el.remove());
+}
+
+function resetAll() {
+    document.getElementById('imageName').value = 'nginx:latest';
+    document.getElementById('containerName').value = '';
+    document.querySelector('input[name="runMode"][value="-d"]').checked = true;
+    document.querySelectorAll('#runModeGroup .radio-label').forEach(l => {
+        l.classList.toggle('selected', l.querySelector('input').value === '-d');
+    });
+    document.getElementById('removeAfterExit').checked = false;
+    document.getElementById('networkSelect').value = 'bridge';
+    document.getElementById('customNetRow').style.display = 'none';
+    document.getElementById('restartPolicy').value = '';
+    document.getElementById('cpuLimit').value = '';
+    document.getElementById('memLimit').value = '';
+    document.getElementById('additionalArgs').value = '';
+    document.getElementById('cmdOverride').value = '';
+    clearRows('port-row-');
+    clearRows('vol-row-');
+    clearRows('env-row-');
+    update();
+    showToast('リセットしました');
+}
+
+function loadPreset(name) {
+    clearRows('port-row-');
+    clearRows('vol-row-');
+    clearRows('env-row-');
+    document.getElementById('removeAfterExit').checked = false;
+    document.getElementById('cpuLimit').value = '';
+    document.getElementById('memLimit').value = '';
+    document.getElementById('additionalArgs').value = '';
+    document.getElementById('cmdOverride').value = '';
+    document.getElementById('networkSelect').value = 'bridge';
+    document.getElementById('customNetRow').style.display = 'none';
+
+    const setMode = val => {
+        document.querySelector(`input[name="runMode"][value="${val}"]`).checked = true;
+        document.querySelectorAll('#runModeGroup .radio-label').forEach(l => {
+            l.classList.toggle('selected', l.querySelector('input').value === val);
+        });
+    };
+
+    if (name === 'nginx') {
+        document.getElementById('imageName').value = 'nginx:latest';
+        document.getElementById('containerName').value = 'nginx-web';
+        setMode('-d');
+        document.getElementById('restartPolicy').value = 'unless-stopped';
+        addPort('80', '80');
+        addPort('443', '443');
+        addVolume('/var/www/html', '/usr/share/nginx/html', 'ro');
+        addVolume('/etc/nginx/nginx.conf', '/etc/nginx/nginx.conf', 'ro');
+    } else if (name === 'postgres') {
+        document.getElementById('imageName').value = 'postgres:16';
+        document.getElementById('containerName').value = 'postgres-db';
+        setMode('-d');
+        document.getElementById('restartPolicy').value = 'unless-stopped';
+        document.getElementById('memLimit').value = '512m';
+        addPort('5432', '5432');
+        addVolume('postgres_data', '/var/lib/postgresql/data', 'rw');
+        addEnv('POSTGRES_DB', 'mydb');
+        addEnv('POSTGRES_USER', 'myuser');
+        addEnv('POSTGRES_PASSWORD', 'mypassword');
+    } else if (name === 'redis') {
+        document.getElementById('imageName').value = 'redis:7-alpine';
+        document.getElementById('containerName').value = 'redis-cache';
+        setMode('-d');
+        document.getElementById('restartPolicy').value = 'unless-stopped';
+        document.getElementById('memLimit').value = '256m';
+        addPort('6379', '6379');
+        addVolume('redis_data', '/data', 'rw');
+        document.getElementById('cmdOverride').value = 'redis-server --appendonly yes';
+    } else if (name === 'node') {
+        document.getElementById('imageName').value = 'node:20-alpine';
+        document.getElementById('containerName').value = 'node-app';
+        setMode('-d');
+        document.getElementById('restartPolicy').value = 'unless-stopped';
+        document.getElementById('cpuLimit').value = '1';
+        document.getElementById('memLimit').value = '512m';
+        addPort('3000', '3000');
+        addVolume('/app', '/usr/src/app', 'rw');
+        addEnv('NODE_ENV', 'production');
+        addEnv('PORT', '3000');
+        document.getElementById('cmdOverride').value = 'node server.js';
+    } else if (name === 'mysql') {
+        document.getElementById('imageName').value = 'mysql:8.0';
+        document.getElementById('containerName').value = 'mysql-db';
+        setMode('-d');
+        document.getElementById('restartPolicy').value = 'unless-stopped';
+        document.getElementById('memLimit').value = '1g';
+        addPort('3306', '3306');
+        addVolume('mysql_data', '/var/lib/mysql', 'rw');
+        addEnv('MYSQL_ROOT_PASSWORD', 'rootpassword');
+        addEnv('MYSQL_DATABASE', 'mydb');
+        addEnv('MYSQL_USER', 'myuser');
+        addEnv('MYSQL_PASSWORD', 'mypassword');
+    }
+    update();
+    showToast(`${name} プリセットを読み込みました`);
+}
+
+// Init
+update();
+    </script>
+</body>
+</html>

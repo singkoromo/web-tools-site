@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>package.jsonビルダー - ToolBox</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+.header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+nav ul { list-style: none; display: flex; gap: 2rem; }
+nav a { color: #555; text-decoration: none; font-weight: 500; }
+nav a:hover { color: #4a90e2; }
+.tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+.tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+.tool-header { background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); color: #2c3e50; padding: 2rem; text-align: center; }
+.tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; color: #2c3e50; }
+.tool-header p { opacity: 0.8; color: #3a5a3a; }
+.tool-content { padding: 2rem; }
+button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+.btn-primary { background: #4a90e2; color: white; }
+.btn-primary:hover { background: #357abd; transform: translateY(-2px); }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #545b62; transform: translateY(-2px); }
+.btn-success { background: #27ae60; color: white; }
+.btn-success:hover { background: #1e8449; transform: translateY(-2px); }
+.btn-danger { background: #e74c3c; color: white; }
+.btn-danger:hover { background: #c0392b; transform: translateY(-2px); }
+.btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+textarea, input, select { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; }
+textarea:focus, input:focus, select:focus { outline: none; border-color: #4a90e2; }
+.form-group { margin-bottom: 1.5rem; }
+.label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; font-family: 'Inter', sans-serif; }
+.result-box { background: #1e1e1e; color: #d4d4d4; border: 1px solid #444; border-radius: 6px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; white-space: pre-wrap; word-break: break-all; min-height: 200px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.section-title { font-size: 1.1rem; font-weight: 700; color: #2c3e50; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #d4fc79; }
+.entry-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+.entry-row input { flex: 1; }
+.entry-row select { flex: 0 0 160px; }
+.entry-row button { flex: 0 0 auto; }
+.tag { display: inline-block; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 4px; padding: 0.2rem 0.5rem; font-size: 0.8rem; margin: 0.2rem; }
+.checkbox-group { display: flex; align-items: center; gap: 0.5rem; }
+.checkbox-group input[type="checkbox"] { width: auto; cursor: pointer; }
+.checkbox-group label { cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 500; }
+footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+.footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+.footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+.footer-inner .footer-links a:hover { color: #fff; }
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
+@media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .grid-2 { grid-template-columns: 1fr; } nav ul { gap: 1rem; } .entry-row { flex-wrap: wrap; } .entry-row select { flex: 1 1 100%; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-container">
+    <a href="../index.html" class="logo">🧰 ToolBox</a>
+    <nav>
+      <ul>
+        <li><a href="../index.html">ホーム</a></li>
+        <li><a href="../index.html#tools">ツール一覧</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="tool-page">
+  <div class="tool-card-main">
+    <div class="tool-header">
+      <h1>📦 package.jsonビルダー</h1>
+      <p>npm/Node.jsのpackage.jsonをGUIで対話的に生成。依存パッケージ、スクリプト、ライセンス等を設定してJSONを出力します。</p>
+    </div>
+    <div class="tool-content">
+      <div class="grid-2">
+        <!-- Left: Form -->
+        <div>
+          <!-- Basic Info -->
+          <div class="section-title">基本情報</div>
+          <div class="form-group">
+            <label class="label">パッケージ名 <span style="color:#e74c3c">*</span></label>
+            <input type="text" id="pkgName" placeholder="my-package" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label class="label">バージョン</label>
+            <input type="text" id="pkgVersion" value="1.0.0" placeholder="1.0.0" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label class="label">説明</label>
+            <input type="text" id="pkgDesc" placeholder="パッケージの説明" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label class="label">メインファイル</label>
+            <input type="text" id="pkgMain" value="index.js" placeholder="index.js" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label class="label">作者</label>
+            <input type="text" id="pkgAuthor" placeholder="Your Name <email@example.com>" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label class="label">ライセンス</label>
+            <select id="pkgLicense" onchange="updatePreview()">
+              <option value="MIT">MIT</option>
+              <option value="ISC">ISC</option>
+              <option value="Apache-2.0">Apache-2.0</option>
+              <option value="GPL-3.0">GPL-3.0</option>
+              <option value="BSD-3-Clause">BSD-3-Clause</option>
+              <option value="UNLICENSED">UNLICENSED</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="label">キーワード（カンマ区切り）</label>
+            <input type="text" id="pkgKeywords" placeholder="nodejs, tool, utility" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <div class="checkbox-group">
+              <input type="checkbox" id="pkgPrivate" onchange="updatePreview()">
+              <label for="pkgPrivate">private（npmに公開しない）</label>
+            </div>
+          </div>
+
+          <!-- Scripts -->
+          <div class="section-title">スクリプト</div>
+          <div class="btn-group">
+            <button class="btn-secondary btn-sm" onclick="addScriptPreset('test','jest')">+ test</button>
+            <button class="btn-secondary btn-sm" onclick="addScriptPreset('build','vite build')">+ build</button>
+            <button class="btn-secondary btn-sm" onclick="addScriptPreset('start','node index.js')">+ start</button>
+            <button class="btn-secondary btn-sm" onclick="addScriptPreset('dev','nodemon index.js')">+ dev</button>
+          </div>
+          <div id="scriptsList"></div>
+          <button class="btn-primary btn-sm" onclick="addScriptRow()">+ スクリプトを追加</button>
+
+          <!-- Dependencies -->
+          <div class="section-title" style="margin-top:1.5rem">依存パッケージ</div>
+          <div id="depsList"></div>
+          <button class="btn-primary btn-sm" onclick="addDepRow()">+ パッケージを追加</button>
+
+          <!-- Repository -->
+          <div class="section-title" style="margin-top:1.5rem">リポジトリ</div>
+          <div class="form-group">
+            <label class="label">リポジトリURL</label>
+            <input type="text" id="pkgRepoUrl" placeholder="https://github.com/user/repo.git" oninput="updatePreview()">
+          </div>
+
+          <!-- Engines -->
+          <div class="section-title">エンジン要件</div>
+          <div class="form-group">
+            <label class="label">Node.jsバージョン</label>
+            <input type="text" id="pkgNodeEngine" placeholder=">=18.0.0" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label class="label">npmバージョン</label>
+            <input type="text" id="pkgNpmEngine" placeholder=">=8.0.0" oninput="updatePreview()">
+          </div>
+        </div>
+
+        <!-- Right: Preview -->
+        <div>
+          <div class="section-title">JSONプレビュー（リアルタイム）</div>
+          <pre class="result-box" id="jsonPreview">{}</pre>
+          <div class="btn-group" style="margin-top:1rem">
+            <button class="btn-success" onclick="copyJson()">コピー</button>
+            <button class="btn-primary" onclick="downloadJson()">ダウンロード</button>
+            <button class="btn-danger" onclick="resetAll()">リセット</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+    </div>
+    <p style="color:#aaa;font-size:0.9rem">© 2024 ToolBox - 開発者向けツール集</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
+function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('コピーしました')).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('コピーしました');});}
+
+let scriptRows = [];
+let depRows = [];
+
+function addScriptRow(key='', value='') {
+  const id = Date.now() + Math.random();
+  scriptRows.push({id, key, value});
+  renderScripts();
+}
+
+function addScriptPreset(key, value) {
+  const exists = scriptRows.find(r => r.key === key);
+  if (exists) { exists.value = value; }
+  else { scriptRows.push({id: Date.now() + Math.random(), key, value}); }
+  renderScripts();
+  updatePreview();
+}
+
+function renderScripts() {
+  const container = document.getElementById('scriptsList');
+  container.innerHTML = '';
+  scriptRows.forEach((row, i) => {
+    const div = document.createElement('div');
+    div.className = 'entry-row';
+    div.innerHTML = `
+      <input type="text" placeholder="スクリプト名" value="${escapeAttr(row.key)}" oninput="scriptRows[${i}].key=this.value;updatePreview()">
+      <input type="text" placeholder="コマンド" value="${escapeAttr(row.value)}" oninput="scriptRows[${i}].value=this.value;updatePreview()">
+      <button class="btn-danger btn-sm" onclick="removeScript(${i})">✕</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function removeScript(i) { scriptRows.splice(i, 1); renderScripts(); updatePreview(); }
+
+function addDepRow(name='', version='', type='dependencies') {
+  const id = Date.now() + Math.random();
+  depRows.push({id, name, version, type});
+  renderDeps();
+}
+
+function renderDeps() {
+  const container = document.getElementById('depsList');
+  container.innerHTML = '';
+  depRows.forEach((row, i) => {
+    const div = document.createElement('div');
+    div.className = 'entry-row';
+    div.innerHTML = `
+      <input type="text" placeholder="パッケージ名" value="${escapeAttr(row.name)}" oninput="depRows[${i}].name=this.value;updatePreview()">
+      <input type="text" placeholder="^1.0.0" value="${escapeAttr(row.version)}" oninput="depRows[${i}].version=this.value;updatePreview()" style="flex:0 0 120px">
+      <select onchange="depRows[${i}].type=this.value;updatePreview()">
+        <option value="dependencies" ${row.type==='dependencies'?'selected':''}>dependencies</option>
+        <option value="devDependencies" ${row.type==='devDependencies'?'selected':''}>devDependencies</option>
+        <option value="peerDependencies" ${row.type==='peerDependencies'?'selected':''}>peerDependencies</option>
+      </select>
+      <button class="btn-danger btn-sm" onclick="removeDep(${i})">✕</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function removeDep(i) { depRows.splice(i, 1); renderDeps(); updatePreview(); }
+
+function escapeAttr(str) { return str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function buildJson() {
+  const obj = {};
+  const name = document.getElementById('pkgName').value.trim();
+  const version = document.getElementById('pkgVersion').value.trim();
+  const desc = document.getElementById('pkgDesc').value.trim();
+  const main = document.getElementById('pkgMain').value.trim();
+  const author = document.getElementById('pkgAuthor').value.trim();
+  const license = document.getElementById('pkgLicense').value;
+  const keywords = document.getElementById('pkgKeywords').value.trim();
+  const isPrivate = document.getElementById('pkgPrivate').checked;
+  const repoUrl = document.getElementById('pkgRepoUrl').value.trim();
+  const nodeEngine = document.getElementById('pkgNodeEngine').value.trim();
+  const npmEngine = document.getElementById('pkgNpmEngine').value.trim();
+
+  if (name) obj.name = name;
+  if (version) obj.version = version;
+  if (desc) obj.description = desc;
+  if (isPrivate) obj.private = true;
+  if (main && main !== 'index.js') obj.main = main;
+  else if (main) obj.main = main;
+
+  // Scripts
+  const scripts = {};
+  scriptRows.forEach(r => { if(r.key.trim()) scripts[r.key.trim()] = r.value; });
+  if (Object.keys(scripts).length > 0) obj.scripts = scripts;
+
+  // Keywords
+  if (keywords) {
+    obj.keywords = keywords.split(',').map(k => k.trim()).filter(Boolean);
+  }
+
+  if (author) obj.author = author;
+  if (license) obj.license = license;
+
+  // Dependencies
+  const deps = {}, devDeps = {}, peerDeps = {};
+  depRows.forEach(r => {
+    if (!r.name.trim()) return;
+    if (r.type === 'dependencies') deps[r.name.trim()] = r.version || '*';
+    else if (r.type === 'devDependencies') devDeps[r.name.trim()] = r.version || '*';
+    else if (r.type === 'peerDependencies') peerDeps[r.name.trim()] = r.version || '*';
+  });
+  if (Object.keys(deps).length > 0) obj.dependencies = deps;
+  if (Object.keys(devDeps).length > 0) obj.devDependencies = devDeps;
+  if (Object.keys(peerDeps).length > 0) obj.peerDependencies = peerDeps;
+
+  // Repository
+  if (repoUrl) obj.repository = { type: 'git', url: repoUrl };
+
+  // Engines
+  const engines = {};
+  if (nodeEngine) engines.node = nodeEngine;
+  if (npmEngine) engines.npm = npmEngine;
+  if (Object.keys(engines).length > 0) obj.engines = engines;
+
+  return obj;
+}
+
+function updatePreview() {
+  const obj = buildJson();
+  document.getElementById('jsonPreview').textContent = JSON.stringify(obj, null, 2);
+}
+
+function copyJson() {
+  const obj = buildJson();
+  copyText(JSON.stringify(obj, null, 2));
+}
+
+function downloadJson() {
+  const obj = buildJson();
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'package.json';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast('ダウンロードしました');
+}
+
+function resetAll() {
+  document.getElementById('pkgName').value = '';
+  document.getElementById('pkgVersion').value = '1.0.0';
+  document.getElementById('pkgDesc').value = '';
+  document.getElementById('pkgMain').value = 'index.js';
+  document.getElementById('pkgAuthor').value = '';
+  document.getElementById('pkgLicense').value = 'MIT';
+  document.getElementById('pkgKeywords').value = '';
+  document.getElementById('pkgPrivate').checked = false;
+  document.getElementById('pkgRepoUrl').value = '';
+  document.getElementById('pkgNodeEngine').value = '';
+  document.getElementById('pkgNpmEngine').value = '';
+  scriptRows = [];
+  depRows = [];
+  renderScripts();
+  renderDeps();
+  updatePreview();
+  showToast('リセットしました');
+}
+
+// Initialize
+updatePreview();
+</script>
+</body>
+</html>

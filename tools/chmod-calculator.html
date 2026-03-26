@@ -9,636 +9,252 @@
   gtag('js', new Date());
   gtag('config', 'G-JPE0M70GR8');
 </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="chmod 計算機。数値表記とシンボリック表記を相互変換でき、GUIでファイル権限を設定できます。">
-    <meta name="keywords" content="chmod, ファイル権限, Linux, パーミッション, IT・インフラ">
-    <meta name="author" content="ToolBox">
-    <meta name="theme-color" content="#007bff">
-    <title>chmod 計算機 - ToolBox</title>
+    <title>chmod（パーミッション）計算機 | ToolBox</title>
+    <meta name="description" content="Unixファイルパーミッション計算機。rwxビット、8進数、シンボル表記を相互変換。">
+    <meta property="og:title" content="chmod（パーミッション）計算機 | ToolBox">
+    <meta property="og:description" content="Unixファイルパーミッション計算機。rwxビット、8進数、シンボル表記を相互変換。">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="chmod（パーミッション）計算機 | ToolBox">
+    <link rel="canonical" href="https://web-tool-site.com/tools/chmod-calculator.html">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"WebApplication","name":"chmod（パーミッション）計算機","description":"Unixファイルパーミッション計算機。rwxビット、8進数、シンボル表記を相互変換。","url":"https://web-tool-site.com/tools/chmod-calculator.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}
+    </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
+        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { color: #555; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        nav a:hover { color: #4a90e2; }
+        .tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
+        .tool-header { background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%); color: white; padding: 2rem; text-align: center; }
+        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .tool-header p { font-size: 1.1rem; opacity: 0.9; }
+        .tool-content { padding: 2rem; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+        .btn-primary { background: #4a90e2; color: white; }
+        .btn-primary:hover { background: #357abd; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(74,144,226,0.4); }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        textarea, input[type="text"], input[type="number"], select { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        textarea:focus, input:focus, select:focus { outline: none; border-color: #4a90e2; box-shadow: 0 0 0 3px rgba(74,144,226,0.1); }
+        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .result-box { background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; white-space: pre-wrap; word-break: break-all; min-height: 60px; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; display: none; }
+        .label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
+        .form-group { margin-bottom: 1.5rem; }
+        footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
+        .footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .footer-inner .footer-links a { color: #aaa; text-decoration: none; }
+        .footer-inner .footer-links a:hover { color: white; }
+        @media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } nav ul { gap: 1rem; } .tool-header h1 { font-size: 1.5rem; } }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            color: #333;
-        }
-
-        header {
-            background: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 1rem 2rem;
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #007bff;
-        }
-
-        nav {
-            display: flex;
-            gap: 2rem;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        nav a:hover {
-            color: #007bff;
-        }
-
-        main {
-            flex: 1;
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .ad-banner {
-            width: 100%;
-            margin-bottom: 2rem;
-        }
-
-        .ad-placeholder {
-            background: #f5f5f5;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .tool-page {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .tool-page h1 {
-            color: #333;
-            margin-bottom: 1.5rem;
-            font-size: 2rem;
-        }
-
-        .preset-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-
-        .preset-btn {
-            padding: 0.5rem 1rem;
-            border: 2px solid #007bff;
-            background: white;
-            color: #007bff;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .preset-btn:hover {
-            background: #007bff;
-            color: white;
-        }
-
-        .form-section {
-            margin-bottom: 2rem;
-        }
-
-        .form-section h2 {
-            font-size: 1.1rem;
-            color: #333;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #007bff;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-
-        .permission-group {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-
-        .permission-group h3 {
-            color: #333;
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-
-        .permission-row {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .permission-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex: 1;
-        }
-
-        .permission-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #007bff;
-        }
-
-        .permission-item label {
-            cursor: pointer;
-            font-weight: 500;
-            user-select: none;
-        }
-
-        .permission-value {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            color: #007bff;
-            font-weight: 600;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        .output-section {
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .output-section h3 {
-            color: #333;
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-
-        .output-item {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .output-item label {
-            display: block;
-            font-weight: 600;
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .output-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.3rem;
-            color: #007bff;
-            font-weight: 600;
-            user-select: all;
-        }
-
-        .command-output {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            word-break: break-all;
-            color: #333;
-            user-select: all;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-        }
-
-        button {
-            flex: 1;
-            min-width: 200px;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-generate {
-            background: #007bff;
-            color: white;
-        }
-
-        .btn-generate:hover {
-            background: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-        }
-
-        .btn-copy {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-copy:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-        }
-
-        footer {
-            background: white;
-            padding: 1.5rem 2rem;
-            text-align: center;
-            color: #666;
-            font-size: 0.9rem;
-            margin-top: auto;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: #333;
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            nav {
-                gap: 1rem;
-                flex-direction: column;
-            }
-
-            main {
-                padding: 1rem;
-            }
-
-            .tool-page {
-                padding: 1.5rem;
-            }
-
-            .permission-row {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            button {
-                min-width: unset;
-            }
-        }
+        .perm-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+        .perm-table th, .perm-table td { border: 1px solid #ddd; padding: 0.75rem 1rem; text-align: center; }
+        .perm-table th { background: #f8f9fa; font-weight: 600; }
+        .perm-table td label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; cursor: pointer; font-size: 0.9rem; }
+        .perm-table input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #f7971e; }
+        .perm-row-label { font-weight: 700; font-size: 1rem; }
+        .octal-input-wrap { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .octal-input-wrap input { max-width: 120px; font-size: 1.5rem; text-align: center; font-weight: 700; }
+        .symbolic-display { font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; color: #2c3e50; letter-spacing: 2px; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #ddd; display: inline-block; min-width: 180px; text-align: center; }
+        .perm-section { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .preset-btn { padding: 0.5rem 1rem; background: #fff; border: 2px solid #f7971e; color: #f7971e; border-radius: 6px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+        .preset-btn:hover { background: #f7971e; color: white; }
+        .copy-btn-small { padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #4a90e2; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .copy-btn-small:hover { background: #357abd; }
+        @media (max-width: 700px) { .perm-section { grid-template-columns: 1fr; } .perm-table { font-size: 0.85rem; } }
     </style>
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <div class="logo">ToolBox</div>
-            <nav>
-                <a href="../index.html">ホーム</a>
-                <a href="../index.html#tools">ツール一覧</a>
-            </nav>
+        <div class="header-container">
+            <a href="../index.html" class="logo">ToolBox</a>
+            <nav><ul><li><a href="../index.html">ホーム</a></li><li><a href="../index.html#tools">ツール一覧</a></li></ul></nav>
         </div>
     </header>
-
-    <main>
-
-        <div class="tool-page">
-            <h1>chmod 計算機</h1>
-
-            <div class="form-section">
-                <h2>よく使うパターン</h2>
-                <div class="preset-buttons">
-                    <button class="preset-btn" onclick="loadPreset('644')">644 (ファイル標準)</button>
-                    <button class="preset-btn" onclick="loadPreset('755')">755 (ディレクトリ標準)</button>
-                    <button class="preset-btn" onclick="loadPreset('777')">777 (全権限)</button>
-                    <button class="preset-btn" onclick="loadPreset('600')">600 (所有者のみ)</button>
-                    <button class="preset-btn" onclick="loadPreset('700')">700 (所有者のみ実行可)</button>
-                    <button class="preset-btn" onclick="loadPreset('750')">750 (グループ読取)</button>
-                </div>
+    <div class="tool-page">
+        <div class="tool-card-main">
+            <div class="tool-header">
+                <h1>chmod（パーミッション）計算機</h1>
+                <p>Unixファイルパーミッションを視覚的に計算・変換</p>
             </div>
-
-            <div class="form-section">
-                <h2>数値表記入力</h2>
+            <div class="tool-content">
                 <div class="form-group">
-                    <label for="numericInput">数値 (例: 755):</label>
-                    <input type="text" id="numericInput" placeholder="755" maxlength="4" oninput="updateFromNumeric()">
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h2>GUI権限設定</h2>
-
-                <div class="permission-group">
-                    <h3>所有者 (Owner)</h3>
-                    <div class="permission-row">
-                        <div class="permission-item">
-                            <input type="checkbox" id="ownerRead" onchange="updateFromGui()">
-                            <label for="ownerRead">読取 (r)</label>
-                        </div>
-                        <div class="permission-item">
-                            <input type="checkbox" id="ownerWrite" onchange="updateFromGui()">
-                            <label for="ownerWrite">書込 (w)</label>
-                        </div>
-                        <div class="permission-item">
-                            <input type="checkbox" id="ownerExecute" onchange="updateFromGui()">
-                            <label for="ownerExecute">実行 (x)</label>
-                        </div>
-                        <div class="permission-value" id="ownerValue">0</div>
+                    <span class="label">プリセット</span>
+                    <div class="btn-group">
+                        <button class="preset-btn" onclick="applyPreset('755')">755</button>
+                        <button class="preset-btn" onclick="applyPreset('644')">644</button>
+                        <button class="preset-btn" onclick="applyPreset('777')">777</button>
+                        <button class="preset-btn" onclick="applyPreset('700')">700</button>
+                        <button class="preset-btn" onclick="applyPreset('600')">600</button>
+                        <button class="preset-btn" onclick="applyPreset('400')">400</button>
                     </div>
                 </div>
 
-                <div class="permission-group">
-                    <h3>グループ (Group)</h3>
-                    <div class="permission-row">
-                        <div class="permission-item">
-                            <input type="checkbox" id="groupRead" onchange="updateFromGui()">
-                            <label for="groupRead">読取 (r)</label>
+                <div class="form-group">
+                    <span class="label">パーミッションビット</span>
+                    <table class="perm-table">
+                        <thead>
+                            <tr>
+                                <th>対象</th>
+                                <th>読み取り (r = 4)</th>
+                                <th>書き込み (w = 2)</th>
+                                <th>実行 (x = 1)</th>
+                                <th>値</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="perm-row-label">Owner<br><small style="font-weight:400;color:#888">所有者</small></td>
+                                <td><label><input type="checkbox" id="or" onchange="fromCheckboxes()"> r</label></td>
+                                <td><label><input type="checkbox" id="ow" onchange="fromCheckboxes()"> w</label></td>
+                                <td><label><input type="checkbox" id="ox" onchange="fromCheckboxes()"> x</label></td>
+                                <td id="oval" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.2rem;">0</td>
+                            </tr>
+                            <tr>
+                                <td class="perm-row-label">Group<br><small style="font-weight:400;color:#888">グループ</small></td>
+                                <td><label><input type="checkbox" id="gr" onchange="fromCheckboxes()"> r</label></td>
+                                <td><label><input type="checkbox" id="gw" onchange="fromCheckboxes()"> w</label></td>
+                                <td><label><input type="checkbox" id="gx" onchange="fromCheckboxes()"> x</label></td>
+                                <td id="gval" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.2rem;">0</td>
+                            </tr>
+                            <tr>
+                                <td class="perm-row-label">Other<br><small style="font-weight:400;color:#888">その他</small></td>
+                                <td><label><input type="checkbox" id="rr" onchange="fromCheckboxes()"> r</label></td>
+                                <td><label><input type="checkbox" id="rw" onchange="fromCheckboxes()"> w</label></td>
+                                <td><label><input type="checkbox" id="rx" onchange="fromCheckboxes()"> x</label></td>
+                                <td id="rval" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.2rem;">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="perm-section">
+                    <div class="form-group">
+                        <span class="label">8進数（Octal）</span>
+                        <div class="octal-input-wrap">
+                            <input type="text" id="octalInput" maxlength="3" placeholder="755" oninput="fromOctal()">
+                            <button class="copy-btn-small" onclick="copyText(document.getElementById('octalInput').value)">コピー</button>
                         </div>
-                        <div class="permission-item">
-                            <input type="checkbox" id="groupWrite" onchange="updateFromGui()">
-                            <label for="groupWrite">書込 (w)</label>
+                        <small style="color:#888;margin-top:0.5rem;display:block;">0〜7 の3桁で入力</small>
+                    </div>
+                    <div class="form-group">
+                        <span class="label">シンボル表記（Symbolic）</span>
+                        <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+                            <span class="symbolic-display" id="symbolicDisplay">---------</span>
+                            <button class="copy-btn-small" onclick="copyText(document.getElementById('symbolicDisplay').textContent)">コピー</button>
                         </div>
-                        <div class="permission-item">
-                            <input type="checkbox" id="groupExecute" onchange="updateFromGui()">
-                            <label for="groupExecute">実行 (x)</label>
-                        </div>
-                        <div class="permission-value" id="groupValue">0</div>
                     </div>
                 </div>
 
-                <div class="permission-group">
-                    <h3>その他 (Other)</h3>
-                    <div class="permission-row">
-                        <div class="permission-item">
-                            <input type="checkbox" id="otherRead" onchange="updateFromGui()">
-                            <label for="otherRead">読取 (r)</label>
-                        </div>
-                        <div class="permission-item">
-                            <input type="checkbox" id="otherWrite" onchange="updateFromGui()">
-                            <label for="otherWrite">書込 (w)</label>
-                        </div>
-                        <div class="permission-item">
-                            <input type="checkbox" id="otherExecute" onchange="updateFromGui()">
-                            <label for="otherExecute">実行 (x)</label>
-                        </div>
-                        <div class="permission-value" id="otherValue">0</div>
-                    </div>
+                <div class="form-group">
+                    <span class="label">chmodコマンド</span>
+                    <div class="result-box" id="cmdDisplay" style="font-size:1.1rem;"></div>
+                    <button class="copy-btn-small" style="margin-top:0.5rem;" onclick="copyText(document.getElementById('cmdDisplay').textContent)">コピー</button>
                 </div>
             </div>
-
-            <div class="output-section">
-                <h3>変換結果</h3>
-
-                <div class="output-item">
-                    <label>数値表記 (Numeric):</label>
-                    <div class="output-value" id="numericOutput">644</div>
-                </div>
-
-                <div class="output-item">
-                    <label>シンボリック表記 (Symbolic):</label>
-                    <div class="output-value" id="symbolicOutput">rw-r--r--</div>
-                </div>
-
-                <div class="output-item">
-                    <label>chmodコマンド:</label>
-                    <div class="command-output" id="chmodCommand">chmod 644 filename</div>
-                </div>
-            </div>
-
-            <div class="button-group">
-                <button class="btn-copy" onclick="copyCommand()">chmodコマンドをコピー</button>
-            </div>
         </div>
-    </main>
-
-    
-    <!-- SEO Content Section -->
-    <section class="tool-description-section" style="max-width:900px;margin:32px auto;padding:0 20px;">
-        <div style="background:#f8f9fa;border-radius:12px;padding:28px 24px;border:1px solid #eee;">
-            <h2 style="font-size:1.2rem;margin-bottom:12px;">chmod計算機とは？</h2>
-            <p style="font-size:14px;color:#555;line-height:1.8;margin-bottom:16px;">Linuxファイルパーミッションを計算するツールです。チェックボックスで権限を選択するだけで、対応するchmodの数値やシンボリック表記を生成できます。</p>
-            <h3 style="font-size:1rem;margin-bottom:8px;">こんな時に便利</h3>
-            <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px;">
-                <li>ファイルパーミッションの設定</li>
-                <li>Webサーバーの権限管理</li>
-                <li>セキュリティ設定の確認</li>
-                <li>デプロイスクリプトの作成</li>
-            </ul>
-            <p style="font-size:13px;color:#888;margin-top:16px;">
-                このツールはブラウザ上で完全に動作します。入力データがサーバーに送信されることはありません。
-            </p>
-        </div>
-    </section>
-
-    <footer class="footer">
-    <div class="footer-inner">
-        <div class="footer-links">
-            <a href="../index.html">ホーム</a>
-            <a href="../index.html#tools">ツール一覧</a>
-            <a href="../about.html">このサイトについて</a>
-            <a href="../contact.html">お問い合わせ</a>
-            <a href="../privacy.html">プライバシーポリシー</a>
-            <a href="../terms.html">利用規約</a>
-        </div>
-        <p>&copy; 2026 ToolBox. All rights reserved.</p>
     </div>
-</footer>
-
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="../index.html">ホーム</a>
+                <a href="../index.html#tools">ツール一覧</a>
+                <a href="../about.html">このサイトについて</a>
+                <a href="../contact.html">お問い合わせ</a>
+                <a href="../privacy.html">プライバシーポリシー</a>
+                <a href="../terms.html">利用規約</a>
+            </div>
+            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+        </div>
+    </footer>
     <div class="toast" id="toast"></div>
-
     <script>
-        const toast = document.getElementById('toast');
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2000);
+    }
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました')).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('コピーしました');
+        });
+    }
 
-        function calculatePermissionValue(read, write, execute) {
-            return (read ? 4 : 0) + (write ? 2 : 0) + (execute ? 1 : 0);
-        }
+    function getBitVal(id) { return document.getElementById(id).checked ? 1 : 0; }
 
-        function updateFromGui() {
-            const ownerR = document.getElementById('ownerRead').checked;
-            const ownerW = document.getElementById('ownerWrite').checked;
-            const ownerX = document.getElementById('ownerExecute').checked;
+    function fromCheckboxes() {
+        const o = (getBitVal('or') * 4) + (getBitVal('ow') * 2) + (getBitVal('ox') * 1);
+        const g = (getBitVal('gr') * 4) + (getBitVal('gw') * 2) + (getBitVal('gx') * 1);
+        const r = (getBitVal('rr') * 4) + (getBitVal('rw') * 2) + (getBitVal('rx') * 1);
+        document.getElementById('oval').textContent = o;
+        document.getElementById('gval').textContent = g;
+        document.getElementById('rval').textContent = r;
+        const octal = '' + o + g + r;
+        document.getElementById('octalInput').value = octal;
+        updateSymbolic(o, g, r);
+        updateCmd(octal);
+    }
 
-            const groupR = document.getElementById('groupRead').checked;
-            const groupW = document.getElementById('groupWrite').checked;
-            const groupX = document.getElementById('groupExecute').checked;
+    function fromOctal() {
+        const val = document.getElementById('octalInput').value.trim();
+        if (!/^[0-7]{1,3}$/.test(val)) return;
+        const padded = val.padStart(3, '0');
+        const o = parseInt(padded[0]);
+        const g = parseInt(padded[1]);
+        const r = parseInt(padded[2]);
+        setCheckboxes('o', o);
+        setCheckboxes('g', g);
+        setCheckboxes('r', r);
+        document.getElementById('oval').textContent = o;
+        document.getElementById('gval').textContent = g;
+        document.getElementById('rval').textContent = r;
+        updateSymbolic(o, g, r);
+        updateCmd(padded);
+    }
 
-            const otherR = document.getElementById('otherRead').checked;
-            const otherW = document.getElementById('otherWrite').checked;
-            const otherX = document.getElementById('otherExecute').checked;
+    function setCheckboxes(prefix, val) {
+        document.getElementById(prefix + 'r').checked = (val & 4) !== 0;
+        document.getElementById(prefix + 'w').checked = (val & 2) !== 0;
+        document.getElementById(prefix + 'x').checked = (val & 1) !== 0;
+    }
 
-            const owner = calculatePermissionValue(ownerR, ownerW, ownerX);
-            const group = calculatePermissionValue(groupR, groupW, groupX);
-            const other = calculatePermissionValue(otherR, otherW, otherX);
+    function bitToSymbol(val) {
+        return ((val & 4) ? 'r' : '-') + ((val & 2) ? 'w' : '-') + ((val & 1) ? 'x' : '-');
+    }
 
-            const numeric = '' + owner + group + other;
+    function updateSymbolic(o, g, r) {
+        document.getElementById('symbolicDisplay').textContent = bitToSymbol(o) + bitToSymbol(g) + bitToSymbol(r);
+    }
 
-            document.getElementById('ownerValue').textContent = owner;
-            document.getElementById('groupValue').textContent = group;
-            document.getElementById('otherValue').textContent = other;
-            document.getElementById('numericInput').value = numeric;
-            document.getElementById('numericOutput').textContent = numeric;
+    function updateCmd(octal) {
+        document.getElementById('cmdDisplay').textContent = 'chmod ' + octal + ' filename';
+    }
 
-            const symbolic = (ownerR ? 'r' : '-') + (ownerW ? 'w' : '-') + (ownerX ? 'x' : '-') +
-                            (groupR ? 'r' : '-') + (groupW ? 'w' : '-') + (groupX ? 'x' : '-') +
-                            (otherR ? 'r' : '-') + (otherW ? 'w' : '-') + (otherX ? 'x' : '-');
+    function applyPreset(val) {
+        document.getElementById('octalInput').value = val;
+        fromOctal();
+    }
 
-            document.getElementById('symbolicOutput').textContent = symbolic;
-            document.getElementById('chmodCommand').textContent = `chmod ${numeric} filename`;
-        }
-
-        function updateFromNumeric() {
-            const numeric = document.getElementById('numericInput').value.replace(/\D/g, '');
-            if (numeric.length !== 3) return;
-
-            const owner = parseInt(numeric[0]);
-            const group = parseInt(numeric[1]);
-            const other = parseInt(numeric[2]);
-
-            const ownerR = (owner & 4) !== 0;
-            const ownerW = (owner & 2) !== 0;
-            const ownerX = (owner & 1) !== 0;
-
-            const groupR = (group & 4) !== 0;
-            const groupW = (group & 2) !== 0;
-            const groupX = (group & 1) !== 0;
-
-            const otherR = (other & 4) !== 0;
-            const otherW = (other & 2) !== 0;
-            const otherX = (other & 1) !== 0;
-
-            document.getElementById('ownerRead').checked = ownerR;
-            document.getElementById('ownerWrite').checked = ownerW;
-            document.getElementById('ownerExecute').checked = ownerX;
-
-            document.getElementById('groupRead').checked = groupR;
-            document.getElementById('groupWrite').checked = groupW;
-            document.getElementById('groupExecute').checked = groupX;
-
-            document.getElementById('otherRead').checked = otherR;
-            document.getElementById('otherWrite').checked = otherW;
-            document.getElementById('otherExecute').checked = otherX;
-
-            document.getElementById('ownerValue').textContent = owner;
-            document.getElementById('groupValue').textContent = group;
-            document.getElementById('otherValue').textContent = other;
-
-            const symbolic = (ownerR ? 'r' : '-') + (ownerW ? 'w' : '-') + (ownerX ? 'x' : '-') +
-                            (groupR ? 'r' : '-') + (groupW ? 'w' : '-') + (groupX ? 'x' : '-') +
-                            (otherR ? 'r' : '-') + (otherW ? 'w' : '-') + (otherX ? 'x' : '-');
-
-            document.getElementById('symbolicOutput').textContent = symbolic;
-            document.getElementById('numericOutput').textContent = numeric;
-            document.getElementById('chmodCommand').textContent = `chmod ${numeric} filename`;
-        }
-
-        function loadPreset(preset) {
-            document.getElementById('numericInput').value = preset;
-            updateFromNumeric();
-        }
-
-        function copyCommand() {
-            const command = document.getElementById('chmodCommand').textContent;
-            navigator.clipboard.writeText(command).then(() => {
-                toast.textContent = 'chmodコマンドをコピーしました';
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 2000);
-            });
-        }
-
-        // Initialize with 644
-        loadPreset('644');
+    applyPreset('644');
     </script>
 </body>
 </html>
