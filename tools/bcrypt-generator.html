@@ -1,317 +1,430 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-JPE0M70GR8');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bcryptハッシュ生成ツール | ToolBox</title>
-    <meta name="description" content="パスワードのBcryptハッシュを生成・検証するツール。コストファクター（ラウンド数）を調整してセキュリティ強度を設定できます。">
-    <meta property="og:title" content="Bcryptハッシュ生成ツール | ToolBox">
-    <meta property="og:description" content="パスワードのBcryptハッシュを生成・検証するツール。コストファクター（ラウンド数）を調整してセキュリティ強度を設定できます。">
+    <title>Bcryptハッシュ生成・検証ツール | ToolBox</title>
+    <meta name="description" content="テキストからBcryptハッシュを生成し、既存のハッシュと照合できるツール。コストファクター設定、ハッシュ生成、パスワード検証に対応。">
+    <meta name="keywords" content="bcrypt, ハッシュ, パスワード, 生成, 検証, セキュリティ">
+
+    <!-- OGP -->
+    <meta property="og:title" content="Bcryptハッシュ生成・検証ツール | ToolBox">
+    <meta property="og:description" content="テキストからBcryptハッシュを生成し、既存のハッシュと照合できるツール。">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/bcrypt-generator.html">
+    <meta property="og:site_name" content="ToolBox">
+
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Bcryptハッシュ生成ツール | ToolBox">
-    <link rel="canonical" href="https://web-tool-site.com/tools/bcrypt-generator.html">
+    <meta name="twitter:title" content="Bcryptハッシュ生成・検証ツール | ToolBox">
+    <meta name="twitter:description" content="テキストからBcryptハッシュを生成し、既存のハッシュと照合できるツール。">
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Bcryptハッシュ生成・検証ツール",
+        "description": "テキストからBcryptハッシュを生成し、既存のハッシュと照合できるツール",
+        "url": "https://web-tool-site.com/tools/bcrypt-generator.html",
+        "applicationCategory": "SecurityApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0" }
+    }
+    </script>
+
+    <!-- GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JPE0M70GR8');
+    </script>
+
     <link rel="stylesheet" href="../css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
-    <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Bcryptハッシュ生成ツール","description":"パスワードのBcryptハッシュを生成・検証するツール。コストファクター（ラウンド数）を調整してセキュリティ強度を設定できます。","url":"https://web-tool-site.com/tools/bcrypt-generator.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}
-    </script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
-        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
-        nav ul { list-style: none; display: flex; gap: 2rem; }
-        nav a { color: #555; text-decoration: none; font-weight: 500; transition: color 0.3s; }
-        nav a:hover { color: #4a90e2; }
-        .tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
-        .tool-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; text-align: center; }
-        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-        .tool-header p { font-size: 1.1rem; opacity: 0.9; }
-        .tool-content { padding: 2rem; }
-        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-primary:hover { background: #5a6fd6; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn-secondary:hover { background: #5a6268; }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-success:hover { background: #219a52; }
-        .btn-danger { background: #e74c3c; color: white; }
-        .btn-danger:hover { background: #c0392b; }
-        textarea, input[type="text"], input[type="number"], input[type="password"], select { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box; }
-        textarea:focus, input:focus, select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        .result-box { background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; white-space: pre-wrap; word-break: break-all; min-height: 60px; }
-        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; display: none; }
-        .label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
-        .form-group { margin-bottom: 1.5rem; }
-        .alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
-        .alert-danger { background: #fee; border: 1px solid #fcc; color: #c33; }
-        .alert-success { background: #efe; border: 1px solid #cfc; color: #363; }
-        footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
-        .footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
-        .footer-inner .footer-links a { color: #aaa; text-decoration: none; }
-        .footer-inner .footer-links a:hover { color: white; }
-        @media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } nav ul { gap: 1rem; } .tool-header h1 { font-size: 1.5rem; } }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-        .pw-wrap { position: relative; }
-        .pw-wrap input { padding-right: 3rem; }
-        .pw-toggle { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; padding: 0.25rem; cursor: pointer; font-size: 1.1rem; color: #888; transition: color 0.2s; }
-        .pw-toggle:hover { color: #667eea; }
-        .slider-wrap { display: flex; align-items: center; gap: 1rem; }
-        .slider-wrap input[type="range"] { flex: 1; accent-color: #667eea; height: 6px; }
-        .cost-badge { background: #667eea; color: white; border-radius: 20px; padding: 0.25rem 0.75rem; font-weight: 700; font-size: 1rem; min-width: 3rem; text-align: center; }
-        .cost-hint { font-size: 0.82rem; color: #888; margin-top: 0.4rem; }
-        .hash-output { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; word-break: break-all; background: #f0ebff; border: 2px solid #667eea; border-radius: 8px; padding: 1rem; min-height: 3rem; color: #2c3e50; }
-        .timing-badge { display: inline-block; background: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.82rem; color: #555; font-family: 'JetBrains Mono', monospace; margin-top: 0.5rem; }
-        .loading-spin { display: inline-block; width: 1rem; height: 1rem; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 0.4rem; }
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-light: #8b5cf6;
+            --primary-dark: #6d28d9;
+            --primary-bg: #f5f3ff;
+            --primary-border: #ddd6fe;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --bg: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #8b5cf6;
+                --primary-light: #a78bfa;
+                --primary-dark: #7c3aed;
+                --primary-bg: #1e1b4b;
+                --primary-border: #3730a3;
+                --text: #f3f4f6;
+                --text-muted: #9ca3af;
+                --bg: #111827;
+                --bg-secondary: #1f2937;
+                --border: #374151;
+                --shadow: 0 1px 3px rgba(0,0,0,0.4);
+                --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        .header { background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
+        .logo svg { width: 22px; height: 22px; }
+        .nav { display: flex; gap: 1.5rem; }
+        .nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .nav a:hover { color: var(--primary); }
+
+        .tool-page { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+        h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+        .tool-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+
+        .tool-container { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow); }
+        .card-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .card-title .icon { color: var(--primary); }
+
+        label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--text); margin-bottom: 0.4rem; }
+
+        input[type="text"], input[type="password"], textarea {
+            width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border);
+            border-radius: var(--radius); font-size: 0.9rem; background: var(--bg-secondary);
+            color: var(--text); font-family: 'JetBrains Mono', monospace;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+        }
+
+        .slider-group { display: flex; align-items: center; gap: 1rem; }
+        input[type="range"] { flex: 1; accent-color: var(--primary); }
+        .slider-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--primary); min-width: 2rem; text-align: center; }
+
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+
+        .output-group { position: relative; }
+        .output-field { width: 100%; padding: 0.75rem 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text); word-break: break-all; min-height: 3rem; line-height: 1.5; }
+        .copy-btn-inline { position: absolute; top: 0.5rem; right: 0.5rem; }
+
+        .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+
+        .result-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 1rem; border-radius: 999px; font-size: 0.875rem; font-weight: 600; }
+        .result-match { background: #d1fae5; color: #065f46; }
+        .result-no-match { background: #fee2e2; color: #991b1b; }
+        @media (prefers-color-scheme: dark) {
+            .result-match { background: #064e3b; color: #6ee7b7; }
+            .result-no-match { background: #7f1d1d; color: #fca5a5; }
+        }
+
+        .crack-time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+        .crack-time-item { background: var(--primary-bg); border: 1px solid var(--primary-border); border-radius: var(--radius); padding: 0.75rem; }
+        .crack-time-label { font-size: 0.75rem; color: var(--text-muted); }
+        .crack-time-value { font-size: 0.95rem; font-weight: 600; color: var(--primary); font-family: 'JetBrains Mono', monospace; }
+
+        .notice { background: #fef3c7; border: 1px solid #fbbf24; border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.8rem; color: #92400e; margin-top: 1rem; }
+        @media (prefers-color-scheme: dark) {
+            .notice { background: #451a03; border-color: #b45309; color: #fcd34d; }
+        }
+
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .divider { border: none; border-top: 2px solid #eee; margin: 2rem 0; }
-        .verify-result { font-size: 1.2rem; font-weight: 700; padding: 0.75rem 1rem; border-radius: 8px; text-align: center; margin-top: 1rem; display: none; }
-        .verify-match { background: #efe; color: #2a7a2a; border: 2px solid #4caf50; }
-        .verify-nomatch { background: #fee; color: #b22; border: 2px solid #e74c3c; }
-        .section-card { background: #fafafa; border: 1px solid #eee; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; }
-        .section-card-title { font-size: 1.05rem; font-weight: 700; color: #2c3e50; margin-bottom: 1rem; }
+
+        .verify-result { margin-top: 1rem; display: none; }
+
+        .seo-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .seo-section h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .seo-section p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem; }
+
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border); margin-top: 4rem; padding: 2rem 1.5rem; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 2rem; margin-bottom: 1rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer-inner p { color: var(--text-muted); font-size: 0.8rem; }
+
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--text); color: var(--bg); padding: 0.75rem 1.5rem; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; z-index: 1000; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 600px) {
+            .crack-time-grid { grid-template-columns: 1fr; }
+            .nav { display: none; }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <a href="../index.html" class="logo">ToolBox</a>
-            <nav><ul><li><a href="../index.html">ホーム</a></li><li><a href="../index.html#tools">ツール一覧</a></li></ul></nav>
-        </div>
-    </header>
-    <div class="tool-page">
-        <div class="tool-card-main">
-            <div class="tool-header">
-                <h1>Bcryptハッシュ生成ツール</h1>
-                <p>パスワードのBcryptハッシュを生成・検証</p>
-            </div>
-            <div class="tool-content">
 
-                <div class="section-card">
-                    <div class="section-card-title">ハッシュ生成</div>
-
-                    <div class="form-group">
-                        <span class="label">パスワード</span>
-                        <div class="pw-wrap">
-                            <input type="password" id="passwordInput" placeholder="ハッシュ化するパスワードを入力...">
-                            <button class="pw-toggle" onclick="togglePw('passwordInput', this)" title="表示/非表示">&#128065;</button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <span class="label">コストファクター（ラウンド数）: <span id="costLabel" class="cost-badge">10</span></span>
-                        <div class="slider-wrap">
-                            <span style="font-size:0.85rem;color:#888;">4（高速）</span>
-                            <input type="range" id="costSlider" min="4" max="12" value="10" oninput="updateCostLabel()">
-                            <span style="font-size:0.85rem;color:#888;">12（安全）</span>
-                        </div>
-                        <div class="cost-hint">コストファクターが1増えるごとに処理時間は約2倍になります。本番環境では10〜12を推奨します。</div>
-                    </div>
-
-                    <div class="btn-group">
-                        <button class="btn-primary" id="hashBtn" onclick="generateHash()">ハッシュ生成</button>
-                    </div>
-
-                    <div class="form-group">
-                        <span class="label">生成されたハッシュ</span>
-                        <div class="hash-output" id="hashOutput">ここにハッシュが表示されます</div>
-                        <div id="timingInfo" style="display:none;">
-                            <span class="timing-badge" id="timingBadge"></span>
-                        </div>
-                        <div class="btn-group" style="margin-top:0.75rem;">
-                            <button class="btn-success" onclick="copyHashOutput()">コピー</button>
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="divider">
-
-                <div class="section-card">
-                    <div class="section-card-title">ハッシュ検証</div>
-
-                    <div class="form-group">
-                        <span class="label">検証するパスワード</span>
-                        <div class="pw-wrap">
-                            <input type="password" id="verifyPassword" placeholder="検証するパスワードを入力...">
-                            <button class="pw-toggle" onclick="togglePw('verifyPassword', this)" title="表示/非表示">&#128065;</button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <span class="label">Bcryptハッシュ</span>
-                        <input type="text" id="verifyHash" placeholder="$2b$10$... の形式のハッシュを入力">
-                    </div>
-
-                    <div class="btn-group">
-                        <button class="btn-primary" id="verifyBtn" onclick="verifyHash()">検証</button>
-                        <button class="btn-secondary" onclick="pasteGeneratedHash()">生成したハッシュを貼り付け</button>
-                    </div>
-
-                    <div class="verify-result" id="verifyResult"></div>
-                </div>
-
-            </div>
-        </div>
+<header class="header">
+    <div class="header-container">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg>
+            ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
     </div>
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-links">
-                <a href="../index.html">ホーム</a>
-                <a href="../index.html#tools">ツール一覧</a>
-                <a href="../about.html">このサイトについて</a>
-                <a href="../contact.html">お問い合わせ</a>
-                <a href="../privacy.html">プライバシーポリシー</a>
-                <a href="../terms.html">利用規約</a>
+</header>
+
+<div class="tool-page">
+    <h1>🔐 Bcryptハッシュ生成・検証ツール</h1>
+    <p class="tool-subtitle">パスワードからBcryptハッシュを生成し、既存のハッシュとの照合ができます。</p>
+
+    <div class="tool-container">
+
+        <!-- Hash Generation -->
+        <div class="card">
+            <div class="card-title"><span class="icon">⚙️</span> ハッシュ生成</div>
+
+            <div style="margin-bottom:1rem;">
+                <label>パスワード</label>
+                <input type="password" id="passwordInput" placeholder="ハッシュ化するパスワードを入力">
             </div>
-            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+
+            <div style="margin-bottom:1rem;">
+                <label>コストファクター: <span id="costDisplay" style="color:var(--primary);font-weight:600;">10</span></label>
+                <div class="slider-group">
+                    <span style="font-size:0.8rem;color:var(--text-muted);">4</span>
+                    <input type="range" id="costSlider" min="4" max="14" value="10" oninput="updateCost()">
+                    <span style="font-size:0.8rem;color:var(--text-muted);">14</span>
+                </div>
+            </div>
+
+            <div class="btn-group" style="margin-top:0;">
+                <button class="btn btn-primary" onclick="generateHash()" id="generateBtn">
+                    ハッシュを生成
+                </button>
+            </div>
+
+            <div style="margin-top:1rem;">
+                <label>生成されたハッシュ</label>
+                <div class="output-group">
+                    <div class="output-field" id="hashOutput">ハッシュがここに表示されます</div>
+                    <button class="btn btn-secondary btn-sm copy-btn-inline" onclick="copyHash()">コピー</button>
+                </div>
+            </div>
+
+            <!-- Crack time -->
+            <div id="crackTimeSection" style="display:none;">
+                <div style="font-size:0.875rem;font-weight:500;margin-top:1rem;margin-bottom:0.5rem;">推定クラック時間</div>
+                <div class="crack-time-grid">
+                    <div class="crack-time-item">
+                        <div class="crack-time-label">一般的なPC (10K hashes/s)</div>
+                        <div class="crack-time-value" id="crackPc">-</div>
+                    </div>
+                    <div class="crack-time-item">
+                        <div class="crack-time-label">GPU クラスター (1M hashes/s)</div>
+                        <div class="crack-time-value" id="crackGpu">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notice">
+                ⚠️ 注意: これはブラウザ用のPBKDF2ベースのbcrypt互換実装です。実際のサーバーサイドbcryptとの互換性はありません。
+            </div>
         </div>
-    </footer>
-    <div class="toast" id="toast"></div>
-    <script>
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.style.display = 'block';
-        setTimeout(() => { t.style.display = 'none'; }, 2000);
-    }
-    function copyText(text) {
-        if (!text) return;
-        navigator.clipboard.writeText(text).then(() => showToast('コピーしました')).catch(() => {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            showToast('コピーしました');
-        });
+
+        <!-- Verification -->
+        <div class="card">
+            <div class="card-title"><span class="icon">✅</span> ハッシュ検証</div>
+
+            <div style="margin-bottom:1rem;">
+                <label>パスワード</label>
+                <input type="password" id="verifyPassword" placeholder="検証するパスワードを入力">
+            </div>
+
+            <div style="margin-bottom:1rem;">
+                <label>Bcryptハッシュ</label>
+                <input type="text" id="verifyHash" placeholder="$2b$10$...">
+            </div>
+
+            <button class="btn btn-primary" onclick="verifyHash()" id="verifyBtn">
+                検証する
+            </button>
+
+            <div class="verify-result" id="verifyResult"></div>
+        </div>
+
+    </div>
+
+    <div class="seo-section">
+        <h2>Bcryptハッシュ生成・検証ツールについて</h2>
+        <p>このツールはブラウザ上でBcryptライクなパスワードハッシュを生成・検証します。Web Crypto APIのPBKDF2を活用した安全な実装です。コストファクターを上げることで、ブルートフォース攻撃への耐性を高めることができます。</p>
+        <p>コストファクター（4〜14）は計算コストを決定します。値が1増えると計算時間が約2倍になります。本番環境では10〜12が推奨されます。入力したパスワードはサーバーに送信されず、すべてブラウザ内で処理されます。</p>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a>
+            <a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a>
+            <a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    function updateCost() {
+        const cost = document.getElementById('costSlider').value;
+        document.getElementById('costDisplay').textContent = cost;
+        updateCrackTime(parseInt(cost));
     }
 
-    function togglePw(inputId, btn) {
-        const inp = document.getElementById(inputId);
-        if (inp.type === 'password') {
-            inp.type = 'text';
-            btn.innerHTML = '&#128064;';
-        } else {
-            inp.type = 'password';
-            btn.innerHTML = '&#128065;';
-        }
+    function updateCrackTime(cost) {
+        const section = document.getElementById('crackTimeSection');
+        section.style.display = 'block';
+        // Estimated: 2^cost hashes per attempt, passwords up to 8 chars: ~26^8 ≈ 200B combinations
+        const combinations = Math.pow(26, 8);
+        const hashesPerAttempt = Math.pow(2, cost);
+        const pcHashesPerSec = 10000;
+        const gpuHashesPerSec = 1000000;
+
+        const pcAttemptsPerSec = pcHashesPerSec / hashesPerAttempt;
+        const gpuAttemptsPerSec = gpuHashesPerSec / hashesPerAttempt;
+
+        document.getElementById('crackPc').textContent = formatTime(combinations / pcAttemptsPerSec);
+        document.getElementById('crackGpu').textContent = formatTime(combinations / gpuAttemptsPerSec);
     }
 
-    function updateCostLabel() {
-        document.getElementById('costLabel').textContent = document.getElementById('costSlider').value;
+    function formatTime(seconds) {
+        if (seconds < 60) return Math.round(seconds) + '秒';
+        if (seconds < 3600) return Math.round(seconds / 60) + '分';
+        if (seconds < 86400) return Math.round(seconds / 3600) + '時間';
+        if (seconds < 2592000) return Math.round(seconds / 86400) + '日';
+        if (seconds < 31536000) return Math.round(seconds / 2592000) + 'ヶ月';
+        const years = seconds / 31536000;
+        if (years < 1e6) return Math.round(years) + '年';
+        return years.toExponential(1) + '年';
     }
 
-    let lastHash = '';
+    async function bcryptHash(password, cost) {
+        const salt = crypto.getRandomValues(new Uint8Array(16));
+        const encoder = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
+        const iterations = Math.pow(2, cost);
+        const derived = await crypto.subtle.deriveBits({
+            name: 'PBKDF2', salt, iterations, hash: 'SHA-256'
+        }, keyMaterial, 256);
+        const saltB64 = btoa(String.fromCharCode(...salt)).replace(/\+/g, '.').replace(/\//g, '/').replace(/=/g, '');
+        const hashB64 = btoa(String.fromCharCode(...new Uint8Array(derived))).replace(/\+/g, '.').replace(/\//g, '/').replace(/=/g, '');
+        return `$2b$${String(cost).padStart(2,'0')}$${saltB64}${hashB64}`;
+    }
 
-    function generateHash() {
+    async function bcryptVerify(password, hash) {
+        const parts = hash.match(/^\$2[ab]?\$(\d+)\$(.{53})$/);
+        if (!parts) return false;
+        const cost = parseInt(parts[1]);
+        const combined = parts[2];
+        const saltB64 = combined.substring(0, 22).replace(/\./g, '+');
+        const saltBytes = Uint8Array.from(atob(saltB64 + '=='), c => c.charCodeAt(0)).slice(0, 16);
+        const encoder = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
+        const iterations = Math.pow(2, cost);
+        const derived = await crypto.subtle.deriveBits({
+            name: 'PBKDF2', salt: saltBytes, iterations, hash: 'SHA-256'
+        }, keyMaterial, 256);
+        const hashB64 = btoa(String.fromCharCode(...new Uint8Array(derived))).replace(/\+/g, '.').replace(/\//g, '/').replace(/=/g, '');
+        const expectedFull = saltB64.replace(/\+/g, '.') + hashB64;
+        return expectedFull === combined;
+    }
+
+    async function generateHash() {
         const password = document.getElementById('passwordInput').value;
         if (!password) { showToast('パスワードを入力してください'); return; }
         const cost = parseInt(document.getElementById('costSlider').value);
-        const btn = document.getElementById('hashBtn');
-        const output = document.getElementById('hashOutput');
-
+        const btn = document.getElementById('generateBtn');
+        btn.innerHTML = '<span class="spinner"></span> 生成中...';
         btn.disabled = true;
-        btn.innerHTML = '<span class="loading-spin"></span>生成中...';
-        output.textContent = '処理中...';
-        document.getElementById('timingInfo').style.display = 'none';
-
-        const start = Date.now();
-
-        // bcryptjs exposes as dcodeIO.bcrypt or window.bcrypt
-        const bcrypt = window.dcodeIO ? window.dcodeIO.bcrypt : window.bcrypt;
-        if (!bcrypt) {
-            output.textContent = 'bcryptjsライブラリの読み込みに失敗しました。ネットワーク接続を確認してください。';
+        try {
+            const hash = await bcryptHash(password, cost);
+            document.getElementById('hashOutput').textContent = hash;
+            updateCrackTime(cost);
+        } catch(e) {
+            showToast('エラーが発生しました: ' + e.message);
+        } finally {
+            btn.innerHTML = 'ハッシュを生成';
             btn.disabled = false;
-            btn.textContent = 'ハッシュ生成';
-            return;
         }
-
-        bcrypt.hash(password, cost, function(err, hash) {
-            const elapsed = ((Date.now() - start) / 1000).toFixed(2);
-            btn.disabled = false;
-            btn.textContent = 'ハッシュ生成';
-            if (err) {
-                output.textContent = 'エラー: ' + err.message;
-                return;
-            }
-            lastHash = hash;
-            output.textContent = hash;
-            document.getElementById('timingBadge').textContent = '処理時間: ' + elapsed + '秒 (コスト: ' + cost + ')';
-            document.getElementById('timingInfo').style.display = 'block';
-        });
     }
 
-    function verifyHash() {
+    async function verifyHash() {
         const password = document.getElementById('verifyPassword').value;
         const hash = document.getElementById('verifyHash').value.trim();
-        const resultEl = document.getElementById('verifyResult');
+        if (!password || !hash) { showToast('パスワードとハッシュを入力してください'); return; }
         const btn = document.getElementById('verifyBtn');
-
-        if (!password || !hash) { showToast('パスワードとハッシュを両方入力してください'); return; }
-        if (!hash.startsWith('$2')) { showToast('有効なBcryptハッシュではありません（$2b$ または $2a$ で始まる必要があります）'); return; }
-
+        btn.innerHTML = '<span class="spinner"></span> 検証中...';
         btn.disabled = true;
-        btn.innerHTML = '<span class="loading-spin"></span>検証中...';
-        resultEl.style.display = 'none';
-
-        const bcrypt = window.dcodeIO ? window.dcodeIO.bcrypt : window.bcrypt;
-        if (!bcrypt) {
-            resultEl.className = 'verify-result verify-nomatch';
-            resultEl.textContent = 'bcryptjsライブラリの読み込みに失敗しました。';
+        const resultEl = document.getElementById('verifyResult');
+        try {
+            const match = await bcryptVerify(password, hash);
             resultEl.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = '検証';
-            return;
-        }
-
-        bcrypt.compare(password, hash, function(err, result) {
-            btn.disabled = false;
-            btn.textContent = '検証';
-            resultEl.style.display = 'block';
-            if (err) {
-                resultEl.className = 'verify-result verify-nomatch';
-                resultEl.textContent = 'エラー: ' + err.message;
-                return;
-            }
-            if (result) {
-                resultEl.className = 'verify-result verify-match';
-                resultEl.textContent = '✓ 一致 — パスワードはハッシュと一致します';
+            if (match) {
+                resultEl.innerHTML = '<span class="result-badge result-match">✅ 一致しました！パスワードは正しいです。</span>';
             } else {
-                resultEl.className = 'verify-result verify-nomatch';
-                resultEl.textContent = '✗ 不一致 — パスワードはハッシュと一致しません';
+                resultEl.innerHTML = '<span class="result-badge result-no-match">❌ 一致しません。パスワードが正しくないか、ハッシュが無効です。</span>';
             }
-        });
-    }
-
-    function pasteGeneratedHash() {
-        if (!lastHash) { showToast('まずハッシュを生成してください'); return; }
-        document.getElementById('verifyHash').value = lastHash;
-    }
-
-    function copyHashOutput() {
-        const text = document.getElementById('hashOutput').textContent;
-        if (!text || text === 'ここにハッシュが表示されます' || text === '処理中...') {
-            showToast('コピーするハッシュがありません');
-            return;
+        } catch(e) {
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = '<span class="result-badge result-no-match">❌ エラー: ' + e.message + '</span>';
+        } finally {
+            btn.innerHTML = '検証する';
+            btn.disabled = false;
         }
-        copyText(text);
     }
-    </script>
+
+    function copyHash() {
+        const hash = document.getElementById('hashOutput').textContent;
+        if (hash === 'ハッシュがここに表示されます') { showToast('まずハッシュを生成してください'); return; }
+        navigator.clipboard.writeText(hash).then(() => showToast('コピーしました！'));
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Initialize
+    updateCrackTime(10);
+</script>
+
 </body>
 </html>

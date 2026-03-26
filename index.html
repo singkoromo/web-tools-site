@@ -34,7 +34,7 @@
     <h1>無料で使える<br><span class="gradient-text">便利ツール</span>集</h1>
     <p>開発者・クリエイターの日常作業を効率化する90種類のオンラインツール。データは一切サーバーに送信されません。</p>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="number">131</div><div class="label">ツール数</div></div>
+      <div class="hero-stat"><div class="number">122</div><div class="label">ツール数</div></div>
       <div class="hero-stat"><div class="number">12</div><div class="label">カテゴリ</div></div>
       <div class="hero-stat"><div class="number">0円</div><div class="label">完全無料</div></div>
     </div>
@@ -62,7 +62,7 @@
     <button class="category-chip" data-category="audio"><span class="chip-icon">🎵</span>オーディオ<span class="chip-count">8</span></button>
     <button class="category-chip" data-category="video"><span class="chip-icon">🎬</span>動画<span class="chip-count">9</span></button>
     <button class="category-chip" data-category="generator"><span class="chip-icon">🎲</span>生成<span class="chip-count">2</span></button>
-    <button class="category-chip" data-category="it"><span class="chip-icon">🖥️</span>IT・インフラ<span class="chip-count">29</span></button>
+    <button class="category-chip" data-category="it"><span class="chip-icon">🖥️</span>IT・インフラ<span class="chip-count">34</span></button>
   </div>
 
   <!-- No results -->
@@ -733,7 +733,7 @@
     <div class="section-header">
       <div class="section-icon dev-icon">🖥️</div>
       <h2>IT・インフラ系ツール</h2>
-      <span class="section-count">24 ツール</span>
+      <span class="section-count">34 ツール</span>
     </div>
     <div class="tool-grid">
       <a href="tools/cron-builder.html" class="tool-card" data-search="cron クーロン スケジューラ 定期実行 Linux タスク">
@@ -874,6 +874,56 @@
       <a href="tools/cors-generator.html" class="tool-card" data-search="CORS ヘッダー 生成 クロスオリジン Nginx Apache Express Flask アクセス制御">
         <div class="tool-icon red">🌐</div><h3>CORSヘッダー生成ツール</h3>
         <p>CORS設定を生成。Nginx・Apache・Node.js/Express・Python/Flask向けのコードを出力。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/bcrypt-generator.html" class="tool-card" data-search="bcrypt ハッシュ パスワード 生成 検証 セキュリティ PBKDF2 暗号化">
+        <div class="tool-icon purple">🔐</div><h3>Bcryptハッシュ生成・検証</h3>
+        <p>パスワードをBcrypt形式でハッシュ化。コストファクター設定・ハッシュ照合対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/jwt-debugger.html" class="tool-card" data-search="JWT デバッガー JSON Web Token デコード ペイロード 署名 検証 HS256 認証">
+        <div class="tool-icon blue">🔍</div><h3>JWTデバッガー</h3>
+        <p>JWTトークンをデコードしヘッダー・ペイロードを詳細表示。有効期限・HS256署名検証対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/svg-optimizer.html" class="tool-card" data-search="SVG 最適化 圧縮 軽量化 不要属性 削除 ベクター optimizer">
+        <div class="tool-icon green">⚡</div><h3>SVGオプティマイザー</h3>
+        <p>SVGコードの不要属性・コメント・空白を削除して最適化。削減率とプレビュー表示付き。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/base64-image.html" class="tool-card" data-search="Base64 画像 エンコード デコード data URI PNG JPEG 変換">
+        <div class="tool-icon teal">🖼️</div><h3>画像↔Base64変換</h3>
+        <p>画像ファイルをBase64/Data URIに変換、またはBase64から画像を復元。ドラッグ&ドロップ対応。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/css-animation-generator.html" class="tool-card" data-search="CSS アニメーション keyframes animation ジェネレーター フェード スライド Web制作">
+        <div class="tool-icon pink">✨</div><h3>CSSアニメーションジェネレーター</h3>
+        <p>GUIでCSSアニメーションを作成・プレビュー。@keyframesとanimationプロパティを自動生成。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/websocket-tester.html" class="tool-card" data-search="WebSocket テスト 接続 wss ws リアルタイム デバッグ echo">
+        <div class="tool-icon blue">🔌</div><h3>WebSocketテスター</h3>
+        <p>WebSocket接続のテスト・デバッグ。メッセージ送受信ログ・JSON整形表示・接続統計。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/cors-policy-generator.html" class="tool-card" data-search="CORS Cross-Origin ヘッダー セキュリティ Access-Control Nginx Apache Express">
+        <div class="tool-icon orange">🌐</div><h3>CORSポリシージェネレーター</h3>
+        <p>CORSヘッダー設定をGUIで構成。Nginx/Apache/.htaccess/Express用コードを自動生成。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/makefile-generator.html" class="tool-card" data-search="Makefile make ビルド 自動化 タスク GNU make CI/CD ジェネレーター">
+        <div class="tool-icon teal">🛠️</div><h3>Makefileジェネレーター</h3>
+        <p>GUIでMakefileを作成。変数・ターゲット・依存関係を設定してMakefileコードを自動生成。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/ssl-cert-decoder.html" class="tool-card" data-search="SSL TLS 証明書 PEM X.509 HTTPS 期限 デコード フィンガープリント SAN">
+        <div class="tool-icon green">🔒</div><h3>SSL証明書デコーダー</h3>
+        <p>PEM形式の証明書をデコードし、Subject・Issuer・有効期限・SANドメイン等を表示。</p>
+        <span class="arrow">使ってみる →</span>
+      </a>
+      <a href="tools/apache-vhost-generator.html" class="tool-card" data-search="Apache VirtualHost 設定 HTTP HTTPS SSL conf Webサーバー リバースプロキシ">
+        <div class="tool-icon red">🖥️</div><h3>Apache VirtualHost設定ジェネレーター</h3>
+        <p>Apache HTTP ServerのVirtualHost設定を生成。SSL/HTTPS・リバースプロキシ・Gzip対応。</p>
         <span class="arrow">使ってみる →</span>
       </a>
     </div>

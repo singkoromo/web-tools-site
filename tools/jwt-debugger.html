@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWTデバッガー | ToolBox</title>
+    <meta name="description" content="JWTトークンをデコードし、ヘッダー・ペイロードの詳細表示と署名検証ができるデバッグツール。">
+    <meta name="keywords" content="JWT, JSON Web Token, デコード, デバッグ, ペイロード, 署名, 認証">
+
+    <!-- OGP -->
+    <meta property="og:title" content="JWTデバッガー | ToolBox">
+    <meta property="og:description" content="JWTトークンをデコードし、ヘッダー・ペイロードの詳細表示と署名検証ができるデバッグツール。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/jwt-debugger.html">
+    <meta property="og:site_name" content="ToolBox">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="JWTデバッガー | ToolBox">
+    <meta name="twitter:description" content="JWTトークンをデコードし、ヘッダー・ペイロードの詳細表示と署名検証ができるデバッグツール。">
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "JWTデバッガー",
+        "description": "JWTトークンをデコードし、ヘッダー・ペイロードの詳細表示と署名検証ができるデバッグツール",
+        "url": "https://web-tool-site.com/tools/jwt-debugger.html",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0" }
+    }
+    </script>
+
+    <!-- GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JPE0M70GR8');
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --primary-bg: #eff6ff;
+            --primary-border: #bfdbfe;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --bg: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --col-header: #ef4444;
+            --col-payload: #7c3aed;
+            --col-sig: #2563eb;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #3b82f6;
+                --primary-light: #60a5fa;
+                --primary-dark: #2563eb;
+                --primary-bg: #1e3a5f;
+                --primary-border: #1e40af;
+                --text: #f3f4f6;
+                --text-muted: #9ca3af;
+                --bg: #111827;
+                --bg-secondary: #1f2937;
+                --border: #374151;
+                --shadow: 0 1px 3px rgba(0,0,0,0.4);
+                --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        .header { background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
+        .logo svg { width: 22px; height: 22px; }
+        .nav { display: flex; gap: 1.5rem; }
+        .nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .nav a:hover { color: var(--primary); }
+
+        .tool-page { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+        h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+        .tool-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+
+        .tool-container { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow); }
+        .card-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--text); margin-bottom: 0.4rem; }
+
+        textarea {
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border);
+            border-radius: var(--radius); font-size: 0.85rem; background: var(--bg-secondary);
+            color: var(--text); font-family: 'JetBrains Mono', monospace; resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+
+        input[type="text"], input[type="password"] {
+            width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--border);
+            border-radius: var(--radius); font-size: 0.875rem; background: var(--bg-secondary);
+            color: var(--text); font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
+
+        /* JWT Token Colored Display */
+        .jwt-colored { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; word-break: break-all; line-height: 1.7; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; }
+        .jwt-header-part { color: var(--col-header); }
+        .jwt-payload-part { color: var(--col-payload); }
+        .jwt-sig-part { color: var(--col-sig); }
+        .jwt-dot { color: var(--text-muted); font-weight: 700; }
+
+        /* Part labels */
+        .part-labels { display: flex; gap: 1.5rem; margin-bottom: 0.75rem; font-size: 0.78rem; font-weight: 600; }
+        .label-header { color: var(--col-header); }
+        .label-payload { color: var(--col-payload); }
+        .label-sig { color: var(--col-sig); }
+
+        /* JSON display */
+        .json-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 700px) { .json-panels { grid-template-columns: 1fr; } }
+
+        .json-panel { border-radius: var(--radius); overflow: hidden; }
+        .json-panel-header { padding: 0.5rem 1rem; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+        .json-panel-header.header-col { background: #fee2e2; color: #991b1b; }
+        .json-panel-header.payload-col { background: #ede9fe; color: #5b21b6; }
+        @media (prefers-color-scheme: dark) {
+            .json-panel-header.header-col { background: #7f1d1d; color: #fca5a5; }
+            .json-panel-header.payload-col { background: #2e1065; color: #c4b5fd; }
+        }
+        .json-panel-body { background: var(--bg-secondary); padding: 0.75rem 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; overflow-x: auto; border: 1px solid var(--border); border-top: none; }
+
+        /* Syntax highlight */
+        .json-key { color: #2563eb; }
+        .json-string { color: #16a34a; }
+        .json-number { color: #d97706; }
+        .json-bool { color: #dc2626; }
+        @media (prefers-color-scheme: dark) {
+            .json-key { color: #60a5fa; }
+            .json-string { color: #4ade80; }
+            .json-number { color: #fbbf24; }
+            .json-bool { color: #f87171; }
+        }
+
+        /* Claims table */
+        .claims-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .claims-table th { text-align: left; padding: 0.5rem 0.75rem; background: var(--primary-bg); color: var(--primary); font-size: 0.8rem; }
+        .claims-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .claims-table tr:last-child td { border-bottom: none; }
+        .claim-key { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--text); }
+        .claim-value { color: var(--text-muted); word-break: break-all; }
+        .claim-expired { color: var(--error); font-weight: 600; }
+        .claim-valid { color: var(--success); font-weight: 600; }
+
+        /* Signature verify */
+        .verify-row { display: flex; gap: 0.75rem; align-items: flex-end; }
+        .verify-row > div { flex: 1; }
+        .verify-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+        .badge-valid { background: #d1fae5; color: #065f46; }
+        .badge-invalid { background: #fee2e2; color: #991b1b; }
+        .badge-unknown { background: var(--bg-secondary); color: var(--text-muted); border: 1px solid var(--border); }
+        @media (prefers-color-scheme: dark) {
+            .badge-valid { background: #064e3b; color: #6ee7b7; }
+            .badge-invalid { background: #7f1d1d; color: #fca5a5; }
+        }
+
+        .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem; }
+        .error-state { color: var(--error); padding: 0.75rem; background: #fee2e2; border-radius: var(--radius); font-size: 0.875rem; }
+        @media (prefers-color-scheme: dark) { .error-state { background: #7f1d1d; } }
+
+        .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+
+        .seo-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .seo-section h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .seo-section p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem; }
+
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border); margin-top: 4rem; padding: 2rem 1.5rem; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 2rem; margin-bottom: 1rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer-inner p { color: var(--text-muted); font-size: 0.8rem; }
+
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--text); color: var(--bg); padding: 0.75rem 1.5rem; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; z-index: 1000; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 600px) { .nav { display: none; } .verify-row { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-container">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg>
+            ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="tool-page">
+    <h1>🔑 JWTデバッガー</h1>
+    <p class="tool-subtitle">JWTトークンをデコードして、ヘッダー・ペイロード・署名を詳細表示します。</p>
+
+    <div class="tool-container">
+
+        <!-- Input -->
+        <div class="card">
+            <div class="card-title">JWTトークンを入力</div>
+            <textarea id="jwtInput" rows="5" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.xxxxx" oninput="decodeJWT()"></textarea>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="loadSample()">サンプルJWTを読み込む</button>
+                <button class="btn btn-secondary" onclick="clearAll()">クリア</button>
+            </div>
+        </div>
+
+        <!-- Colored token display -->
+        <div class="card" id="decodedSection" style="display:none;">
+            <div class="card-title">トークン構造</div>
+            <div class="part-labels">
+                <span class="label-header">■ ヘッダー</span>
+                <span class="label-payload">■ ペイロード</span>
+                <span class="label-sig">■ 署名</span>
+            </div>
+            <div class="jwt-colored" id="coloredToken"></div>
+
+            <!-- JSON panels -->
+            <div class="json-panels">
+                <div class="json-panel">
+                    <div class="json-panel-header header-col">
+                        <span>ヘッダー (Header)</span>
+                        <button class="btn btn-sm btn-secondary" onclick="copyPart('header')">コピー</button>
+                    </div>
+                    <pre class="json-panel-body" id="headerJson"></pre>
+                </div>
+                <div class="json-panel">
+                    <div class="json-panel-header payload-col">
+                        <span>ペイロード (Payload)</span>
+                        <button class="btn btn-sm btn-secondary" onclick="copyPart('payload')">コピー</button>
+                    </div>
+                    <pre class="json-panel-body" id="payloadJson"></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claims -->
+        <div class="card" id="claimsSection" style="display:none;">
+            <div class="card-title">クレーム詳細</div>
+            <table class="claims-table">
+                <thead>
+                    <tr>
+                        <th>クレーム</th>
+                        <th>名称</th>
+                        <th>値</th>
+                    </tr>
+                </thead>
+                <tbody id="claimsBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Signature verification -->
+        <div class="card" id="sigSection" style="display:none;">
+            <div class="card-title">署名検証 (HS256)</div>
+            <div class="verify-row">
+                <div>
+                    <label>シークレットキー</label>
+                    <input type="text" id="secretInput" placeholder="your-secret-key" oninput="clearVerifyResult()">
+                </div>
+                <div style="flex:0;">
+                    <button class="btn btn-primary" onclick="verifySignature()">検証</button>
+                </div>
+            </div>
+            <div id="verifyResult" style="margin-top:1rem;"></div>
+            <div style="margin-top:0.75rem;">
+                <label style="font-size:0.8rem;color:var(--text-muted);">生の署名</label>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;word-break:break-all;color:var(--col-sig);padding:0.5rem 0.75rem;background:var(--bg-secondary);border-radius:var(--radius);border:1px solid var(--border);" id="rawSig"></div>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div class="error-state" id="errorState" style="display:none;"></div>
+
+    </div>
+
+    <div class="seo-section">
+        <h2>JWTデバッガーについて</h2>
+        <p>JWT (JSON Web Token) はRFC 7519で定義された認証・情報交換のための標準規格です。ヘッダー・ペイロード・署名の3つのBase64URLエンコードされたJSON文字列をドット(.)で連結した形式です。</p>
+        <p>このツールでは、JWTをブラウザ内でデコードし、iss（発行者）、sub（サブジェクト）、exp（有効期限）などの標準クレームを人間が読みやすい形式で表示します。Web Crypto APIを使ったHS256署名検証にも対応しています。</p>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a>
+            <a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a>
+            <a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const SAMPLE_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRhcm8gWWFtYWRhIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyNDI2MjIsImlzcyI6ImV4YW1wbGUuY29tIiwicm9sZSI6ImFkbWluIn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+    let currentParts = null;
+    let currentPayload = null;
+    let currentHeader = null;
+
+    function loadSample() {
+        document.getElementById('jwtInput').value = SAMPLE_JWT;
+        decodeJWT();
+    }
+
+    function clearAll() {
+        document.getElementById('jwtInput').value = '';
+        document.getElementById('decodedSection').style.display = 'none';
+        document.getElementById('claimsSection').style.display = 'none';
+        document.getElementById('sigSection').style.display = 'none';
+        document.getElementById('errorState').style.display = 'none';
+        currentParts = null;
+    }
+
+    function base64urlDecode(str) {
+        str = str.replace(/-/g, '+').replace(/_/g, '/');
+        while (str.length % 4) str += '=';
+        return atob(str);
+    }
+
+    function decodeJWT() {
+        const token = document.getElementById('jwtInput').value.trim();
+        if (!token) {
+            clearAll();
+            document.getElementById('jwtInput').value = '';
+            return;
+        }
+
+        const parts = token.split('.');
+        document.getElementById('errorState').style.display = 'none';
+
+        if (parts.length !== 3) {
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorState').textContent = 'エラー: 有効なJWTトークンではありません（ヘッダー.ペイロード.署名の形式が必要です）';
+            document.getElementById('decodedSection').style.display = 'none';
+            document.getElementById('claimsSection').style.display = 'none';
+            document.getElementById('sigSection').style.display = 'none';
+            return;
+        }
+
+        try {
+            const headerJson = base64urlDecode(parts[0]);
+            const payloadJson = base64urlDecode(parts[1]);
+            currentHeader = JSON.parse(headerJson);
+            currentPayload = JSON.parse(payloadJson);
+            currentParts = parts;
+
+            // Colored display
+            document.getElementById('coloredToken').innerHTML =
+                `<span class="jwt-header-part">${escHtml(parts[0])}</span><span class="jwt-dot">.</span><span class="jwt-payload-part">${escHtml(parts[1])}</span><span class="jwt-dot">.</span><span class="jwt-sig-part">${escHtml(parts[2])}</span>`;
+
+            // JSON panels
+            document.getElementById('headerJson').innerHTML = syntaxHighlight(JSON.stringify(currentHeader, null, 2));
+            document.getElementById('payloadJson').innerHTML = syntaxHighlight(JSON.stringify(currentPayload, null, 2));
+
+            // Raw sig
+            document.getElementById('rawSig').textContent = parts[2];
+
+            document.getElementById('decodedSection').style.display = 'block';
+            document.getElementById('sigSection').style.display = 'block';
+
+            // Claims
+            buildClaimsTable(currentPayload);
+            document.getElementById('claimsSection').style.display = 'block';
+
+        } catch(e) {
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorState').textContent = 'デコードエラー: ' + e.message;
+        }
+    }
+
+    function escHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function syntaxHighlight(json) {
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+            let cls = 'json-number';
+            if (/^"/.test(match)) {
+                cls = /:$/.test(match) ? 'json-key' : 'json-string';
+            } else if (/true|false/.test(match)) {
+                cls = 'json-bool';
+            }
+            return `<span class="${cls}">${escHtml(match)}</span>`;
+        });
+    }
+
+    const claimNames = {
+        iss: '発行者 (Issuer)',
+        sub: 'サブジェクト (Subject)',
+        aud: '対象者 (Audience)',
+        exp: '有効期限 (Expiration)',
+        nbf: '有効開始 (Not Before)',
+        iat: '発行時刻 (Issued At)',
+        jti: 'JWT ID',
+    };
+
+    function buildClaimsTable(payload) {
+        const now = Math.floor(Date.now() / 1000);
+        const rows = [];
+
+        for (const [key, val] of Object.entries(payload)) {
+            const name = claimNames[key] || 'カスタムクレーム';
+            let displayVal = '';
+            let extraClass = '';
+
+            if ((key === 'exp' || key === 'iat' || key === 'nbf') && typeof val === 'number') {
+                const date = new Date(val * 1000);
+                displayVal = date.toLocaleString('ja-JP');
+                if (key === 'exp') {
+                    if (val < now) {
+                        displayVal += ' <span class="claim-expired">（期限切れ）</span>';
+                    } else {
+                        displayVal += ' <span class="claim-valid">（有効）</span>';
+                    }
+                }
+            } else {
+                displayVal = escHtml(JSON.stringify(val));
+            }
+
+            rows.push(`<tr>
+                <td><span class="claim-key">${escHtml(key)}</span></td>
+                <td style="font-size:0.8rem;color:var(--text-muted);">${name}</td>
+                <td class="claim-value">${displayVal}</td>
+            </tr>`);
+        }
+
+        document.getElementById('claimsBody').innerHTML = rows.join('');
+    }
+
+    async function verifySignature() {
+        if (!currentParts) return;
+        const secret = document.getElementById('secretInput').value;
+        if (!secret) { showToast('シークレットキーを入力してください'); return; }
+
+        const alg = currentHeader && currentHeader.alg;
+        if (alg !== 'HS256') {
+            document.getElementById('verifyResult').innerHTML = '<span class="verify-badge badge-unknown">この実装はHS256のみ対応しています（現在のアルゴリズム: ' + escHtml(alg || '不明') + '）</span>';
+            return;
+        }
+
+        try {
+            const result = await verifyHS256(currentParts[0], currentParts[1], currentParts[2], secret);
+            if (result) {
+                document.getElementById('verifyResult').innerHTML = '<span class="verify-badge badge-valid">✅ 署名が有効です</span>';
+            } else {
+                document.getElementById('verifyResult').innerHTML = '<span class="verify-badge badge-invalid">❌ 署名が無効です</span>';
+            }
+        } catch(e) {
+            document.getElementById('verifyResult').innerHTML = '<span class="verify-badge badge-invalid">エラー: ' + escHtml(e.message) + '</span>';
+        }
+    }
+
+    async function verifyHS256(header64, payload64, signature, secret) {
+        const data = header64 + '.' + payload64;
+        const encoder = new TextEncoder();
+        const key = await crypto.subtle.importKey('raw', encoder.encode(secret), {name: 'HMAC', hash: 'SHA-256'}, false, ['verify']);
+        let sig = signature.replace(/-/g, '+').replace(/_/g, '/');
+        while (sig.length % 4) sig += '=';
+        const sigBytes = Uint8Array.from(atob(sig), c => c.charCodeAt(0));
+        return await crypto.subtle.verify('HMAC', key, sigBytes, encoder.encode(data));
+    }
+
+    function clearVerifyResult() {
+        document.getElementById('verifyResult').innerHTML = '';
+    }
+
+    function copyPart(part) {
+        if (!currentParts) return;
+        let text;
+        if (part === 'header') text = JSON.stringify(currentHeader, null, 2);
+        else if (part === 'payload') text = JSON.stringify(currentPayload, null, 2);
+        navigator.clipboard.writeText(text).then(() => showToast('コピーしました！'));
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+</script>
+
+</body>
+</html>

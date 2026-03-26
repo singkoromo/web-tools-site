@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画像↔Base64変換 | ToolBox</title>
+    <meta name="description" content="画像ファイルをBase64エンコード文字列に変換、またはBase64文字列から画像を復元するツール。PNG、JPEG、GIF、WebP、SVGに対応。">
+    <meta name="keywords" content="Base64, 画像, エンコード, デコード, data URI, PNG, JPEG">
+
+    <!-- OGP -->
+    <meta property="og:title" content="画像↔Base64変換 | ToolBox">
+    <meta property="og:description" content="画像ファイルをBase64エンコード文字列に変換、またはBase64文字列から画像を復元するツール。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/base64-image.html">
+    <meta property="og:site_name" content="ToolBox">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="画像↔Base64変換 | ToolBox">
+    <meta name="twitter:description" content="画像ファイルをBase64エンコード文字列に変換、またはBase64文字列から画像を復元するツール。">
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "画像↔Base64変換",
+        "description": "画像ファイルをBase64エンコード文字列に変換、またはBase64文字列から画像を復元するツール",
+        "url": "https://web-tool-site.com/tools/base64-image.html",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0" }
+    }
+    </script>
+
+    <!-- GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JPE0M70GR8');
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #0d9488;
+            --primary-light: #14b8a6;
+            --primary-dark: #0f766e;
+            --primary-bg: #f0fdfa;
+            --primary-border: #99f6e4;
+            --success: #10b981;
+            --error: #ef4444;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --bg: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #14b8a6;
+                --primary-light: #2dd4bf;
+                --primary-dark: #0d9488;
+                --primary-bg: #042f2e;
+                --primary-border: #134e4a;
+                --text: #f3f4f6;
+                --text-muted: #9ca3af;
+                --bg: #111827;
+                --bg-secondary: #1f2937;
+                --border: #374151;
+                --shadow: 0 1px 3px rgba(0,0,0,0.4);
+                --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        .header { background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
+        .logo svg { width: 22px; height: 22px; }
+        .nav { display: flex; gap: 1.5rem; }
+        .nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .nav a:hover { color: var(--primary); }
+
+        .tool-page { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+        h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+        .tool-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+        .tool-container { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; width: fit-content; }
+        .tab-btn { padding: 0.6rem 1.5rem; font-size: 0.9rem; font-weight: 600; border: none; background: var(--bg-secondary); color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-btn:hover:not(.active) { background: var(--border); color: var(--text); }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow); }
+        .card-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 1rem; }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 2px dashed var(--primary-border);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--primary-bg);
+            position: relative;
+        }
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-bg);
+        }
+        .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+        .drop-zone-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .drop-zone-text { font-size: 0.95rem; font-weight: 500; color: var(--text); margin-bottom: 0.4rem; }
+        .drop-zone-sub { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Image preview */
+        .image-preview { display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; min-height: 180px; }
+        .image-preview img { max-width: 100%; max-height: 300px; object-fit: contain; display: block; }
+
+        /* File info */
+        .file-info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+        .file-info-item { background: var(--primary-bg); border: 1px solid var(--primary-border); border-radius: var(--radius); padding: 0.6rem 0.75rem; }
+        .file-info-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .file-info-value { font-size: 0.9rem; font-weight: 600; color: var(--text); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+
+        label { display: block; font-size: 0.875rem; font-weight: 500; color: var(--text); margin-bottom: 0.4rem; }
+
+        textarea {
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border);
+            border-radius: var(--radius); font-size: 0.78rem; background: var(--bg-secondary);
+            color: var(--text); font-family: 'JetBrains Mono', monospace; resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s; line-height: 1.5;
+        }
+        textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,148,136,0.15); }
+
+        .output-group { position: relative; margin-bottom: 1rem; }
+        .copy-float { position: absolute; top: 0.5rem; right: 0.5rem; }
+
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
+        .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+
+        /* Format badge */
+        .format-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: var(--primary); color: white; }
+
+        /* Ratio indicator */
+        .ratio-bar { background: var(--border); border-radius: 999px; height: 8px; overflow: hidden; margin-top: 0.4rem; }
+        .ratio-fill { height: 100%; background: var(--primary); border-radius: 999px; transition: width 0.3s; }
+
+        .empty-hint { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.875rem; }
+
+        .seo-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .seo-section h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .seo-section p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem; }
+
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border); margin-top: 4rem; padding: 2rem 1.5rem; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 2rem; margin-bottom: 1rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer-inner p { color: var(--text-muted); font-size: 0.8rem; }
+
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--text); color: var(--bg); padding: 0.75rem 1.5rem; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; z-index: 1000; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 600px) {
+            .nav { display: none; }
+            .file-info-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-container">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg>
+            ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="tool-page">
+    <h1>🖼️ 画像↔Base64変換</h1>
+    <p class="tool-subtitle">画像をBase64エンコード文字列に変換、またはBase64から画像を復元します。</p>
+
+    <div class="tool-container">
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('encode')">画像 → Base64</button>
+            <button class="tab-btn" onclick="switchTab('decode')">Base64 → 画像</button>
+        </div>
+
+        <!-- Tab: Encode -->
+        <div class="tab-panel active" id="tab-encode">
+            <div class="card">
+                <div class="card-title">画像ファイルをアップロード</div>
+
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" onchange="handleFile(this.files[0])">
+                    <div class="drop-zone-icon">📁</div>
+                    <div class="drop-zone-text">クリックまたはドラッグ&ドロップ</div>
+                    <div class="drop-zone-sub">PNG / JPEG / GIF / WebP / SVG 対応</div>
+                </div>
+
+                <div id="encodeResult" style="display:none; margin-top:1.5rem;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                        <div>
+                            <div style="font-size:0.85rem;font-weight:500;color:var(--text-muted);margin-bottom:0.5rem;">プレビュー</div>
+                            <div class="image-preview"><img id="previewImg" src="" alt="preview"></div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.85rem;font-weight:500;color:var(--text-muted);margin-bottom:0.5rem;">ファイル情報</div>
+                            <div class="file-info-grid" style="grid-template-columns:1fr;">
+                                <div class="file-info-item">
+                                    <div class="file-info-label">ファイル名</div>
+                                    <div class="file-info-value" id="infoName">-</div>
+                                </div>
+                                <div class="file-info-item">
+                                    <div class="file-info-label">ファイルサイズ</div>
+                                    <div class="file-info-value" id="infoSize">-</div>
+                                </div>
+                                <div class="file-info-item">
+                                    <div class="file-info-label">サイズ (px)</div>
+                                    <div class="file-info-value" id="infoDimensions">-</div>
+                                </div>
+                                <div class="file-info-item">
+                                    <div class="file-info-label">フォーマット</div>
+                                    <div class="file-info-value" id="infoFormat">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data URI output -->
+                    <div style="margin-bottom:1rem;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+                            <label style="margin:0;">Data URI (data:image/...;base64,...)</label>
+                            <button class="btn btn-secondary btn-sm" onclick="copyText('dataUriOutput')">コピー</button>
+                        </div>
+                        <textarea id="dataUriOutput" rows="4" readonly></textarea>
+                    </div>
+
+                    <!-- Raw Base64 output -->
+                    <div style="margin-bottom:1rem;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+                            <label style="margin:0;">生Base64 (プレフィックスなし)</label>
+                            <button class="btn btn-secondary btn-sm" onclick="copyText('rawBase64Output')">コピー</button>
+                        </div>
+                        <textarea id="rawBase64Output" rows="4" readonly></textarea>
+                    </div>
+
+                    <!-- Output size info -->
+                    <div style="background:var(--primary-bg);border:1px solid var(--primary-border);border-radius:var(--radius);padding:0.75rem 1rem;font-size:0.85rem;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                            <span>Base64サイズ: <strong id="b64Size">-</strong></span>
+                            <span>増加率: <strong id="b64Ratio">-</strong></span>
+                        </div>
+                        <div class="ratio-bar"><div class="ratio-fill" id="ratioFill" style="width:0%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Decode -->
+        <div class="tab-panel" id="tab-decode">
+            <div class="card">
+                <div class="card-title">Base64またはData URIを貼り付け</div>
+
+                <label>Base64文字列またはData URI</label>
+                <textarea id="b64Input" rows="8" placeholder="data:image/png;base64,iVBORw0KGgo...&#10;または生のBase64文字列をここに貼り付けてください" oninput="decodeBase64()"></textarea>
+
+                <div id="decodeResult" style="display:none; margin-top:1.5rem;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start;">
+                        <div>
+                            <div style="font-size:0.85rem;font-weight:500;color:var(--text-muted);margin-bottom:0.5rem;">プレビュー</div>
+                            <div class="image-preview"><img id="decodePreview" src="" alt="decoded preview"></div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.85rem;font-weight:500;color:var(--text-muted);margin-bottom:0.5rem;">画像情報</div>
+                            <div class="file-info-grid" style="grid-template-columns:1fr;">
+                                <div class="file-info-item">
+                                    <div class="file-info-label">検出フォーマット</div>
+                                    <div class="file-info-value" id="decodeFormat">-</div>
+                                </div>
+                                <div class="file-info-item">
+                                    <div class="file-info-label">サイズ (px)</div>
+                                    <div class="file-info-value" id="decodeDimensions">-</div>
+                                </div>
+                                <div class="file-info-item">
+                                    <div class="file-info-label">Base64長</div>
+                                    <div class="file-info-value" id="decodeB64Len">-</div>
+                                </div>
+                            </div>
+                            <div class="btn-group" style="margin-top:1rem;">
+                                <button class="btn btn-primary" onclick="downloadDecoded('png')">PNG保存</button>
+                                <button class="btn btn-secondary" onclick="downloadDecoded('jpeg')">JPEG保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="decodeError" style="display:none;margin-top:1rem;padding:0.75rem;background:#fee2e2;border-radius:var(--radius);color:#991b1b;font-size:0.875rem;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="seo-section">
+        <h2>画像↔Base64変換ツールについて</h2>
+        <p>Base64エンコーディングは、バイナリデータをASCII文字列として表現する方法です。画像をBase64に変換することで、HTMLのimgタグやCSSのbackground-imageに直接埋め込むことができ、HTTPリクエスト数を削減できます。</p>
+        <p>Data URI形式（data:image/png;base64,...）はそのままHTMLやCSSで使用可能です。このツールはすべての処理をブラウザ内で行うため、画像データがサーバーに送信されることはありません。</p>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a>
+            <a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a>
+            <a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // --- Tab switching ---
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach((b, i) => {
+            b.classList.toggle('active', (i === 0 && tab === 'encode') || (i === 1 && tab === 'decode'));
+        });
+        document.getElementById('tab-encode').classList.toggle('active', tab === 'encode');
+        document.getElementById('tab-decode').classList.toggle('active', tab === 'decode');
+    }
+
+    // --- Encode tab ---
+    const dropZone = document.getElementById('dropZone');
+
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) handleFile(file);
+        else showToast('画像ファイルを選択してください');
+    });
+
+    function handleFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUri = e.target.result;
+            const base64 = dataUri.split(',')[1];
+
+            // Preview
+            const img = document.getElementById('previewImg');
+            img.src = dataUri;
+            img.onload = () => {
+                document.getElementById('infoDimensions').textContent = img.naturalWidth + ' × ' + img.naturalHeight + ' px';
+            };
+
+            // File info
+            document.getElementById('infoName').textContent = file.name;
+            document.getElementById('infoSize').textContent = formatBytes(file.size);
+            document.getElementById('infoFormat').textContent = file.type || '不明';
+
+            // Outputs
+            document.getElementById('dataUriOutput').value = dataUri;
+            document.getElementById('rawBase64Output').value = base64;
+
+            // Size comparison
+            const b64Bytes = base64.length;
+            const ratio = ((b64Bytes / file.size) * 100).toFixed(0);
+            document.getElementById('b64Size').textContent = formatBytes(b64Bytes);
+            document.getElementById('b64Ratio').textContent = ratio + '% (元の' + ((b64Bytes / file.size).toFixed(2)) + '倍)';
+            document.getElementById('ratioFill').style.width = Math.min(100, ratio) + '%';
+
+            document.getElementById('encodeResult').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // --- Decode tab ---
+    let decodeDataUri = '';
+
+    function decodeBase64() {
+        const input = document.getElementById('b64Input').value.trim();
+        document.getElementById('decodeError').style.display = 'none';
+        document.getElementById('decodeResult').style.display = 'none';
+
+        if (!input) return;
+
+        let dataUri = input;
+        let mimeType = 'image/png';
+
+        // Check if it's a data URI
+        if (input.startsWith('data:')) {
+            const mimeMatch = input.match(/^data:(image\/[a-zA-Z+]+);base64,/);
+            if (!mimeMatch) {
+                showDecodeError('無効なData URI形式です');
+                return;
+            }
+            mimeType = mimeMatch[1];
+            dataUri = input;
+        } else {
+            // Try to detect format from base64 header bytes
+            try {
+                const firstBytes = atob(input.substring(0, 16));
+                if (firstBytes.startsWith('\x89PNG')) mimeType = 'image/png';
+                else if (firstBytes.startsWith('\xFF\xD8')) mimeType = 'image/jpeg';
+                else if (firstBytes.startsWith('GIF')) mimeType = 'image/gif';
+                else if (firstBytes.startsWith('RIFF')) mimeType = 'image/webp';
+                else if (input.includes('PHN2Zy')) mimeType = 'image/svg+xml';
+            } catch(e) {}
+            dataUri = `data:${mimeType};base64,${input}`;
+        }
+
+        const img = document.getElementById('decodePreview');
+        img.onerror = () => showDecodeError('無効なBase64データまたはサポートされていない画像形式です');
+        img.onload = () => {
+            document.getElementById('decodeDimensions').textContent = img.naturalWidth + ' × ' + img.naturalHeight + ' px';
+            document.getElementById('decodeFormat').textContent = mimeType;
+            const b64part = dataUri.split(',')[1] || input;
+            document.getElementById('decodeB64Len').textContent = b64part.length.toLocaleString() + ' 文字';
+            document.getElementById('decodeResult').style.display = 'block';
+            decodeDataUri = dataUri;
+        };
+        img.src = dataUri;
+    }
+
+    function showDecodeError(msg) {
+        const el = document.getElementById('decodeError');
+        el.textContent = '❌ ' + msg;
+        el.style.display = 'block';
+    }
+
+    function downloadDecoded(format) {
+        if (!decodeDataUri) return;
+        const canvas = document.createElement('canvas');
+        const img = document.getElementById('decodePreview');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        if (format === 'jpeg') ctx.fillStyle = '#ffffff';
+        if (format === 'jpeg') ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        const mime = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'decoded-image.' + format;
+            a.click();
+            URL.revokeObjectURL(url);
+        }, mime, 0.92);
+    }
+
+    // --- Utilities ---
+    function formatBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+        return (b / 1048576).toFixed(2) + ' MB';
+    }
+
+    function copyText(id) {
+        const el = document.getElementById(id);
+        if (!el.value) { showToast('コピーするデータがありません'); return; }
+        navigator.clipboard.writeText(el.value).then(() => showToast('コピーしました！'));
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+</script>
+
+</body>
+</html>

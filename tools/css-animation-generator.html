@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSSアニメーションジェネレーター | ToolBox</title>
+    <meta name="description" content="GUIでCSSアニメーションを作成・プレビューし、@keyframesとanimationプロパティのコードを生成するツール。Web制作に便利。">
+    <meta name="keywords" content="CSS, アニメーション, keyframes, animation, ジェネレーター, Web制作">
+
+    <!-- OGP -->
+    <meta property="og:title" content="CSSアニメーションジェネレーター | ToolBox">
+    <meta property="og:description" content="GUIでCSSアニメーションを作成・プレビューし、@keyframesとanimationプロパティのコードを生成するツール。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://web-tool-site.com/tools/css-animation-generator.html">
+    <meta property="og:site_name" content="ToolBox">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="CSSアニメーションジェネレーター | ToolBox">
+    <meta name="twitter:description" content="GUIでCSSアニメーションを作成・プレビューし、@keyframesとanimationプロパティのコードを生成するツール。">
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "CSSアニメーションジェネレーター",
+        "description": "GUIでCSSアニメーションを作成・プレビューし、@keyframesとanimationプロパティのコードを生成するツール",
+        "url": "https://web-tool-site.com/tools/css-animation-generator.html",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0" }
+    }
+    </script>
+
+    <!-- GA4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JPE0M70GR8');
+    </script>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #db2777;
+            --primary-light: #ec4899;
+            --primary-dark: #be185d;
+            --primary-bg: #fdf2f8;
+            --primary-border: #fbcfe8;
+            --success: #10b981;
+            --error: #ef4444;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --bg: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #ec4899;
+                --primary-light: #f472b6;
+                --primary-dark: #db2777;
+                --primary-bg: #4a0020;
+                --primary-border: #831843;
+                --text: #f3f4f6;
+                --text-muted: #9ca3af;
+                --bg: #111827;
+                --bg-secondary: #1f2937;
+                --border: #374151;
+                --shadow: 0 1px 3px rgba(0,0,0,0.4);
+                --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        .header { background: var(--bg); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.1rem; color: var(--primary); text-decoration: none; }
+        .logo svg { width: 22px; height: 22px; }
+        .nav { display: flex; gap: 1.5rem; }
+        .nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .nav a:hover { color: var(--primary); }
+
+        .tool-page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+        h1 { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; }
+        .tool-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+
+        /* Main layout */
+        .main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start; }
+        @media (max-width: 800px) { .main-grid { grid-template-columns: 1fr; } }
+
+        .card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; box-shadow: var(--shadow); }
+        .card-title { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); }
+
+        label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.3rem; }
+
+        select {
+            width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border);
+            border-radius: var(--radius); font-size: 0.875rem; background: var(--bg-secondary);
+            color: var(--text); cursor: pointer; transition: border-color 0.2s;
+        }
+        select:focus { outline: none; border-color: var(--primary); }
+
+        input[type="color"] { width: 40px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; padding: 2px; background: var(--bg-secondary); }
+
+        .form-group { margin-bottom: 0.9rem; }
+
+        .slider-row { display: flex; align-items: center; gap: 0.5rem; }
+        input[type="range"] { flex: 1; accent-color: var(--primary); height: 4px; }
+        .slider-val { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; color: var(--primary); min-width: 3.5rem; text-align: right; }
+
+        /* Preset buttons */
+        .preset-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+        .preset-btn { padding: 0.45rem 0.6rem; font-size: 0.78rem; font-weight: 600; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); color: var(--text); cursor: pointer; transition: all 0.15s; text-align: center; }
+        .preset-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-bg); }
+        .preset-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Shape selector */
+        .shape-grid { display: flex; gap: 0.5rem; }
+        .shape-btn { flex: 1; padding: 0.4rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); cursor: pointer; text-align: center; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); transition: all 0.15s; }
+        .shape-btn.active { border-color: var(--primary); background: var(--primary-bg); color: var(--primary); }
+        .shape-btn:hover:not(.active) { border-color: var(--primary-light); }
+
+        /* Right panel */
+        .right-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Preview */
+        .preview-area {
+            background: repeating-conic-gradient(var(--bg-secondary) 0% 25%, var(--bg) 0% 50%) 0 0 / 20px 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #previewEl {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            user-select: none;
+            transition: background 0.3s;
+            will-change: transform, opacity;
+        }
+
+        .preview-controls { display: flex; gap: 0.75rem; align-items: center; }
+
+        /* Timing presets row */
+        .timing-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .timing-pill { padding: 0.25rem 0.65rem; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-secondary); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+        .timing-pill.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .timing-pill:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+
+        /* Code output */
+        .code-output {
+            background: #1e1e2e;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .code-header { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1rem; background: #181825; }
+        .code-lang { font-size: 0.75rem; font-weight: 700; color: #cba6f7; letter-spacing: 0.05em; }
+        pre#codeOutput {
+            padding: 1rem 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #cdd6f4;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.6;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        /* Syntax colors */
+        .css-selector { color: #89dceb; }
+        .css-prop { color: #89b4fa; }
+        .css-value { color: #a6e3a1; }
+        .css-at { color: #cba6f7; }
+        .css-percent { color: #fab387; }
+        .css-comment { color: #6c7086; font-style: italic; }
+
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1.1rem; border: none; border-radius: var(--radius); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.78rem; }
+        .btn-white { background: white; color: #1e1e2e; }
+        .btn-white:hover { background: #f1f1f1; }
+
+        .color-row { display: flex; align-items: center; gap: 0.5rem; }
+        .color-label { font-size: 0.8rem; color: var(--text-muted); }
+
+        .divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+
+        .seo-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+        .seo-section h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .seo-section p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1rem; }
+
+        .footer { background: var(--bg-secondary); border-top: 1px solid var(--border); margin-top: 4rem; padding: 2rem 1.5rem; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+        .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 2rem; margin-bottom: 1rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; }
+        .footer-links a:hover { color: var(--primary); }
+        .footer-inner p { color: var(--text-muted); font-size: 0.8rem; }
+
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--text); color: var(--bg); padding: 0.75rem 1.5rem; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; z-index: 1000; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 600px) { .nav { display: none; } }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-container">
+        <a href="../index.html" class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+            </svg>
+            ToolBox
+        </a>
+        <nav class="nav">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+        </nav>
+    </div>
+</header>
+
+<div class="tool-page">
+    <h1>🎨 CSSアニメーションジェネレーター</h1>
+    <p class="tool-subtitle">プリセットを選んでパラメータを調整するだけで、CSSアニメーションコードを自動生成します。</p>
+
+    <div class="main-grid">
+
+        <!-- Left panel: Controls -->
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+
+            <!-- Presets -->
+            <div class="card">
+                <div class="card-title">プリセット</div>
+                <div class="preset-grid" id="presetGrid">
+                    <button class="preset-btn active" data-preset="fadeIn" onclick="selectPreset('fadeIn', this)">フェードイン</button>
+                    <button class="preset-btn" data-preset="slideInLeft" onclick="selectPreset('slideInLeft', this)">スライド左</button>
+                    <button class="preset-btn" data-preset="slideInRight" onclick="selectPreset('slideInRight', this)">スライド右</button>
+                    <button class="preset-btn" data-preset="slideInUp" onclick="selectPreset('slideInUp', this)">スライドアップ</button>
+                    <button class="preset-btn" data-preset="bounce" onclick="selectPreset('bounce', this)">バウンス</button>
+                    <button class="preset-btn" data-preset="spin" onclick="selectPreset('spin', this)">回転</button>
+                    <button class="preset-btn" data-preset="pulse" onclick="selectPreset('pulse', this)">パルス</button>
+                    <button class="preset-btn" data-preset="shake" onclick="selectPreset('shake', this)">シェイク</button>
+                    <button class="preset-btn" data-preset="zoomIn" onclick="selectPreset('zoomIn', this)">ズームイン</button>
+                    <button class="preset-btn" data-preset="flip" onclick="selectPreset('flip', this)">フリップ</button>
+                </div>
+            </div>
+
+            <!-- Animation properties -->
+            <div class="card">
+                <div class="card-title">アニメーション設定</div>
+
+                <div class="form-group">
+                    <label>duration（再生時間）: <span id="durationVal" style="color:var(--primary);font-weight:700;">1s</span></label>
+                    <div class="slider-row">
+                        <span style="font-size:0.72rem;color:var(--text-muted);">0.1s</span>
+                        <input type="range" id="duration" min="0.1" max="5" step="0.1" value="1" oninput="updateAnimation()">
+                        <span style="font-size:0.72rem;color:var(--text-muted);">5s</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>delay（遅延）: <span id="delayVal" style="color:var(--primary);font-weight:700;">0s</span></label>
+                    <div class="slider-row">
+                        <span style="font-size:0.72rem;color:var(--text-muted);">0s</span>
+                        <input type="range" id="delay" min="0" max="3" step="0.1" value="0" oninput="updateAnimation()">
+                        <span style="font-size:0.72rem;color:var(--text-muted);">3s</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>timing-function（イージング）</label>
+                    <div class="timing-pills" id="timingPills">
+                        <span class="timing-pill active" data-value="ease" onclick="selectTiming('ease', this)">ease</span>
+                        <span class="timing-pill" data-value="linear" onclick="selectTiming('linear', this)">linear</span>
+                        <span class="timing-pill" data-value="ease-in" onclick="selectTiming('ease-in', this)">ease-in</span>
+                        <span class="timing-pill" data-value="ease-out" onclick="selectTiming('ease-out', this)">ease-out</span>
+                        <span class="timing-pill" data-value="ease-in-out" onclick="selectTiming('ease-in-out', this)">ease-in-out</span>
+                        <span class="timing-pill" data-value="cubic-bezier(0.68,-0.55,0.27,1.55)" onclick="selectTiming('cubic-bezier(0.68,-0.55,0.27,1.55)', this)">spring</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>iteration-count（繰り返し）</label>
+                    <select id="iteration" onchange="updateAnimation()">
+                        <option value="1">1回</option>
+                        <option value="2">2回</option>
+                        <option value="3">3回</option>
+                        <option value="infinite" selected>infinite（無限）</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>direction（方向）</label>
+                    <select id="direction" onchange="updateAnimation()">
+                        <option value="normal">normal</option>
+                        <option value="reverse">reverse</option>
+                        <option value="alternate" selected>alternate</option>
+                        <option value="alternate-reverse">alternate-reverse</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>fill-mode（終了後の状態）</label>
+                    <select id="fillMode" onchange="updateAnimation()">
+                        <option value="none">none</option>
+                        <option value="forwards" selected>forwards</option>
+                        <option value="backwards">backwards</option>
+                        <option value="both">both</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Preview element -->
+            <div class="card">
+                <div class="card-title">プレビュー要素</div>
+
+                <div class="form-group">
+                    <label>形状</label>
+                    <div class="shape-grid">
+                        <div class="shape-btn active" data-shape="square" onclick="selectShape('square', this)">■ 四角</div>
+                        <div class="shape-btn" data-shape="circle" onclick="selectShape('circle', this)">● 円</div>
+                        <div class="shape-btn" data-shape="text" onclick="selectShape('text', this)">T テキスト</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>カラー</label>
+                    <div class="color-row">
+                        <input type="color" id="elementColor" value="#ec4899" onchange="updatePreviewElement()">
+                        <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+                            <span class="timing-pill" style="background:#ec4899;color:white;border-color:#ec4899;" onclick="setColor('#ec4899')">ピンク</span>
+                            <span class="timing-pill" style="background:#3b82f6;color:white;border-color:#3b82f6;" onclick="setColor('#3b82f6')">ブルー</span>
+                            <span class="timing-pill" style="background:#22c55e;color:white;border-color:#22c55e;" onclick="setColor('#22c55e')">グリーン</span>
+                            <span class="timing-pill" style="background:#f59e0b;color:white;border-color:#f59e0b;" onclick="setColor('#f59e0b')">オレンジ</span>
+                            <span class="timing-pill" style="background:#8b5cf6;color:white;border-color:#8b5cf6;" onclick="setColor('#8b5cf6')">パープル</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right panel: Preview + Code -->
+        <div class="right-panel">
+
+            <!-- Preview -->
+            <div class="card" style="padding:1rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                    <div class="card-title" style="margin:0;">ライブプレビュー</div>
+                    <div style="display:flex;gap:0.5rem;">
+                        <button class="btn btn-secondary btn-sm" onclick="replayAnimation()">▶ 再生</button>
+                        <button class="btn btn-secondary btn-sm" onclick="pauseAnimation()" id="pauseBtn">⏸ 一時停止</button>
+                    </div>
+                </div>
+                <div class="preview-area" id="previewArea">
+                    <div id="previewEl"></div>
+                </div>
+            </div>
+
+            <!-- Generated Code -->
+            <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                    <div style="font-size:0.9rem;font-weight:600;color:var(--text);">生成されたCSS</div>
+                    <button class="btn btn-primary btn-sm" onclick="copyCode()">コピー</button>
+                </div>
+                <div class="code-output">
+                    <div class="code-header">
+                        <span class="code-lang">CSS</span>
+                        <span style="font-size:0.7rem;color:#6c7086;">クリックしてコピー</span>
+                    </div>
+                    <pre id="codeOutput" onclick="copyCode()" style="cursor:pointer;" title="クリックしてコピー"></pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="seo-section">
+        <h2>CSSアニメーションジェネレーターについて</h2>
+        <p>CSSアニメーションは@keyframesルールとanimationプロパティを組み合わせて実装します。このツールではduration（再生時間）、delay（遅延）、timing-function（イージング）、iteration-count（繰り返し回数）、direction（方向）、fill-mode（終了後状態）を直感的なGUIで設定できます。</p>
+        <p>生成されたコードはそのままHTMLファイルやCSSファイルに貼り付けて使用できます。JavaScriptは不要で、パフォーマンスに優れたCSSアニメーションを簡単に作成できます。</p>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-links">
+            <a href="../index.html">ホーム</a>
+            <a href="../index.html#tools">ツール一覧</a>
+            <a href="../about.html">このサイトについて</a>
+            <a href="../contact.html">お問い合わせ</a>
+            <a href="../privacy.html">プライバシーポリシー</a>
+            <a href="../terms.html">利用規約</a>
+        </div>
+        <p>&copy; 2026 ToolBox. All rights reserved.</p>
+    </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<!-- Injected keyframes stylesheet -->
+<style id="dynamicKeyframes"></style>
+<style id="dynamicAnimation"></style>
+
+<script>
+    const presets = {
+        fadeIn: {
+            keyframes: `@keyframes fadeIn {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}`,
+            name: 'fadeIn'
+        },
+        slideInLeft: {
+            keyframes: `@keyframes slideInLeft {\n  from { transform: translateX(-100px); opacity: 0; }\n  to { transform: translateX(0); opacity: 1; }\n}`,
+            name: 'slideInLeft'
+        },
+        slideInRight: {
+            keyframes: `@keyframes slideInRight {\n  from { transform: translateX(100px); opacity: 0; }\n  to { transform: translateX(0); opacity: 1; }\n}`,
+            name: 'slideInRight'
+        },
+        slideInUp: {
+            keyframes: `@keyframes slideInUp {\n  from { transform: translateY(50px); opacity: 0; }\n  to { transform: translateY(0); opacity: 1; }\n}`,
+            name: 'slideInUp'
+        },
+        bounce: {
+            keyframes: `@keyframes bounce {\n  0%, 100% { transform: translateY(0); }\n  50% { transform: translateY(-30px); }\n}`,
+            name: 'bounce'
+        },
+        spin: {
+            keyframes: `@keyframes spin {\n  from { transform: rotate(0deg); }\n  to { transform: rotate(360deg); }\n}`,
+            name: 'spin'
+        },
+        pulse: {
+            keyframes: `@keyframes pulse {\n  0%, 100% { transform: scale(1); }\n  50% { transform: scale(1.2); }\n}`,
+            name: 'pulse'
+        },
+        shake: {
+            keyframes: `@keyframes shake {\n  0%, 100% { transform: translateX(0); }\n  25% { transform: translateX(-10px); }\n  75% { transform: translateX(10px); }\n}`,
+            name: 'shake'
+        },
+        zoomIn: {
+            keyframes: `@keyframes zoomIn {\n  from { transform: scale(0); opacity: 0; }\n  to { transform: scale(1); opacity: 1; }\n}`,
+            name: 'zoomIn'
+        },
+        flip: {
+            keyframes: `@keyframes flip {\n  from { transform: rotateY(0deg); }\n  to { transform: rotateY(360deg); }\n}`,
+            name: 'flip'
+        }
+    };
+
+    let state = {
+        preset: 'fadeIn',
+        duration: 1,
+        delay: 0,
+        timing: 'ease',
+        iteration: 'infinite',
+        direction: 'alternate',
+        fillMode: 'forwards',
+        shape: 'square',
+        color: '#ec4899',
+        paused: false,
+    };
+
+    function selectPreset(key, btn) {
+        state.preset = key;
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateAnimation();
+    }
+
+    function selectTiming(val, el) {
+        state.timing = val;
+        document.querySelectorAll('.timing-pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        updateAnimation();
+    }
+
+    function selectShape(shape, el) {
+        state.shape = shape;
+        document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        updatePreviewElement();
+    }
+
+    function setColor(c) {
+        state.color = c;
+        document.getElementById('elementColor').value = c;
+        updatePreviewElement();
+    }
+
+    function updatePreviewElement() {
+        state.color = document.getElementById('elementColor').value;
+        const el = document.getElementById('previewEl');
+        el.style.background = state.color;
+
+        if (state.shape === 'square') {
+            el.style.width = '80px';
+            el.style.height = '80px';
+            el.style.borderRadius = '12px';
+            el.textContent = '';
+        } else if (state.shape === 'circle') {
+            el.style.width = '80px';
+            el.style.height = '80px';
+            el.style.borderRadius = '50%';
+            el.textContent = '';
+        } else {
+            el.style.width = 'auto';
+            el.style.height = 'auto';
+            el.style.borderRadius = '8px';
+            el.style.padding = '0.5rem 1.25rem';
+            el.textContent = 'ToolBox';
+        }
+    }
+
+    function updateAnimation() {
+        state.duration = parseFloat(document.getElementById('duration').value);
+        state.delay = parseFloat(document.getElementById('delay').value);
+        state.iteration = document.getElementById('iteration').value;
+        state.direction = document.getElementById('direction').value;
+        state.fillMode = document.getElementById('fillMode').value;
+
+        document.getElementById('durationVal').textContent = state.duration + 's';
+        document.getElementById('delayVal').textContent = state.delay + 's';
+
+        applyAnimation();
+        generateCode();
+    }
+
+    function applyAnimation() {
+        const preset = presets[state.preset];
+
+        // Inject keyframes
+        document.getElementById('dynamicKeyframes').textContent = preset.keyframes;
+
+        // Build animation shorthand
+        const animValue = `${preset.name} ${state.duration}s ${state.timing} ${state.delay}s ${state.iteration} ${state.direction} ${state.fillMode}`;
+
+        // Remove old, force reflow, add new
+        const el = document.getElementById('previewEl');
+        el.style.animation = 'none';
+        void el.offsetWidth; // reflow
+        document.getElementById('dynamicAnimation').textContent = `#previewEl { animation: ${animValue}; }`;
+        el.style.animation = '';
+
+        state.paused = false;
+        document.getElementById('pauseBtn').textContent = '⏸ 一時停止';
+    }
+
+    function replayAnimation() {
+        state.paused = false;
+        document.getElementById('pauseBtn').textContent = '⏸ 一時停止';
+        applyAnimation();
+    }
+
+    function pauseAnimation() {
+        const el = document.getElementById('previewEl');
+        state.paused = !state.paused;
+        el.style.animationPlayState = state.paused ? 'paused' : 'running';
+        document.getElementById('pauseBtn').textContent = state.paused ? '▶ 再開' : '⏸ 一時停止';
+    }
+
+    function generateCode() {
+        const preset = presets[state.preset];
+        const animName = preset.name;
+        const animValue = `${animName} ${state.duration}s ${state.timing} ${state.delay}s ${state.iteration} ${state.direction} ${state.fillMode}`;
+
+        const code = `/* アニメーション定義 */
+${preset.keyframes}
+
+/* 要素に適用 */
+.animated-element {
+  animation: ${animValue};
+}
+
+/* animation プロパティの内訳 */
+.animated-element {
+  animation-name: ${animName};
+  animation-duration: ${state.duration}s;
+  animation-timing-function: ${state.timing};
+  animation-delay: ${state.delay}s;
+  animation-iteration-count: ${state.iteration};
+  animation-direction: ${state.direction};
+  animation-fill-mode: ${state.fillMode};
+}`;
+
+        document.getElementById('codeOutput').innerHTML = syntaxHighlightCSS(escHtml(code));
+    }
+
+    function escHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function syntaxHighlightCSS(code) {
+        // Color @keyframes and selectors
+        code = code.replace(/(\/\*[^*]*\*\/)/g, '<span class="css-comment">$1</span>');
+        code = code.replace(/(@keyframes\s+\w+)/g, '<span class="css-at">$1</span>');
+        code = code.replace(/(\.[\w-]+\s*\{)/g, '<span class="css-selector">$1</span>');
+        code = code.replace(/(from|to|\d+%)/g, '<span class="css-percent">$1</span>');
+        code = code.replace(/(animation[\w-]*)(\s*:\s*)/g, '<span class="css-prop">$1</span>$2');
+        return code;
+    }
+
+    function copyCode() {
+        const preset = presets[state.preset];
+        const animName = preset.name;
+        const animValue = `${animName} ${state.duration}s ${state.timing} ${state.delay}s ${state.iteration} ${state.direction} ${state.fillMode}`;
+        const code = `/* アニメーション定義 */\n${preset.keyframes}\n\n/* 要素に適用 */\n.animated-element {\n  animation: ${animValue};\n}`;
+        navigator.clipboard.writeText(code).then(() => showToast('CSSをコピーしました！'));
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Initialize
+    updatePreviewElement();
+    updateAnimation();
+</script>
+
+</body>
+</html>

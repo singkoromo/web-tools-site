@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JPE0M70GR8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JPE0M70GR8');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CORSヘッダー設定を生成するツール。Nginx/Apache/.htaccess/Expressの設定コードをGUIで出力できます。">
+<meta name="keywords" content="CORS, Cross-Origin, ヘッダー, セキュリティ, Access-Control, オリジン">
+<meta name="author" content="ToolBox">
+<title>CORSポリシージェネレーター | ToolBox</title>
+<meta property="og:title" content="CORSポリシージェネレーター | ToolBox">
+<meta property="og:description" content="CORSヘッダー設定を生成するツール。Nginx/Apache/Express対応。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://web-tool-site.com/tools/cors-policy-generator.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CORSポリシージェネレーター | ToolBox">
+<meta name="twitter:description" content="CORSヘッダー設定を生成。Nginx/Apache/Express対応。">
+<link rel="canonical" href="https://web-tool-site.com/tools/cors-policy-generator.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "CORSポリシージェネレーター",
+  "description": "CORSヘッダー設定を生成するツール。Nginx/Apache/.htaccess/Expressの設定コードをGUIで出力できます。",
+  "url": "https://web-tool-site.com/tools/cors-policy-generator.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0"}
+}
+</script>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .tool-container { display:flex; flex-direction:column; gap:1.25rem; max-width:960px; margin:0 auto; }
+  .card { background:#fff; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.25rem; }
+  .section-title { font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#e06000; margin:0 0 0.75rem 0; }
+
+  /* Warning */
+  .warn-box { background:#fff3cd; border-left:4px solid #ffc107; border-radius:0 0.5rem 0.5rem 0; padding:0.75rem 1rem; font-size:0.85rem; color:#856404; display:none; }
+  .warn-box.visible { display:block; }
+
+  /* Settings grid */
+  .settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  @media(max-width:640px) { .settings-grid { grid-template-columns:1fr; } }
+
+  .field-group { display:flex; flex-direction:column; gap:0.4rem; }
+  .field-group label { font-size:0.85rem; font-weight:600; color:#333; }
+  .field-group select, .field-group input[type="text"], .field-group input[type="number"] {
+    padding:0.6rem 0.8rem; border:1px solid #ccc; border-radius:0.5rem; font-size:0.88rem; font-family:'Inter',sans-serif;
+  }
+  .field-group select:focus, .field-group input:focus { outline:none; border-color:#e06000; box-shadow:0 0 0 3px rgba(224,96,0,0.1); }
+
+  /* Checkboxes grid */
+  .cb-grid { display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .cb-item { display:flex; align-items:center; gap:0.35rem; font-size:0.85rem; }
+  .cb-item input[type="checkbox"] { accent-color:#e06000; }
+
+  /* Toggle switch */
+  .toggle-row { display:flex; align-items:center; gap:0.75rem; }
+  .switch { position:relative; display:inline-block; width:40px; height:22px; }
+  .switch input { opacity:0; width:0; height:0; }
+  .slider { position:absolute; cursor:pointer; top:0;left:0;right:0;bottom:0; background:#ccc; border-radius:22px; transition:0.3s; }
+  .slider:before { position:absolute; content:""; height:16px; width:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.3s; }
+  input:checked + .slider { background:#e06000; }
+  input:checked + .slider:before { transform:translateX(18px); }
+  .toggle-label { font-size:0.88rem; color:#333; }
+
+  /* Tabs */
+  .tabs { display:flex; gap:0; border-bottom:2px solid #e0e0e0; margin-bottom:1rem; flex-wrap:wrap; }
+  .tab { padding:0.6rem 1.1rem; cursor:pointer; font-size:0.88rem; font-weight:600; color:#888; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+  .tab.active { color:#e06000; border-bottom-color:#e06000; }
+  .tab:hover:not(.active) { color:#555; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  /* Code output */
+  .code-block { position:relative; }
+  .code-area { width:100%; min-height:180px; padding:1rem; background:#1e1e1e; color:#d4d4d4; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.82rem; border:none; resize:vertical; line-height:1.6; }
+  .copy-btn { position:absolute; top:0.5rem; right:0.5rem; padding:0.3rem 0.7rem; background:#e06000; color:#fff; border:none; border-radius:0.35rem; font-size:0.78rem; font-weight:600; cursor:pointer; transition:background 0.2s; }
+  .copy-btn:hover { background:#b84d00; }
+
+  /* Buttons */
+  .btn { padding:0.6rem 1.2rem; border:none; border-radius:0.5rem; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Inter',sans-serif; }
+  .btn-primary { background:#e06000; color:#fff; }
+  .btn-primary:hover { background:#b84d00; }
+
+  /* SEO */
+  .seo-section { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.5rem; margin-top:1rem; }
+  .seo-section h2 { font-size:1.1rem; font-weight:700; margin:0 0 0.5rem 0; color:#333; }
+  .seo-section p { font-size:0.9rem; color:#555; line-height:1.7; margin:0 0 0.5rem 0; }
+
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#333; color:#fff; padding:0.75rem 1.25rem; border-radius:0.5rem; opacity:0; pointer-events:none; transition:opacity 0.3s; font-size:0.9rem; z-index:9999; }
+  .toast.show { opacity:1; }
+
+  @media (prefers-color-scheme: dark) {
+    .card { background:#1e2030; border-color:#2d3748; }
+    .section-title { color:#fb923c; }
+    .field-group label { color:#e5e7eb; }
+    .field-group select, .field-group input { background:#111827; border-color:#374151; color:#e5e7eb; }
+    .toggle-label { color:#d1d5db; }
+    .tabs { border-color:#374151; }
+    .tab { color:#6b7280; }
+    .tab.active { color:#fb923c; border-bottom-color:#fb923c; }
+    .warn-box { background:#422006; border-color:#fb923c; color:#fed7aa; }
+    .cb-item { color:#d1d5db; }
+    .seo-section { background:#1e2030; border-color:#2d3748; }
+    .seo-section h2 { color:#e5e7eb; }
+    .seo-section p { color:#9ca3af; }
+    .slider { background:#4b5563; }
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-container">
+    <a href="../index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+      </svg>
+      ToolBox
+    </a>
+    <nav class="nav">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+  <div class="tool-header">
+    <h1 class="tool-title">CORSポリシージェネレーター</h1>
+    <p class="tool-description">CORSヘッダー設定を生成するツール。Nginx / Apache (.htaccess) / Express (Node.js) / HTTPヘッダー一覧に対応。</p>
+  </div>
+
+  <div class="tool-container">
+
+    <!-- Settings -->
+    <div class="card">
+      <div class="section-title">CORS設定</div>
+      <div class="settings-grid">
+
+        <div class="field-group">
+          <label>許可するオリジン</label>
+          <select id="originType" onchange="onOriginTypeChange()">
+            <option value="*">すべて (*)</option>
+            <option value="single">特定のオリジン</option>
+            <option value="multiple">複数のオリジン</option>
+          </select>
+        </div>
+
+        <div class="field-group" id="originInputWrap" style="display:none;">
+          <label id="originInputLabel">オリジン</label>
+          <input type="text" id="originInput" placeholder="https://example.com" oninput="generateAll()">
+        </div>
+
+        <div class="field-group">
+          <label>Max Age (プリフライトキャッシュ秒数)</label>
+          <input type="number" id="maxAge" value="86400" oninput="generateAll()">
+        </div>
+
+        <div class="field-group">
+          <label>Exposed Headers (任意)</label>
+          <input type="text" id="exposedHeaders" placeholder="X-Custom-Header, X-Request-Id" oninput="generateAll()">
+        </div>
+
+      </div>
+
+      <div style="margin-top:1rem;">
+        <div class="section-title">許可するメソッド</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" class="method-cb" value="GET" checked onchange="generateAll()"> GET</label>
+          <label class="cb-item"><input type="checkbox" class="method-cb" value="POST" checked onchange="generateAll()"> POST</label>
+          <label class="cb-item"><input type="checkbox" class="method-cb" value="PUT" onchange="generateAll()"> PUT</label>
+          <label class="cb-item"><input type="checkbox" class="method-cb" value="DELETE" onchange="generateAll()"> DELETE</label>
+          <label class="cb-item"><input type="checkbox" class="method-cb" value="PATCH" onchange="generateAll()"> PATCH</label>
+          <label class="cb-item"><input type="checkbox" class="method-cb" value="HEAD" onchange="generateAll()"> HEAD</label>
+          <label class="cb-item"><input type="checkbox" class="method-cb" value="OPTIONS" checked onchange="generateAll()"> OPTIONS</label>
+        </div>
+      </div>
+
+      <div style="margin-top:1rem;">
+        <div class="section-title">許可するヘッダー</div>
+        <div class="cb-grid">
+          <label class="cb-item"><input type="checkbox" class="header-cb" value="Content-Type" checked onchange="generateAll()"> Content-Type</label>
+          <label class="cb-item"><input type="checkbox" class="header-cb" value="Authorization" onchange="generateAll()"> Authorization</label>
+          <label class="cb-item"><input type="checkbox" class="header-cb" value="X-Requested-With" onchange="generateAll()"> X-Requested-With</label>
+          <label class="cb-item"><input type="checkbox" class="header-cb" value="Accept" checked onchange="generateAll()"> Accept</label>
+          <label class="cb-item"><input type="checkbox" class="header-cb" value="Origin" onchange="generateAll()"> Origin</label>
+        </div>
+        <div style="margin-top:0.5rem;">
+          <input type="text" id="customHeaders" placeholder="カスタムヘッダー (カンマ区切り)" style="width:100%;padding:0.55rem 0.8rem;border:1px solid #ccc;border-radius:0.5rem;font-size:0.85rem;" oninput="generateAll()">
+        </div>
+      </div>
+
+      <div style="margin-top:1rem; display:flex; gap:1.5rem; flex-wrap:wrap; align-items:center;">
+        <div class="toggle-row">
+          <label class="switch">
+            <input type="checkbox" id="allowCredentials" onchange="onCredentialsChange()">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">Allow-Credentials</span>
+        </div>
+      </div>
+
+      <div class="warn-box" id="warnBox">
+        警告: <code>Allow-Credentials: true</code> はワイルドカード (<code>*</code>) オリジンと併用できません。特定のオリジンを指定してください。
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="card">
+      <div class="section-title">生成されたコード</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('nginx')">Nginx</div>
+        <div class="tab" onclick="switchTab('apache')">Apache (.htaccess)</div>
+        <div class="tab" onclick="switchTab('express')">Express (Node.js)</div>
+        <div class="tab" onclick="switchTab('headers')">HTTPヘッダー一覧</div>
+      </div>
+
+      <div class="tab-content active" id="tab-nginx">
+        <div class="code-block">
+          <textarea class="code-area" id="code-nginx" readonly></textarea>
+          <button class="copy-btn" onclick="copyCode('nginx')">コピー</button>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-apache">
+        <div class="code-block">
+          <textarea class="code-area" id="code-apache" readonly></textarea>
+          <button class="copy-btn" onclick="copyCode('apache')">コピー</button>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-express">
+        <div class="code-block">
+          <textarea class="code-area" id="code-express" readonly></textarea>
+          <button class="copy-btn" onclick="copyCode('express')">コピー</button>
+        </div>
+      </div>
+      <div class="tab-content" id="tab-headers">
+        <div class="code-block">
+          <textarea class="code-area" id="code-headers" readonly></textarea>
+          <button class="copy-btn" onclick="copyCode('headers')">コピー</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div class="seo-section">
+      <h2>CORSポリシージェネレーターについて</h2>
+      <p>CORS（Cross-Origin Resource Sharing）はブラウザのセキュリティ機能で、異なるオリジン間でのリソース共有を制御します。APIサーバーやWebアプリケーションで適切なCORSヘッダーを設定する際に活用してください。</p>
+      <p>Nginx・Apache・Express・HTTPヘッダー形式の4種類のコードを生成します。Allow-CredentialsとワイルドカードOriginの組み合わせの警告など、セキュリティ上の注意点も表示します。</p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+      <a href="../about.html">このサイトについて</a>
+      <a href="../contact.html">お問い合わせ</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../terms.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentTab = 'nginx';
+
+function switchTab(name) {
+  currentTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const tabs = document.querySelectorAll('.tab');
+  const names = ['nginx','apache','express','headers'];
+  tabs[names.indexOf(name)].classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function getOrigin() {
+  const type = document.getElementById('originType').value;
+  if (type === '*') return '*';
+  const input = document.getElementById('originInput').value.trim();
+  return input || 'https://example.com';
+}
+
+function getMethods() {
+  return Array.from(document.querySelectorAll('.method-cb:checked')).map(c => c.value);
+}
+
+function getAllowedHeaders() {
+  const checked = Array.from(document.querySelectorAll('.header-cb:checked')).map(c => c.value);
+  const custom = document.getElementById('customHeaders').value.trim();
+  if (custom) {
+    custom.split(',').map(s => s.trim()).filter(Boolean).forEach(h => {
+      if (!checked.includes(h)) checked.push(h);
+    });
+  }
+  return checked;
+}
+
+function getMaxAge() { return document.getElementById('maxAge').value || '86400'; }
+function getExposed() { return document.getElementById('exposedHeaders').value.trim(); }
+function getCreds() { return document.getElementById('allowCredentials').checked; }
+
+function onOriginTypeChange() {
+  const type = document.getElementById('originType').value;
+  const wrap = document.getElementById('originInputWrap');
+  const label = document.getElementById('originInputLabel');
+  if (type === 'single') {
+    wrap.style.display = 'flex';
+    label.textContent = 'オリジン';
+    document.getElementById('originInput').placeholder = 'https://example.com';
+  } else if (type === 'multiple') {
+    wrap.style.display = 'flex';
+    label.textContent = 'オリジン（カンマ区切り）';
+    document.getElementById('originInput').placeholder = 'https://example.com, https://app.example.com';
+  } else {
+    wrap.style.display = 'none';
+  }
+  generateAll();
+}
+
+function onCredentialsChange() {
+  checkWarn();
+  generateAll();
+}
+
+function checkWarn() {
+  const type = document.getElementById('originType').value;
+  const creds = getCreds();
+  const warn = document.getElementById('warnBox');
+  warn.classList.toggle('visible', creds && type === '*');
+}
+
+function getOrigins() {
+  const type = document.getElementById('originType').value;
+  if (type === '*') return ['*'];
+  const raw = document.getElementById('originInput').value;
+  return raw.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+function generateNginx() {
+  const origins = getOrigins();
+  const methods = getMethods().join(', ');
+  const headers = getAllowedHeaders().join(', ');
+  const maxAge = getMaxAge();
+  const creds = getCreds();
+  const exposed = getExposed();
+  let lines = [];
+
+  if (origins.length === 1 && origins[0] !== '*') {
+    lines.push(`# 特定オリジンの場合はmap等で動的に設定することを推奨します`);
+    lines.push(`set $cors_origin "";`);
+    lines.push(`if ($http_origin = "${origins[0]}") {`);
+    lines.push(`    set $cors_origin "${origins[0]}";`);
+    lines.push(`}`);
+    lines.push(`add_header 'Access-Control-Allow-Origin' $cors_origin always;`);
+  } else if (origins.length > 1) {
+    lines.push(`# 複数オリジンの場合はmapディレクティブを使用します`);
+    lines.push(`map $http_origin $cors_origin {`);
+    origins.forEach(o => lines.push(`    ${o} $http_origin;`));
+    lines.push(`    default "";`);
+    lines.push(`}`);
+    lines.push(`add_header 'Access-Control-Allow-Origin' $cors_origin always;`);
+  } else {
+    lines.push(`add_header 'Access-Control-Allow-Origin' '*' always;`);
+  }
+
+  if (creds) lines.push(`add_header 'Access-Control-Allow-Credentials' 'true' always;`);
+  lines.push(`add_header 'Access-Control-Allow-Methods' '${methods}' always;`);
+  lines.push(`add_header 'Access-Control-Allow-Headers' '${headers}' always;`);
+  lines.push(`add_header 'Access-Control-Max-Age' ${maxAge} always;`);
+  if (exposed) lines.push(`add_header 'Access-Control-Expose-Headers' '${exposed}' always;`);
+  lines.push(``);
+  lines.push(`# OPTIONSプリフライトリクエストへの対応`);
+  lines.push(`if ($request_method = 'OPTIONS') {`);
+  lines.push(`    return 204;`);
+  lines.push(`}`);
+  return lines.join('\n');
+}
+
+function generateApache() {
+  const origins = getOrigins();
+  const methods = getMethods().join(', ');
+  const headers = getAllowedHeaders().join(', ');
+  const maxAge = getMaxAge();
+  const creds = getCreds();
+  const exposed = getExposed();
+  let lines = [];
+
+  lines.push(`# .htaccess CORS設定`);
+  lines.push(`<IfModule mod_headers.c>`);
+
+  if (origins[0] === '*') {
+    lines.push(`    Header set Access-Control-Allow-Origin "*"`);
+  } else if (origins.length === 1) {
+    lines.push(`    SetEnvIf Origin "^${origins[0].replace(/\./g,'\\.')}$" ORIGIN_OK`);
+    lines.push(`    Header set Access-Control-Allow-Origin "%{HTTP_ORIGIN}e" env=ORIGIN_OK`);
+  } else {
+    const pattern = origins.map(o => o.replace(/\./g,'\\.')).join('|');
+    lines.push(`    SetEnvIf Origin "^(${pattern})$" ORIGIN_OK`);
+    lines.push(`    Header set Access-Control-Allow-Origin "%{HTTP_ORIGIN}e" env=ORIGIN_OK`);
+  }
+
+  if (creds) lines.push(`    Header set Access-Control-Allow-Credentials "true"`);
+  lines.push(`    Header set Access-Control-Allow-Methods "${methods}"`);
+  lines.push(`    Header set Access-Control-Allow-Headers "${headers}"`);
+  lines.push(`    Header set Access-Control-Max-Age "${maxAge}"`);
+  if (exposed) lines.push(`    Header set Access-Control-Expose-Headers "${exposed}"`);
+  lines.push(`</IfModule>`);
+  lines.push(``);
+  lines.push(`# OPTIONSプリフライトリクエストへの対応`);
+  lines.push(`<IfModule mod_rewrite.c>`);
+  lines.push(`    RewriteEngine On`);
+  lines.push(`    RewriteCond %{REQUEST_METHOD} OPTIONS`);
+  lines.push(`    RewriteRule ^(.*)$ $1 [R=204,L]`);
+  lines.push(`</IfModule>`);
+  return lines.join('\n');
+}
+
+function generateExpress() {
+  const origins = getOrigins();
+  const methods = getMethods().join(', ');
+  const headers = getAllowedHeaders().join(', ');
+  const maxAge = getMaxAge();
+  const creds = getCreds();
+  const exposed = getExposed();
+  let lines = [];
+
+  lines.push(`// Express CORS ミドルウェア`);
+  lines.push(`app.use((req, res, next) => {`);
+
+  if (origins[0] === '*') {
+    lines.push(`  res.setHeader('Access-Control-Allow-Origin', '*');`);
+  } else if (origins.length === 1) {
+    lines.push(`  const origin = req.headers.origin;`);
+    lines.push(`  if (origin === '${origins[0]}') {`);
+    lines.push(`    res.setHeader('Access-Control-Allow-Origin', origin);`);
+    lines.push(`  }`);
+  } else {
+    const list = origins.map(o => `'${o}'`).join(', ');
+    lines.push(`  const allowedOrigins = [${list}];`);
+    lines.push(`  const origin = req.headers.origin;`);
+    lines.push(`  if (allowedOrigins.includes(origin)) {`);
+    lines.push(`    res.setHeader('Access-Control-Allow-Origin', origin);`);
+    lines.push(`  }`);
+  }
+
+  if (creds) lines.push(`  res.setHeader('Access-Control-Allow-Credentials', 'true');`);
+  lines.push(`  res.setHeader('Access-Control-Allow-Methods', '${methods}');`);
+  lines.push(`  res.setHeader('Access-Control-Allow-Headers', '${headers}');`);
+  lines.push(`  res.setHeader('Access-Control-Max-Age', '${maxAge}');`);
+  if (exposed) lines.push(`  res.setHeader('Access-Control-Expose-Headers', '${exposed}');`);
+  lines.push(``);
+  lines.push(`  // OPTIONSプリフライトリクエストへの対応`);
+  lines.push(`  if (req.method === 'OPTIONS') {`);
+  lines.push(`    return res.status(204).end();`);
+  lines.push(`  }`);
+  lines.push(`  next();`);
+  lines.push(`});`);
+  lines.push(``);
+  lines.push(`// または cors パッケージを使用:`);
+  lines.push(`// npm install cors`);
+  const corsOrigin = origins[0] === '*' ? `'*'` : (origins.length === 1 ? `'${origins[0]}'` : `[${origins.map(o=>`'${o}'`).join(', ')}]`);
+  lines.push(`// const cors = require('cors');`);
+  lines.push(`// app.use(cors({ origin: ${corsOrigin}, credentials: ${creds}, methods: '${methods}' }));`);
+  return lines.join('\n');
+}
+
+function generateHeaders() {
+  const origins = getOrigins();
+  const methods = getMethods().join(', ');
+  const headers = getAllowedHeaders().join(', ');
+  const maxAge = getMaxAge();
+  const creds = getCreds();
+  const exposed = getExposed();
+  const originVal = origins[0] === '*' ? '*' : origins[0];
+  let lines = [];
+
+  lines.push(`# HTTPレスポンスヘッダー一覧`);
+  lines.push(`Access-Control-Allow-Origin: ${originVal}`);
+  if (creds) lines.push(`Access-Control-Allow-Credentials: true`);
+  lines.push(`Access-Control-Allow-Methods: ${methods}`);
+  lines.push(`Access-Control-Allow-Headers: ${headers}`);
+  lines.push(`Access-Control-Max-Age: ${maxAge}`);
+  if (exposed) lines.push(`Access-Control-Expose-Headers: ${exposed}`);
+  return lines.join('\n');
+}
+
+function generateAll() {
+  checkWarn();
+  document.getElementById('code-nginx').value = generateNginx();
+  document.getElementById('code-apache').value = generateApache();
+  document.getElementById('code-express').value = generateExpress();
+  document.getElementById('code-headers').value = generateHeaders();
+}
+
+function copyCode(name) {
+  const el = document.getElementById('code-' + name);
+  navigator.clipboard.writeText(el.value).then(() => showToast('コピーしました')).catch(() => {
+    el.select(); document.execCommand('copy'); showToast('コピーしました');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Initialize
+generateAll();
+</script>
+</body>
+</html>

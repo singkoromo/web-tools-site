@@ -9,300 +9,430 @@
   gtag('js', new Date());
   gtag('config', 'G-JPE0M70GR8');
 </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocketテスター | ToolBox</title>
-    <meta name="description" content="WebSocket接続のテスト・デバッグツール。メッセージの送受信、接続状態の確認、ログの表示ができます。">
-    <meta property="og:title" content="WebSocketテスター | ToolBox">
-    <meta property="og:description" content="WebSocket接続のテスト・デバッグツール。メッセージの送受信、接続状態の確認、ログの表示ができます。">
-    <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary">
-    <link rel="canonical" href="https://web-tool-site.com/tools/websocket-tester.html">
-    <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"WebSocketテスター","description":"WebSocket接続のテスト・デバッグツール。メッセージの送受信、接続状態の確認、ログの表示ができます。","url":"https://web-tool-site.com/tools/websocket-tester.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; line-height: 1.6; min-height: 100vh; }
-        header { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-        .header-container { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 700; color: #2c3e50; text-decoration: none; }
-        nav ul { list-style: none; display: flex; gap: 2rem; }
-        nav a { color: #555; text-decoration: none; font-weight: 500; }
-        nav a:hover { color: #4a90e2; }
-        .tool-page { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .tool-card-main { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; }
-        .tool-header { background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%); color: white; padding: 2rem; text-align: center; }
-        .tool-header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-        .tool-header p { opacity: 0.9; }
-        .tool-content { padding: 2rem; }
-        button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Inter', sans-serif; }
-        .btn-primary { background: #4a90e2; color: white; }
-        .btn-primary:hover { background: #357abd; transform: translateY(-2px); }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn-secondary:hover { background: #5a6268; }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-success:hover { background: #219150; transform: translateY(-2px); }
-        .btn-danger { background: #e74c3c; color: white; }
-        .btn-danger:hover { background: #c0392b; transform: translateY(-2px); }
-        .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
-        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        textarea, input[type="text"], input[type="url"] { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; width: 100%; }
-        textarea:focus, input:focus { outline: none; border-color: #4a90e2; }
-        .form-group { margin-bottom: 1.5rem; }
-        .label { font-weight: 600; color: #333; margin-bottom: 0.5rem; display: block; }
-        .alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
-        .alert-warning { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
-        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 1000; display: none; }
-        footer.footer { background: #2c3e50; color: white; text-align: center; padding: 2rem; margin-top: 2rem; }
-        .footer-inner .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
-        .footer-inner .footer-links a { color: #aaa; text-decoration: none; }
-        @media (max-width: 768px) { .header-container { flex-direction: column; gap: 1rem; } .url-row { flex-direction: column; } }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="WebSocket接続のテスト・デバッグツール。接続・メッセージ送受信・ログ表示をブラウザ上で行えます。">
+<meta name="keywords" content="WebSocket, テスト, 接続, wss, ws, リアルタイム, デバッグ">
+<meta name="author" content="ToolBox">
+<title>WebSocketテスター | ToolBox</title>
+<meta property="og:title" content="WebSocketテスター | ToolBox">
+<meta property="og:description" content="WebSocket接続のテスト・デバッグツール。接続・メッセージ送受信・ログ表示。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://web-tool-site.com/tools/websocket-tester.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebSocketテスター | ToolBox">
+<meta name="twitter:description" content="WebSocket接続のテスト・デバッグツール。接続・メッセージ送受信・ログ表示。">
+<link rel="canonical" href="https://web-tool-site.com/tools/websocket-tester.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "WebSocketテスター",
+  "description": "WebSocket接続のテスト・デバッグツール。接続・メッセージ送受信・ログ表示をブラウザ上で行えます。",
+  "url": "https://web-tool-site.com/tools/websocket-tester.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {"@type": "Offer", "price": "0"}
+}
+</script>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  .tool-container { display:flex; flex-direction:column; gap:1.25rem; max-width:960px; margin:0 auto; }
+  .card { background:#fff; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.25rem; }
+  .section-title { font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0077cc; margin:0 0 0.75rem 0; }
 
-        .url-row { display: flex; gap: 0.75rem; align-items: stretch; }
-        .url-row input { flex: 1; }
-        .status-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem; font-weight: 600; }
-        .status-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; transition: background 0.3s; }
-        .dot-disconnected { background: #aaa; }
-        .dot-connecting { background: #f7971e; animation: pulse 1s infinite; }
-        .dot-connected { background: #27ae60; }
-        .dot-error { background: #e74c3c; }
-        @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.4;} }
-        .log-area { background: #1a1a1a; border-radius: 8px; padding: 1rem; height: 350px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.7; }
-        .log-sent { color: #64b5f6; }
-        .log-recv { color: #81c784; }
-        .log-sys { color: #b0b0b0; }
-        .log-err { color: #ef5350; }
-        .msg-area { display: flex; gap: 0.75rem; align-items: flex-end; }
-        .msg-area textarea { flex: 1; height: 80px; resize: vertical; }
-        .options-row { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1rem; font-size: 0.9rem; }
-        .options-row label { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
-        .section-title { font-size: 1.1rem; font-weight: 700; color: #333; margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 2px solid #f7971e; }
-        .quick-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        .log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-    </style>
+  /* Connection bar */
+  .conn-bar { display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap; }
+  .conn-bar input[type="text"] { flex:1; min-width:220px; padding:0.65rem 1rem; border:1px solid #ccc; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.9rem; }
+  .conn-bar input:focus { outline:none; border-color:#0077cc; box-shadow:0 0 0 3px rgba(0,119,204,0.12); }
+  .status-dot { width:12px; height:12px; border-radius:50%; background:#dc3545; flex-shrink:0; transition:background 0.3s; }
+  .status-dot.connecting { background:#ffc107; animation:pulse 1s infinite; }
+  .status-dot.connected { background:#28a745; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .status-text { font-size:0.85rem; color:#666; white-space:nowrap; }
+
+  /* Presets */
+  .preset-row { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; }
+  .preset-label { font-size:0.8rem; color:#888; }
+  .preset-btn { padding:0.3rem 0.7rem; border:1px solid #0077cc; border-radius:1rem; background:#fff; color:#0077cc; font-size:0.78rem; cursor:pointer; font-family:'JetBrains Mono',monospace; transition:all 0.2s; }
+  .preset-btn:hover { background:#0077cc; color:#fff; }
+
+  /* Stats */
+  .stats-row { display:flex; gap:1.5rem; flex-wrap:wrap; }
+  .stat-item { text-align:center; }
+  .stat-value { font-family:'JetBrains Mono',monospace; font-size:1.4rem; font-weight:700; color:#0077cc; }
+  .stat-label { font-size:0.75rem; color:#888; }
+
+  /* Message input */
+  .msg-row { display:flex; gap:0.75rem; align-items:flex-end; flex-wrap:wrap; }
+  .msg-row textarea { flex:1; min-width:200px; height:80px; padding:0.65rem 1rem; border:1px solid #ccc; border-radius:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.88rem; resize:vertical; }
+  .msg-row textarea:focus { outline:none; border-color:#0077cc; box-shadow:0 0 0 3px rgba(0,119,204,0.12); }
+  .msg-controls { display:flex; flex-direction:column; gap:0.5rem; }
+  .toggle-row { display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; color:#555; }
+  .toggle-row input[type="checkbox"] { accent-color:#0077cc; }
+
+  /* Buttons */
+  .btn { padding:0.6rem 1.2rem; border:none; border-radius:0.5rem; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'Inter',sans-serif; white-space:nowrap; }
+  .btn-primary { background:#0077cc; color:#fff; }
+  .btn-primary:hover { background:#005fa3; }
+  .btn-danger { background:#dc3545; color:#fff; }
+  .btn-danger:hover { background:#b02a37; }
+  .btn-secondary { background:#6c757d; color:#fff; }
+  .btn-secondary:hover { background:#545b62; }
+  .btn-send { background:#28a745; color:#fff; }
+  .btn-send:hover { background:#1e7e34; }
+  .btn-send:disabled, .btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+  /* Log */
+  .log-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem; }
+  .log-options { display:flex; gap:1rem; align-items:center; font-size:0.82rem; color:#555; }
+  .log-area { height:320px; overflow-y:auto; background:#0d1117; border-radius:0.5rem; padding:0.75rem; display:flex; flex-direction:column; gap:0.3rem; font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+  .log-entry { padding:0.35rem 0.6rem; border-radius:0.35rem; line-height:1.4; word-break:break-all; }
+  .log-sent { background:#1a3a5c; color:#7ec8e3; }
+  .log-received { background:#1a3d27; color:#7dcc96; }
+  .log-system { background:#2d2d2d; color:#aaa; }
+  .log-error { background:#3d1a1a; color:#f07070; }
+  .log-time { color:#666; margin-right:0.5rem; font-size:0.75rem; }
+  .log-badge { font-size:0.7rem; padding:0.1rem 0.35rem; border-radius:0.25rem; margin-right:0.4rem; font-weight:700; }
+  .badge-sent { background:#0077cc; color:#fff; }
+  .badge-recv { background:#28a745; color:#fff; }
+  .badge-sys { background:#555; color:#fff; }
+  .badge-err { background:#dc3545; color:#fff; }
+  .log-empty { color:#555; text-align:center; margin-top:4rem; }
+
+  /* Note */
+  .note-box { background:#e8f4fd; border-left:4px solid #0077cc; border-radius:0 0.5rem 0.5rem 0; padding:0.75rem 1rem; font-size:0.85rem; color:#0055aa; }
+
+  /* SEO section */
+  .seo-section { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:0.75rem; padding:1.5rem; margin-top:1rem; }
+  .seo-section h2 { font-size:1.1rem; font-weight:700; margin:0 0 0.5rem 0; color:#333; }
+  .seo-section p { font-size:0.9rem; color:#555; line-height:1.7; margin:0 0 0.5rem 0; }
+
+  /* Toast */
+  .toast { position:fixed; bottom:2rem; right:2rem; background:#333; color:#fff; padding:0.75rem 1.25rem; border-radius:0.5rem; opacity:0; pointer-events:none; transition:opacity 0.3s; font-size:0.9rem; z-index:9999; }
+  .toast.show { opacity:1; }
+
+  @media (prefers-color-scheme: dark) {
+    .card { background:#1a2332; border-color:#2d3748; }
+    .section-title { color:#60a5fa; }
+    .conn-bar input, .msg-row textarea { background:#0d1624; border-color:#374151; color:#e5e7eb; }
+    .status-text { color:#9ca3af; }
+    .preset-btn { background:#1a2332; border-color:#60a5fa; color:#60a5fa; }
+    .preset-btn:hover { background:#60a5fa; color:#0d1117; }
+    .stat-value { color:#60a5fa; }
+    .stat-label { color:#9ca3af; }
+    .toggle-row { color:#d1d5db; }
+    .note-box { background:#0d2240; border-color:#60a5fa; color:#93c5fd; }
+    .seo-section { background:#1a2332; border-color:#2d3748; }
+    .seo-section h2 { color:#e5e7eb; }
+    .seo-section p { color:#9ca3af; }
+    .log-options { color:#9ca3af; }
+    .log-options input[type="checkbox"] { accent-color:#60a5fa; }
+    .msg-controls input[type="checkbox"] { accent-color:#60a5fa; }
+  }
+  @media (max-width:600px) {
+    .conn-bar, .msg-row, .stats-row { flex-direction:column; align-items:stretch; }
+    .msg-controls { flex-direction:row; flex-wrap:wrap; }
+    .log-area { height:240px; }
+  }
+</style>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <a href="../index.html" class="logo">ToolBox</a>
-            <nav><ul><li><a href="../index.html">ホーム</a></li><li><a href="../index.html#tools">ツール一覧</a></li></ul></nav>
+<header class="header">
+  <div class="header-container">
+    <a href="../index.html" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+      </svg>
+      ToolBox
+    </a>
+    <nav class="nav">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+  <div class="tool-header">
+    <h1 class="tool-title">WebSocketテスター</h1>
+    <p class="tool-description">WebSocket接続のテスト・デバッグツール。接続・メッセージ送受信・ログ表示をブラウザ上で行えます。</p>
+  </div>
+
+  <div class="tool-container">
+
+    <!-- Note -->
+    <div class="note-box">
+      注: 実際のWebSocketサーバーエンドポイントが必要です。テスト用としてwss://echo.websocket.orgのようなエコーサーバーを使用できます。
+    </div>
+
+    <!-- Connection -->
+    <div class="card">
+      <div class="section-title">接続設定</div>
+      <div class="conn-bar">
+        <span class="status-dot" id="statusDot"></span>
+        <input type="text" id="wsUrl" value="wss://echo.websocket.org" placeholder="wss://example.com/ws">
+        <button class="btn btn-primary" id="connectBtn" onclick="toggleConnect()">接続</button>
+        <span class="status-text" id="statusText">未接続</span>
+      </div>
+      <div class="preset-row" style="margin-top:0.75rem;">
+        <span class="preset-label">プリセット:</span>
+        <button class="preset-btn" onclick="setUrl('wss://echo.websocket.org')">echo.websocket.org</button>
+        <button class="preset-btn" onclick="setUrl('wss://socketsbay.com/wss/v2/1/demo/')">socketsbay demo</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card">
+      <div class="section-title">接続統計</div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-value" id="statSent">0</div>
+          <div class="stat-label">送信メッセージ</div>
         </div>
-    </header>
-    <div class="tool-page"><div class="tool-card-main">
-        <div class="tool-header">
-            <h1>WebSocketテスター</h1>
-            <p>WebSocket接続のテスト・デバッグ。メッセージの送受信と接続ログを確認。</p>
+        <div class="stat-item">
+          <div class="stat-value" id="statRecv">0</div>
+          <div class="stat-label">受信メッセージ</div>
         </div>
-        <div class="tool-content">
-
-            <div class="alert alert-warning">
-                <strong>注意:</strong> wss://echo.websocket.org は常に利用できるとは限りません。自前のWebSocketサーバーURLを入力してテストすることを推奨します。
-            </div>
-
-            <!-- Connection -->
-            <div class="form-group">
-                <label class="label">WebSocket URL</label>
-                <div class="url-row">
-                    <input type="url" id="wsUrl" value="wss://echo.websocket.org" placeholder="wss://example.com/ws">
-                    <button class="btn-success" id="connectBtn" onclick="connectWS()">接続</button>
-                    <button class="btn-danger" id="disconnectBtn" onclick="disconnectWS()" disabled>切断</button>
-                </div>
-            </div>
-
-            <!-- Status -->
-            <div class="status-bar">
-                <div class="status-dot dot-disconnected" id="statusDot"></div>
-                <span id="statusText">未接続</span>
-            </div>
-
-            <!-- Options -->
-            <div class="options-row">
-                <label><input type="checkbox" id="autoReconnect"> 自動再接続</label>
-                <label><input type="checkbox" id="sendAsJson"> JSONとして送信（整形）</label>
-            </div>
-
-            <!-- Send message -->
-            <div class="section-title">メッセージ送信</div>
-            <div class="quick-btns">
-                <button class="btn-secondary btn-sm" onclick="quickSend('ping')">Ping</button>
-                <button class="btn-secondary btn-sm" onclick="quickSend('Hello World')">Hello World</button>
-                <button class="btn-secondary btn-sm" onclick='quickSend(JSON.stringify({"type":"test","ts":Date.now()}))'> {"type":"test"}</button>
-            </div>
-            <div class="msg-area">
-                <textarea id="msgInput" placeholder="送信するメッセージを入力..."></textarea>
-                <button class="btn-primary" id="sendBtn" onclick="sendMsg()" disabled>送信</button>
-            </div>
-
-            <!-- Log -->
-            <div style="margin-top:1.5rem;">
-                <div class="log-header">
-                    <div class="section-title" style="margin-bottom:0;">通信ログ</div>
-                    <button class="btn-secondary btn-sm" onclick="clearLog()">クリア</button>
-                </div>
-                <div class="log-area" id="logArea">
-                    <span class="log-sys">WebSocketテスターを起動しました。URLを入力して接続してください。</span>
-                </div>
-            </div>
-
+        <div class="stat-item">
+          <div class="stat-value" id="statBytesSent">0</div>
+          <div class="stat-label">送信バイト</div>
         </div>
-    </div></div>
-    <footer class="footer"><div class="footer-inner">
-        <div class="footer-links">
-            <a href="../index.html">ホーム</a><a href="../index.html#tools">ツール一覧</a>
-            <a href="../about.html">このサイトについて</a><a href="../contact.html">お問い合わせ</a>
-            <a href="../privacy.html">プライバシーポリシー</a><a href="../terms.html">利用規約</a>
+        <div class="stat-item">
+          <div class="stat-value" id="statBytesRecv">0</div>
+          <div class="stat-label">受信バイト</div>
         </div>
-        <p>&copy; 2026 ToolBox. All rights reserved.</p>
-    </div></footer>
-    <div class="toast" id="toast"></div>
-    <script>
-    function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2000);}
-    function copyText(text){navigator.clipboard.writeText(text).then(()=>showToast('コピーしました')).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('コピーしました');});}
+      </div>
+    </div>
 
-    let ws = null;
-    let logEntries = [];
-    let reconnectTimer = null;
-    let reconnectAttempts = 0;
+    <!-- Send Message -->
+    <div class="card">
+      <div class="section-title">メッセージ送信</div>
+      <div class="msg-row">
+        <textarea id="msgInput" placeholder="送信するメッセージを入力...&#10;JSON形式も可"></textarea>
+        <div class="msg-controls">
+          <button class="btn btn-send" id="sendBtn" onclick="sendMessage()" disabled>送信</button>
+          <div class="toggle-row">
+            <input type="checkbox" id="jsonFormat">
+            <label for="jsonFormat">JSON整形して送信</label>
+          </div>
+          <div class="toggle-row">
+            <input type="checkbox" id="prettyRecv" checked>
+            <label for="prettyRecv">受信JSONを整形</label>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    function ts() {
-        return new Date().toTimeString().slice(0,8);
-    }
+    <!-- Log -->
+    <div class="card">
+      <div class="log-header">
+        <div class="section-title" style="margin:0;">メッセージログ</div>
+        <div class="log-options">
+          <div class="toggle-row">
+            <input type="checkbox" id="autoScroll" checked>
+            <label for="autoScroll">自動スクロール</label>
+          </div>
+          <button class="btn btn-secondary" style="padding:0.35rem 0.75rem;font-size:0.8rem;" onclick="clearLog()">ログクリア</button>
+        </div>
+      </div>
+      <div class="log-area" id="logArea">
+        <div class="log-empty">接続するとメッセージが表示されます</div>
+      </div>
+    </div>
 
-    function addLog(type, msg) {
-        const logArea = document.getElementById('logArea');
-        const entry = { type, msg, time: ts() };
-        logEntries.push(entry);
-        if (logEntries.length > 200) logEntries.shift();
+    <!-- SEO -->
+    <div class="seo-section">
+      <h2>WebSocketテスターについて</h2>
+      <p>WebSocket（ws://またはwss://）プロトコルを使った接続のテスト・デバッグができるブラウザツールです。ブラウザのネイティブWebSocket APIを使用して動作します。</p>
+      <p>送信メッセージ・受信メッセージ・接続イベントをタイムスタンプ付きでログ表示します。JSON形式のメッセージは自動整形が可能です。送受信統計（メッセージ数・バイト数）もリアルタイムで確認できます。</p>
+      <p>テスト用エコーサーバーとしてwss://echo.websocket.orgを利用できます。実際のバックエンドに接続してWebSocket APIの動作確認にもご活用ください。</p>
+    </div>
 
-        const classMap = { sent: 'log-sent', recv: 'log-recv', sys: 'log-sys', err: 'log-err' };
-        const prefixMap = { sent: '→ SENT', recv: '← RECV', sys: '[SYS] ', err: '[ERR] ' };
+  </div>
+</main>
 
-        // Truncate long messages for display
-        const displayMsg = msg.length > 500 ? msg.slice(0, 497) + '...' : msg;
-        const line = document.createElement('div');
-        line.className = classMap[type] || 'log-sys';
-        line.textContent = `[${entry.time}] ${prefixMap[type]} ${displayMsg}`;
-        logArea.appendChild(line);
-        logArea.scrollTop = logArea.scrollHeight;
-    }
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="../index.html">ホーム</a>
+      <a href="../index.html#tools">ツール一覧</a>
+      <a href="../about.html">このサイトについて</a>
+      <a href="../contact.html">お問い合わせ</a>
+      <a href="../privacy.html">プライバシーポリシー</a>
+      <a href="../terms.html">利用規約</a>
+    </div>
+    <p>&copy; 2026 ToolBox. All rights reserved.</p>
+  </div>
+</footer>
 
-    function setStatus(state) {
-        const dot = document.getElementById('statusDot');
-        const text = document.getElementById('statusText');
-        const connectBtn = document.getElementById('connectBtn');
-        const disconnectBtn = document.getElementById('disconnectBtn');
-        const sendBtn = document.getElementById('sendBtn');
+<div class="toast" id="toast"></div>
 
-        dot.className = 'status-dot';
-        const stateMap = {
-            disconnected: { cls: 'dot-disconnected', label: '未接続', conn: false, disconn: true, send: false },
-            connecting:   { cls: 'dot-connecting',   label: '接続中...', conn: true, disconn: false, send: false },
-            connected:    { cls: 'dot-connected',     label: '接続済み', conn: true, disconn: false, send: false },
-            error:        { cls: 'dot-error',         label: 'エラー', conn: false, disconn: true, send: false }
-        };
-        const s = stateMap[state] || stateMap.disconnected;
-        dot.classList.add(s.cls);
-        text.textContent = s.label;
-        connectBtn.disabled = s.conn;
-        disconnectBtn.disabled = s.disconn;
-        sendBtn.disabled = state !== 'connected';
-    }
+<script>
+let ws = null;
+let statSent = 0, statRecv = 0, statBytesSent = 0, statBytesRecv = 0;
+let logEmpty = true;
 
-    function connectWS() {
-        const url = document.getElementById('wsUrl').value.trim();
-        if (!url) { showToast('URLを入力してください'); return; }
-        if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
-            showToast('ws:// または wss:// で始まるURLを入力してください'); return;
-        }
-        if (ws) { ws.close(); }
-        setStatus('connecting');
-        addLog('sys', `接続中: ${url}`);
-        try {
-            ws = new WebSocket(url);
-        } catch(e) {
-            addLog('err', `接続エラー: ${e.message}`);
-            setStatus('error');
-            return;
-        }
+function setUrl(url) {
+  document.getElementById('wsUrl').value = url;
+}
 
-        ws.onopen = function() {
-            setStatus('connected');
-            reconnectAttempts = 0;
-            addLog('sys', '接続しました');
-        };
+function setStatus(state) {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  const btn = document.getElementById('connectBtn');
+  dot.className = 'status-dot';
+  if (state === 'connected') {
+    dot.classList.add('connected');
+    text.textContent = '接続済み';
+    btn.textContent = '切断';
+    btn.className = 'btn btn-danger';
+    document.getElementById('sendBtn').disabled = false;
+  } else if (state === 'connecting') {
+    dot.classList.add('connecting');
+    text.textContent = '接続中...';
+    btn.textContent = 'キャンセル';
+    btn.className = 'btn btn-secondary';
+    document.getElementById('sendBtn').disabled = true;
+  } else {
+    text.textContent = '未接続';
+    btn.textContent = '接続';
+    btn.className = 'btn btn-primary';
+    document.getElementById('sendBtn').disabled = true;
+  }
+}
 
-        ws.onmessage = function(e) {
-            let msg = e.data;
-            if (typeof msg === 'object') msg = '[Binary data]';
-            addLog('recv', msg);
-        };
+function addLog(type, message) {
+  const area = document.getElementById('logArea');
+  if (logEmpty) {
+    area.innerHTML = '';
+    logEmpty = false;
+  }
+  const entry = document.createElement('div');
+  const badges = { sent:'badge-sent', received:'badge-recv', system:'badge-sys', error:'badge-err' };
+  const labels = { sent:'送信', received:'受信', system:'システム', error:'エラー' };
+  const classes = { sent:'log-sent', received:'log-received', system:'log-system', error:'log-error' };
+  const now = new Date();
+  const time = now.toTimeString().slice(0,8) + '.' + String(now.getMilliseconds()).padStart(3,'0');
+  entry.className = 'log-entry ' + (classes[type] || 'log-system');
+  entry.innerHTML = `<span class="log-time">${time}</span><span class="log-badge ${badges[type]}">${labels[type]}</span>${escapeHtml(message)}`;
+  area.appendChild(entry);
+  if (document.getElementById('autoScroll').checked) {
+    area.scrollTop = area.scrollHeight;
+  }
+}
 
-        ws.onerror = function(e) {
-            addLog('err', '接続エラーが発生しました');
-            setStatus('error');
-        };
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
-        ws.onclose = function(e) {
-            addLog('sys', `切断されました (code: ${e.code}, reason: ${e.reason || 'なし'})`);
-            ws = null;
-            setStatus('disconnected');
-            if (document.getElementById('autoReconnect').checked && reconnectAttempts < 5) {
-                reconnectAttempts++;
-                const delay = Math.min(1000 * reconnectAttempts, 10000);
-                addLog('sys', `${delay/1000}秒後に再接続を試みます... (${reconnectAttempts}/5)`);
-                reconnectTimer = setTimeout(connectWS, delay);
-            }
-        };
-    }
+function tryPrettyJson(str) {
+  try {
+    return JSON.stringify(JSON.parse(str), null, 2);
+  } catch(e) {
+    return str;
+  }
+}
 
-    function disconnectWS() {
-        if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
-        reconnectAttempts = 5; // prevent auto-reconnect
-        if (ws) { ws.close(1000, 'User disconnected'); }
-        setStatus('disconnected');
-    }
-
-    function sendMsg() {
-        const input = document.getElementById('msgInput');
-        let msg = input.value;
-        if (!msg.trim()) { showToast('メッセージを入力してください'); return; }
-        if (!ws || ws.readyState !== WebSocket.OPEN) { showToast('接続されていません'); return; }
-
-        if (document.getElementById('sendAsJson').checked) {
-            try {
-                const parsed = JSON.parse(msg);
-                msg = JSON.stringify(parsed, null, 2);
-            } catch(e) {
-                // not valid JSON, send as-is
-            }
-        }
-
-        ws.send(msg);
-        addLog('sent', msg);
-        input.value = '';
-    }
-
-    function quickSend(msg) {
-        if (!ws || ws.readyState !== WebSocket.OPEN) { showToast('先に接続してください'); return; }
-        ws.send(msg);
-        addLog('sent', msg);
-    }
-
-    function clearLog() {
-        logEntries = [];
-        document.getElementById('logArea').innerHTML = '<span class="log-sys">ログをクリアしました</span>';
-    }
-
-    // Allow Enter to send (Shift+Enter for newline)
-    document.getElementById('msgInput').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMsg();
-        }
-    });
-
+function connect() {
+  const url = document.getElementById('wsUrl').value.trim();
+  if (!url) { showToast('URLを入力してください'); return; }
+  setStatus('connecting');
+  addLog('system', `接続中: ${url}`);
+  try {
+    ws = new WebSocket(url);
+  } catch(e) {
+    addLog('error', `接続エラー: ${e.message}`);
     setStatus('disconnected');
-    </script>
+    return;
+  }
+  ws.onopen = () => {
+    setStatus('connected');
+    addLog('system', `接続成功: ${url}`);
+  };
+  ws.onmessage = (e) => {
+    statRecv++;
+    const data = typeof e.data === 'string' ? e.data : '[バイナリデータ]';
+    statBytesRecv += data.length;
+    updateStats();
+    const pretty = document.getElementById('prettyRecv').checked ? tryPrettyJson(data) : data;
+    addLog('received', pretty);
+  };
+  ws.onerror = (e) => {
+    addLog('error', '接続エラーが発生しました');
+  };
+  ws.onclose = (e) => {
+    addLog('system', `切断されました (コード: ${e.code}${e.reason ? ', 理由: '+e.reason : ''})`);
+    setStatus('disconnected');
+    ws = null;
+  };
+}
+
+function disconnect() {
+  if (ws) {
+    ws.close(1000, 'User disconnected');
+    ws = null;
+  }
+  setStatus('disconnected');
+}
+
+function toggleConnect() {
+  if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+    disconnect();
+  } else {
+    connect();
+  }
+}
+
+function sendMessage() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    showToast('接続されていません');
+    return;
+  }
+  let msg = document.getElementById('msgInput').value;
+  if (!msg.trim()) { showToast('メッセージを入力してください'); return; }
+  if (document.getElementById('jsonFormat').checked) {
+    msg = tryPrettyJson(msg);
+  }
+  ws.send(msg);
+  statSent++;
+  statBytesSent += msg.length;
+  updateStats();
+  addLog('sent', msg);
+}
+
+function updateStats() {
+  document.getElementById('statSent').textContent = statSent;
+  document.getElementById('statRecv').textContent = statRecv;
+  document.getElementById('statBytesSent').textContent = formatBytes(statBytesSent);
+  document.getElementById('statBytesRecv').textContent = formatBytes(statBytesRecv);
+}
+
+function formatBytes(n) {
+  if (n < 1024) return n + 'B';
+  if (n < 1048576) return (n/1024).toFixed(1) + 'KB';
+  return (n/1048576).toFixed(1) + 'MB';
+}
+
+function clearLog() {
+  document.getElementById('logArea').innerHTML = '<div class="log-empty">ログがクリアされました</div>';
+  logEmpty = true;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Enter key to send
+document.getElementById('msgInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && e.ctrlKey) sendMessage();
+});
+</script>
 </body>
 </html>
