@@ -1,5 +1,5 @@
-/* ============================================================
-   ToolBox — Modern UI (2026)
+﻿/* ============================================================
+   ツール置き場 — Modern UI (2026)
    Mesh gradients · Glassmorphism · Scroll animations · Bento
    ============================================================ */
 
@@ -712,3 +712,4 @@ label {
   .hero h1 { font-size: 1.8rem; }
   .tool-grid { grid-template-columns: 1fr; gap: 10px; }
 }
+

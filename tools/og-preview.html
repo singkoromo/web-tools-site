@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -12,10 +12,10 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OGPプレビュー - ToolBox</title>
+    <title>OGPプレビュー - ツール置き場</title>
     <meta name="description" content="OGP（Open Graph Protocol）タグを入力してSNSでのシェア表示をプレビュー。Twitter、Facebook、LINE、Slackでの見え方を確認できます。">
     <meta name="keywords" content="OGP, Open Graph, SNS, シェア, プレビュー, Twitter, Facebook">
-    <meta property="og:title" content="OGPプレビュー - ToolBox">
+    <meta property="og:title" content="OGPプレビュー - ツール置き場">
     <meta property="og:description" content="OGPタグを入力してSNSでのシェア表示をプレビュー。Twitter、Facebook、LINE、Slackでの見え方を確認できます。">
     <meta property="og:url" content="https://web-tool-site.com/tools/og-preview.html">
     <meta property="og:type" content="website">
@@ -89,7 +89,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
                 </svg>
-                ToolBox
+                ツール置き場
             </a>
             <nav class="nav">
                 <a href="../index.html">ホーム</a>
@@ -104,7 +104,7 @@
         <div class="input-section">
             <div class="field-group">
                 <label class="field-label">og:title <span class="field-hint">ページタイトル</span></label>
-                <input type="text" id="ogTitle" placeholder="例: ToolBox - 無料オンラインツール集" oninput="updatePreview()">
+                <input type="text" id="ogTitle" placeholder="例: ツール置き場 - 無料オンラインツール集" oninput="updatePreview()">
             </div>
             <div class="field-group">
                 <label class="field-label">og:description <span class="field-hint">ページの説明</span></label>
@@ -120,7 +120,7 @@
             </div>
             <div class="field-group">
                 <label class="field-label">og:site_name <span class="field-hint">サイト名</span></label>
-                <input type="text" id="ogSiteName" placeholder="例: ToolBox" oninput="updatePreview()">
+                <input type="text" id="ogSiteName" placeholder="例: ツール置き場" oninput="updatePreview()">
             </div>
             <div class="button-group">
                 <button class="btn-primary" onclick="updatePreview()">プレビュー更新</button>
@@ -211,7 +211,7 @@
                 <a href="../privacy.html">プライバシーポリシー</a>
                 <a href="../terms.html">利用規約</a>
             </div>
-            <p>&copy; 2026 ToolBox. All rights reserved.</p>
+            <p>&copy; 2026 ツール置き場. All rights reserved.</p>
         </div>
     </footer>
 
@@ -324,11 +324,11 @@
         }
 
         function loadExample() {
-            document.getElementById('ogTitle').value = 'ToolBox - 無料オンラインツール集';
+            document.getElementById('ogTitle').value = 'ツール置き場 - 無料オンラインツール集';
             document.getElementById('ogDesc').value = '開発者・クリエイター向け90種類の無料オンラインツール。ブラウザ完結でプライバシーも安全。';
             document.getElementById('ogUrl').value = 'https://web-tool-site.com/';
             document.getElementById('ogImage').value = 'https://web-tool-site.com/images/ogp.png';
-            document.getElementById('ogSiteName').value = 'ToolBox';
+            document.getElementById('ogSiteName').value = 'ツール置き場';
             updatePreview();
             showToast('サンプルを読み込みました');
         }
@@ -350,3 +350,4 @@
     </script>
 </body>
 </html>
+

@@ -1,7 +1,9 @@
-{
+﻿{
   "permissions": {
     "allow": [
-      "Bash(node add-ga4.js)"
+      "Bash(node add-ga4.js)",
+      "Bash(powershell -Command \"Get-ChildItem -Path . -Recurse -Include ''*.html'',''*.js'',''*.json'',''*.css'' | ForEach-Object { $c = Get-Content $_.FullName -Raw -Encoding UTF8; if \\($c -match ''ツール置き場''\\) { $c -replace ''ツール置き場'',''ツール置き場'' | Set-Content $_.FullName -Encoding UTF8; Write-Host $_.FullName } }\")"
     ]
   }
 }
+
