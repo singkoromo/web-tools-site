@@ -12,10 +12,10 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>お問い合わせ - ツール置き場</title>
-  <meta name="description" content="ツール置き場へのお問い合わせ。ご質問、ご要望、不具合報告などお気軽にご連絡ください。">
-  <meta property="og:title" content="お問い合わせ - ツール置き場">
-  <meta property="og:description" content="ツール置き場へのお問い合わせページです。">
+  <title>お問い合わせ - Web Tool Site</title>
+  <meta name="description" content="Web Tool Siteへのお問い合わせ。ご質問、ご要望、不具合報告などお気軽にご連絡ください。">
+  <meta property="og:title" content="お問い合わせ - Web Tool Site">
+  <meta property="og:description" content="Web Tool Siteへのお問い合わせページです。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://web-tool-site.com/contact.html">
   <link rel="canonical" href="https://web-tool-site.com/contact.html">
@@ -74,7 +74,7 @@
     <div class="header-inner">
       <a href="index.html" class="logo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
-        ツール置き場
+        Web Tool Site
       </a>
       <nav class="nav">
         <a href="index.html">ホーム</a>
@@ -182,7 +182,7 @@
         <a href="privacy.html">プライバシーポリシー</a>
         <a href="terms.html">利用規約</a>
       </div>
-      <p>&copy; 2026 ツール置き場. All rights reserved.</p>
+      <p>&copy; 2026 Web Tool Site. All rights reserved.</p>
       <p class="footer-note">すべてのツールはブラウザ上で動作します。データはサーバーに送信されません。</p>
     </div>
   </footer>
@@ -209,7 +209,7 @@
     const category = document.getElementById('category').value;
     const message = document.getElementById('message').value;
     const categoryLabels = { question: 'ご質問', request: '機能リクエスト', bug: '不具合報告', business: 'ビジネス', other: 'その他' };
-    const subject = encodeURIComponent(`[ツール置き場] ${categoryLabels[category] || 'お問い合わせ'}`);
+    const subject = encodeURIComponent(`[Web Tool Site] ${categoryLabels[category] || 'お問い合わせ'}`);
     const body = encodeURIComponent(`お名前: ${name}\nメールアドレス: ${email}\n種別: ${categoryLabels[category]}\n\n${message}`);
     window.location.href = `mailto:contact@web-tool-site.com?subject=${subject}&body=${body}`;
     document.getElementById('successMsg').style.display = 'block';

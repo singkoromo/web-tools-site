@@ -12,10 +12,10 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iCalendar (.ics) 生成 | ツール置き場</title>
+    <title>iCalendar (.ics) 生成 | Web Tool Site</title>
     <meta name="description" content="イベント情報からiCalendar形式(.ics)ファイルを生成する無料ツール。繰り返し設定対応。">
     <meta name="keywords" content="iCalendar, ics, イベント, カレンダー, 生成">
-    <meta name="author" content="ツール置き場">
+    <meta name="author" content="Web Tool Site">
     <link rel="canonical" href="./tools/ical-generator.html">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -351,7 +351,7 @@
     <!-- Header -->
     <header>
         <div class="header-container">
-            <a href="../index.html" class="logo">ツール置き場</a>
+            <a href="../index.html" class="logo">Web Tool Site</a>
             <nav>
                 <ul>
                     <li><a href="../index.html">ホーム</a></li>
@@ -514,7 +514,7 @@
             <a href="../privacy.html">プライバシーポリシー</a>
             <a href="../terms.html">利用規約</a>
         </div>
-        <p>&copy; 2026 ツール置き場. All rights reserved.</p>
+        <p>&copy; 2026 Web Tool Site. All rights reserved.</p>
     </div>
 </footer>
 
@@ -617,12 +617,12 @@
             }
 
             try {
-                const uid = 'ツール置き場-' + Date.now() + '@web-tool-site.com';
+                const uid = 'Web Tool Site-' + Date.now() + '@web-tool-site.com';
                 const now = new Date().toISOString().replace(/[-:.]/g, '').split('Z')[0] + 'Z';
 
                 let ics = 'BEGIN:VCALENDAR\n';
                 ics += 'VERSION:2.0\n';
-                ics += 'PRODID:-//ツール置き場//Calendar//EN\n';
+                ics += 'PRODID:-//Web Tool Site//Calendar//EN\n';
                 ics += 'CALSCALE:GREGORIAN\n';
                 ics += 'METHOD:PUBLISH\n';
                 ics += 'BEGIN:VEVENT\n';
